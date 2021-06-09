@@ -68,9 +68,13 @@ class Gitea:
         repo_name_convertor: Callable[
             [User], Optional[str]
         ] = default_repo_name_convertor,
-    ) -> None:
+    ) -> List[str]:
+        repo_names = []
         for student in students:
             repo_name = repo_name_convertor(student)
+            if repo_name is None:
+                continue
+            repo_names.append(repo_name)
             repo: Dict[str, Any] = self.organization_api.create_org_repo(
                 self.org_name,
                 body={
@@ -87,6 +91,7 @@ class Gitea:
                 repo["name"],
                 self.__get_username_by_student_id(student.sis_login_id),
             )
+        return repo_names
 
     def create_teams_and_repos_by_canvas_groups(
         self,
@@ -95,13 +100,15 @@ class Gitea:
         team_name_convertor: Callable[[str], Optional[str]] = lambda name: name,
         repo_name_convertor: Callable[[str], Optional[str]] = lambda name: name,
         permission: PermissionEnum = PermissionEnum.write,
-    ) -> None:
+    ) -> List[str]:
+        repo_names = []
         group: Group
         for group in groups:
             team_name = team_name_convertor(group.name)
             repo_name = repo_name_convertor(group.name)
             if team_name is None or repo_name is None:
                 continue
+            repo_names.append(repo_name)
             team: Dict[str, Any] = self.organization_api.org_create_team(
                 self.org_name,
                 body={
@@ -145,6 +152,7 @@ class Gitea:
                 self.organization_api.org_add_team_member(
                     team["id"], self.__get_username_by_student_id(student.sis_login_id)
                 )
+        return repo_names
 
     def get_public_key_of_students(
         self, students: PaginatedList
