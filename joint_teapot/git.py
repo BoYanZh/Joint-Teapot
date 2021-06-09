@@ -22,10 +22,10 @@ class Git:
             branch="master",
         )
 
-    def repo_checkout_to_tag(self, repo_name: str, tag_name: str) -> str:
+    def repo_clean_and_checkout(self, repo_name: str, checkout_dest: str) -> str:
         repo = self.__get_repo(repo_name)
         repo.git.fetch("--tags", "--all", "-f")
         repo.git.reset("--hard", f"origin/master")
         repo.git.clean("-d", "-f", "-x")
-        repo.git.checkout(f"tags/{tag_name}")
+        repo.git.checkout(checkout_dest)
         return os.path.join(self.repos_dir, repo_name)
