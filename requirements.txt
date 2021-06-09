@@ -1,0 +1,3 @@
+canvasapi>=2.2.0
+focs_gitea>=1.0.0
+pydantic[dotenv]>=1.8.1
