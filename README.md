@@ -25,3 +25,11 @@ pip3 install -r requirements-dev.txt
 pre-commit install
 pytest -svv
 ```
+
+## Features
+
+- [ ] retreive the hw/project releases for all students
+- [ ] open "bulk issues" to report something wrong
+- [x] collect all the public keys
+- [x] import groups (create teams)
+- [x] create repos
