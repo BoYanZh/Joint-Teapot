@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     gitea_access_token: str = ""
     org_name: str = ""
 
+    # git
+    repos_dir: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
