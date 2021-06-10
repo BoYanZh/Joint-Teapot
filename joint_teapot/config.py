@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     org_name: str = ""
 
     # git
-    repos_dir: str = ""
+    repos_dir: str = "./repos"
 
     class Config:
         env_file = ".env"
