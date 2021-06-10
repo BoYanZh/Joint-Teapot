@@ -1,7 +1,8 @@
 from canvasapi import Canvas as PyCanvas
-from canvasapi.group import Group, GroupMembership
 
 from joint_teapot.config import settings
+
+# from canvasapi.group import Group, GroupMembership
 
 
 class Canvas:
@@ -17,20 +18,19 @@ class Canvas:
         )
         self.assignments = self.course.get_assignments()
         self.groups = self.course.get_groups()
-        # for attr in ["sis_login_id", "sortable_name"]:
-        #     assert hasattr(
-        #         self.students[0], attr
-        #     ), f"Unable to gather students' {attr}, please contact the Canvas site admin"
-        group: Group
-        for group in self.groups:
-            membership: GroupMembership
-            print(group.__dict__)
-            for membership in group.get_memberships():
-                print(membership.user_id, end=", ")
-            print("")
+        for attr in ["sis_login_id", "sortable_name"]:
+            if not hasattr(self.students[0], attr):
+                raise Exception(
+                    f"Unable to gather students' {attr}, please contact the Canvas site admin"
+                )
+        # group: Group
+        # for group in self.groups:
+        #     membership: GroupMembership
+        #     print(group.__dict__)
+        #     for membership in group.get_memberships():
+        #         print(membership.user_id, end=", ")
+        #     print("")
 
 
 if __name__ == "__main__":
     canvas = Canvas()
-    # for student in canvas.students:
-    #     print(student.__dict__)

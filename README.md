@@ -28,7 +28,7 @@ pytest -svv
 
 ## Features
 
-- [ ] retreive the hw/project releases for all students
+- [x] retrieve the hw/project releases for all students
 - [x] open "bulk issues" to report something wrong
 - [x] collect all the public keys
 - [x] import groups (create teams)
