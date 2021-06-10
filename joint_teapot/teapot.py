@@ -1,6 +1,8 @@
+from datetime import datetime
 from typing import Any, Dict, List
 
 from joint_teapot import Canvas, Git, Gitea
+from joint_teapot.utils import first
 
 
 class Teapot:
@@ -33,6 +35,26 @@ class Teapot:
     ) -> None:
         for repo_name in repo_names:
             self.gitea.create_issue(repo_name, title, body)
+
+    def checkout_to_repos_by_release_name(
+        self,
+        repo_names: List[str],
+        release_name: str,
+        due: datetime = datetime(3000, 1, 1),
+    ) -> List[str]:
+        failed_repos = []
+        repos_releases = self.gitea.get_repos_releases(repo_names)
+        for repo_name, repo_releases in zip(repo_names, repos_releases):
+            release = first(repo_releases, lambda item: item["name"] == release_name)
+            if (
+                release is None
+                or datetime.strptime(release["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                >= due
+            ):
+                failed_repos.append(repo_name)
+                continue
+            self.git.repo_clean_and_checkout(repo_name, f"tags/{release['tag_name']}")
+        return failed_repos
 
 
 if __name__ == "__main__":

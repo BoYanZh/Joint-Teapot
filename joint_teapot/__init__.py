@@ -1,4 +1,4 @@
-from joint_teapot.canvas import Canvas as Canvas
-from joint_teapot.git import Git as Git
-from joint_teapot.gitea import Gitea as Gitea
 from joint_teapot.teapot import Teapot as Teapot
+from joint_teapot.workers import Canvas as Canvas
+from joint_teapot.workers import Git as Git
+from joint_teapot.workers import Gitea as Gitea

@@ -6,12 +6,6 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     """
     Define the settings (config).
-
-    The selected value is determined as follows (in descending order of priority):
-    1. The command line arguments, e.g., '--db-host' is mapped to 'db-host'
-    2. Environment variables, e.g., '$DB_HOST' is mapped to 'db-host'
-    3. Variables loaded from a dotenv (.env) file
-    4. The default field values for the Settings model
     """
 
     # canvas
