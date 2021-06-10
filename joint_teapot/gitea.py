@@ -49,8 +49,8 @@ class Gitea:
         return res["data"][0]["id"]
 
     @lru_cache
-    def __get_username_by_student_id(self, student_id: str) -> str:
-        res = self.user_api.user_search(q=student_id, limit=1)
+    def __get_username_by_canvas_student(self, student: User) -> str:
+        res = self.user_api.user_search(q=student.sis_login_id, limit=1)
         return res["data"][0]["username"]
 
     def add_canvas_students_to_teams(
@@ -59,7 +59,7 @@ class Gitea:
         for team_name in team_names:
             team_id = self.__get_team_id_by_name(team_name)
             for student in students:
-                username = self.__get_username_by_student_id(student.sis_login_id)
+                username = self.__get_username_by_canvas_student(student)
                 self.organization_api.org_add_team_member(team_id, username)
 
     def create_personal_repos_for_canvas_students(
@@ -89,7 +89,7 @@ class Gitea:
             self.repository_api.repo_add_collaborator(
                 self.org_name,
                 repo["name"],
-                self.__get_username_by_student_id(student.sis_login_id),
+                self.__get_username_by_canvas_student(student),
             )
         return repo_names
 
@@ -150,7 +150,7 @@ class Gitea:
                         f"student with user_id {membership.user_id} not found"
                     )
                 self.organization_api.org_add_team_member(
-                    team["id"], self.__get_username_by_student_id(student.sis_login_id)
+                    team["id"], self.__get_username_by_canvas_student(student)
                 )
         return repo_names
 
@@ -158,9 +158,7 @@ class Gitea:
         self, students: PaginatedList
     ) -> List[List[Dict[str, Any]]]:
         return [
-            self.user_api.user_list_keys(
-                self.__get_username_by_student_id(student.sis_login_id)
-            )
+            self.user_api.user_list_keys(self.__get_username_by_canvas_student(student))
             for student in students
         ]
 
