@@ -33,3 +33,4 @@ pytest -svv
 - [x] collect all the public keys
 - [x] import groups (create teams)
 - [x] create repos
+- [ ] archive all repos of a course
