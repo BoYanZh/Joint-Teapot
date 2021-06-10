@@ -140,7 +140,7 @@ class Gitea:
                 },
             )
             self.organization_api.org_add_team_repository(
-                team["id"], self.org_name, repo["name"]
+                team["id"], self.org_name, repo_name
             )
             membership: GroupMembership
             for membership in group.get_memberships():
@@ -149,18 +149,52 @@ class Gitea:
                     raise Exception(
                         f"student with user_id {membership.user_id} not found"
                     )
-                self.organization_api.org_add_team_member(
-                    team["id"], self.__get_username_by_canvas_student(student)
+                username = self.__get_username_by_canvas_student(student)
+                self.organization_api.org_add_team_member(team["id"])
+                self.repository_api.repo_add_collaborator(
+                    self.org_name, repo_name, username
                 )
         return repo_names
 
-    def get_public_key_of_students(
+    def get_public_key_of_canvas_students(
         self, students: PaginatedList
     ) -> List[List[Dict[str, Any]]]:
         return [
             self.user_api.user_list_keys(self.__get_username_by_canvas_student(student))
             for student in students
         ]
+
+    def get_repos_releases(self, repo_names: List[str]) -> List[List[Dict[str, Any]]]:
+        return [
+            self.repository_api.repo_list_releases(self.org_name, repo_name)
+            for repo_name in repo_names
+        ]
+
+    def get_all_repo_names(self) -> List[str]:
+        return [
+            data["name"] for data in self.organization_api.org_list_repos(self.org_name)
+        ]
+
+    def create_issue(
+        self,
+        repo_name: str,
+        title: str,
+        body: str,
+        assign_every_collaborators: bool = True,
+    ) -> None:
+        assignees = []
+        if assign_every_collaborators:
+            assignees = [
+                item["username"]
+                for item in self.repository_api.repo_list_collaborators(
+                    self.org_name, repo_name
+                )
+            ]
+        self.issue_api.issue_create_issue(
+            self.org_name,
+            repo_name,
+            body={"title": title, "body": body, "assignees": assignees},
+        )
 
 
 if __name__ == "__main__":
