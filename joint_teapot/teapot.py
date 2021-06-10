@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict, List
 
-from joint_teapot import Canvas, Git, Gitea
 from joint_teapot.utils import first
+from joint_teapot.workers import Canvas, Git, Gitea
 
 
 class Teapot:

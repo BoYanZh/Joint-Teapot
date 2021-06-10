@@ -42,5 +42,6 @@ setup(
     maintainer_email="bomingzh@sjtu.edu.cn",
     packages=find_packages(),
     python_requires=">=3.6",
+    entry_points={"console_scripts": ["joint-teapot=joint_teapot:main"]},
     install_requires=get_install_requires(),
 )
