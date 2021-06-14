@@ -14,19 +14,19 @@ class Git:
             raise Exception(f"{repos_dir} does not exist! Create it first.")
         self.repos_dir = repos_dir
 
-    def clone_repo(self, repo_name: str) -> Repo:
+    def clone_repo(self, repo_name: str, branch: str = "master") -> Repo:
         repo_dir = os.path.join(self.repos_dir, repo_name)
         return Repo.clone_from(
-            f"https://focs.ji.sjtu.edu.cn/git/{self.org_name}/{repo_name}",
+            f"ssh://git@focs.ji.sjtu.edu.cn:2222/{self.org_name}/{repo_name}.git",
             repo_dir,
-            branch="master",
+            branch=branch,
         )
 
     def get_repo(self, repo_name: str) -> Repo:
         repo_dir = os.path.join(self.repos_dir, repo_name)
         if os.path.exists(repo_dir):
             return Repo(repo_dir)
-        return self.clone_repo(repo_dir)
+        return self.clone_repo(repo_name)
 
     def repo_clean_and_checkout(self, repo_name: str, checkout_dest: str) -> str:
         repo_dir = os.path.join(self.repos_dir, repo_name)

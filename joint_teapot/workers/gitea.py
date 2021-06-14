@@ -46,6 +46,8 @@ class Gitea:
     @lru_cache
     def __get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
+        if len(res["data"]) == 0:
+            raise Exception("Team not found by name")
         return res["data"][0]["id"]
 
     @lru_cache
@@ -75,7 +77,7 @@ class Gitea:
             if repo_name is None:
                 continue
             repo_names.append(repo_name)
-            repo: Dict[str, Any] = self.organization_api.create_org_repo(
+            repo = self.organization_api.create_org_repo(
                 self.org_name,
                 body={
                     "auto_init": False,
@@ -87,9 +89,7 @@ class Gitea:
                 },
             )
             self.repository_api.repo_add_collaborator(
-                self.org_name,
-                repo["name"],
-                self.__get_username_by_canvas_student(student),
+                self.org_name, repo.name, self.__get_username_by_canvas_student(student)
             )
         return repo_names
 
@@ -109,7 +109,7 @@ class Gitea:
             if team_name is None or repo_name is None:
                 continue
             repo_names.append(repo_name)
-            team: Dict[str, Any] = self.organization_api.org_create_team(
+            team = self.organization_api.org_create_team(
                 self.org_name,
                 body={
                     "can_create_org_repo": False,
@@ -128,7 +128,7 @@ class Gitea:
                     ],
                 },
             )
-            repo: Dict[str, Any] = self.organization_api.create_org_repo(
+            repo = self.organization_api.create_org_repo(
                 self.org_name,
                 body={
                     "auto_init": False,
@@ -140,7 +140,7 @@ class Gitea:
                 },
             )
             self.organization_api.org_add_team_repository(
-                team["id"], self.org_name, repo_name
+                team.id, self.org_name, repo_name
             )
             membership: GroupMembership
             for membership in group.get_memberships():
@@ -150,7 +150,7 @@ class Gitea:
                         f"student with user_id {membership.user_id} not found"
                     )
                 username = self.__get_username_by_canvas_student(student)
-                self.organization_api.org_add_team_member(team["id"])
+                self.organization_api.org_add_team_member(team.id)
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo_name, username
                 )
@@ -172,7 +172,7 @@ class Gitea:
 
     def get_all_repo_names(self) -> List[str]:
         return [
-            data["name"] for data in self.organization_api.org_list_repos(self.org_name)
+            data.name for data in self.organization_api.org_list_repos(self.org_name)
         ]
 
     def create_issue(
@@ -185,7 +185,7 @@ class Gitea:
         assignees = []
         if assign_every_collaborators:
             assignees = [
-                item["username"]
+                item.username
                 for item in self.repository_api.repo_list_collaborators(
                     self.org_name, repo_name
                 )
