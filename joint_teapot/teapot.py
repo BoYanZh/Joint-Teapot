@@ -6,10 +6,27 @@ from joint_teapot.workers import Canvas, Git, Gitea
 
 
 class Teapot:
-    def __init__(self) -> None:
-        self.canvas = Canvas()
-        self.gitea = Gitea()
-        self.git = Git()
+    _canvas = None
+    _gitea = None
+    _git = None
+
+    @property
+    def canvas(self) -> Canvas:
+        if not self._canvas:
+            self._canvas = Canvas()
+        return self._canvas
+
+    @property
+    def gitea(self) -> Gitea:
+        if not self._gitea:
+            self._gitea = Gitea()
+        return self._gitea
+
+    @property
+    def git(self) -> Git:
+        if not self._git:
+            self._git = Git()
+        return self._git
 
     def create_personal_repos_for_all_canvas_students(self) -> List[str]:
         return self.gitea.create_personal_repos_for_canvas_students(
