@@ -16,6 +16,7 @@ source env/Scripts/activate
 ```bash
 pip3 install -e .
 vi .env # configure environment
+joint-teapot --help
 ```
 
 ### For developers
