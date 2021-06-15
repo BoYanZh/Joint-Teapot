@@ -44,14 +44,14 @@ class Gitea:
         self.user_api = focs_gitea.UserApi(self.api_client)
 
     @lru_cache
-    def __get_team_id_by_name(self, name: str) -> int:
+    def _get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
         if len(res["data"]) == 0:
             raise Exception("Team not found by name")
         return res["data"][0]["id"]
 
     @lru_cache
-    def __get_username_by_canvas_student(self, student: User) -> str:
+    def _get_username_by_canvas_student(self, student: User) -> str:
         res = self.user_api.user_search(q=student.sis_login_id, limit=1)
         return res["data"][0]["username"]
 
@@ -59,9 +59,9 @@ class Gitea:
         self, students: PaginatedList, team_names: List[str]
     ) -> None:
         for team_name in team_names:
-            team_id = self.__get_team_id_by_name(team_name)
+            team_id = self._get_team_id_by_name(team_name)
             for student in students:
-                username = self.__get_username_by_canvas_student(student)
+                username = self._get_username_by_canvas_student(student)
                 self.organization_api.org_add_team_member(team_id, username)
 
     def create_personal_repos_for_canvas_students(
@@ -89,7 +89,7 @@ class Gitea:
                 },
             )
             self.repository_api.repo_add_collaborator(
-                self.org_name, repo.name, self.__get_username_by_canvas_student(student)
+                self.org_name, repo.name, self._get_username_by_canvas_student(student)
             )
         return repo_names
 
@@ -149,7 +149,7 @@ class Gitea:
                     raise Exception(
                         f"student with user_id {membership.user_id} not found"
                     )
-                username = self.__get_username_by_canvas_student(student)
+                username = self._get_username_by_canvas_student(student)
                 self.organization_api.org_add_team_member(team.id)
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo_name, username
@@ -160,7 +160,7 @@ class Gitea:
         self, students: PaginatedList
     ) -> List[List[Dict[str, Any]]]:
         return [
-            self.user_api.user_list_keys(self.__get_username_by_canvas_student(student))
+            self.user_api.user_list_keys(self._get_username_by_canvas_student(student))
             for student in students
         ]
 
