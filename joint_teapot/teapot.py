@@ -53,6 +53,15 @@ class Teapot:
         for repo_name in repo_names:
             self.gitea.create_issue(repo_name, title, body)
 
+    def check_exist_issue_by_title(
+        self, repo_names: List[str], title: str
+    ) -> List[str]:
+        res = []
+        for repo_name in repo_names:
+            if not self.gitea.check_exist_issue_by_title(repo_name, title):
+                res.append(repo_name)
+        return res
+
     def checkout_to_repos_by_release_name(
         self,
         repo_names: List[str],

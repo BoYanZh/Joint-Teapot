@@ -196,6 +196,12 @@ class Gitea:
             body={"title": title, "body": body, "assignees": assignees},
         )
 
+    def check_exist_issue_by_title(self, repo_name: str, title: str) -> bool:
+        for issue in self.issue_api.issue_list_issues(self.org_name, repo_name):
+            if issue.title == title:
+                return True
+        return False
+
 
 if __name__ == "__main__":
     gitea = Gitea()
