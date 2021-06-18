@@ -1,6 +1,5 @@
-from joint_teapot.__main__ import run
-from joint_teapot.teapot import Teapot as Teapot
+from joint_teapot.__main__ import app
 
 
 def main() -> None:
-    run()
+    app()
