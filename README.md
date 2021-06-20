@@ -35,3 +35,4 @@ pytest -svv
 - [x] import groups (create teams)
 - [x] create repos
 - [x] archive all repos of a course
+- [x] check whether an issue exists with appointed title
