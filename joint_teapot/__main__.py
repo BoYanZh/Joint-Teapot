@@ -3,6 +3,7 @@ __version__ = "0.0.0"
 from datetime import datetime
 from typing import List
 
+from loguru import logger
 from typer import Typer, echo
 
 from joint_teapot.teapot import Teapot
@@ -32,7 +33,7 @@ def create_teams_and_repos_by_canvas_groups() -> None:
 
 @app.command("get-public-keys", help="get all public keys on gitea")
 def get_public_key_of_all_canvas_students() -> None:
-    echo(teapot.get_public_key_of_all_canvas_students())
+    echo("\n".join(teapot.get_public_key_of_all_canvas_students()))
 
 
 @app.command("archieve", help="clone all gitea repos to local")
@@ -47,7 +48,7 @@ def create_issue_for_repos(repo_names: List[str], title: str, body: str) -> None
 
 @app.command("check-issues", help="check the existence of issue by title on gitea")
 def check_exist_issue_by_title(repo_names: List[str], title: str) -> None:
-    echo(teapot.check_exist_issue_by_title(repo_names, title))
+    echo("\n".join(teapot.check_exist_issue_by_title(repo_names, title)))
 
 
 @app.command(
@@ -61,4 +62,7 @@ def checkout_to_repos_by_release_name(
 
 
 if __name__ == "__main__":
-    app()
+    try:
+        app()
+    except Exception:
+        logger.exception("Unexpected error:")

@@ -1,6 +1,8 @@
 import os
 import sys
 
+from loguru import logger
+
 current_path = sys.path[0]
 sys.path.remove(current_path)
 from git import Repo
@@ -12,12 +14,15 @@ from joint_teapot.config import settings
 
 class Git:
     def __init__(
-        self, org_name: str = settings.org_name, repos_dir: str = settings.repos_dir
+        self,
+        org_name: str = settings.gitea_org_name,
+        repos_dir: str = settings.repos_dir,
     ):
         self.org_name = org_name
         if not os.path.isdir(repos_dir):
             raise Exception(f"{repos_dir} does not exist! Create it first.")
         self.repos_dir = repos_dir
+        logger.info("Git initialized.")
 
     def clone_repo(self, repo_name: str, branch: str = "master") -> Repo:
         repo_dir = os.path.join(self.repos_dir, repo_name)

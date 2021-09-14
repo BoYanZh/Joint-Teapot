@@ -1,6 +1,9 @@
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import List
 
+from loguru import logger
+
+from joint_teapot.config import settings
 from joint_teapot.utils import first
 from joint_teapot.workers import Canvas, Git, Gitea
 
@@ -28,6 +31,12 @@ class Teapot:
             self._git = Git()
         return self._git
 
+    def __init__(self) -> None:
+        logger.info(
+            f"Settings loaded. Canvas Course ID: {settings.canvas_course_id}, Gitea Organization name: {settings.gitea_org_name}"
+        )
+        logger.info("Teapot initialized.")
+
     def add_all_canvas_students_to_teams(self, team_names: List[str]) -> None:
         return self.gitea.add_canvas_students_to_teams(self.canvas.students, team_names)
 
@@ -41,7 +50,7 @@ class Teapot:
             self.canvas.students, self.canvas.groups
         )
 
-    def get_public_key_of_all_canvas_students(self) -> List[List[Dict[str, Any]]]:
+    def get_public_key_of_all_canvas_students(self) -> List[str]:
         return self.gitea.get_public_key_of_canvas_students(self.canvas.students)
 
     def archieve_all_repos(self) -> List[str]:

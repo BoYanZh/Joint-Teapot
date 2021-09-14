@@ -11,7 +11,7 @@ python3 -m venv env
 source env/Scripts/activate
 ```
 
-### Install
+### Install & Run
 
 ```bash
 pip3 install -e .

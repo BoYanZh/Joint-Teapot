@@ -7,6 +7,7 @@ import focs_gitea
 from canvasapi.group import Group, GroupMembership
 from canvasapi.paginated_list import PaginatedList
 from canvasapi.user import User
+from loguru import logger
 
 from joint_teapot.config import settings
 from joint_teapot.utils import first
@@ -29,7 +30,7 @@ class Gitea:
     def __init__(
         self,
         access_token: str = settings.gitea_access_token,
-        org_name: str = settings.org_name,
+        org_name: str = settings.gitea_org_name,
     ):
         self.org_name = org_name
         configuration = focs_gitea.Configuration()
@@ -42,6 +43,7 @@ class Gitea:
         self.repository_api = focs_gitea.RepositoryApi(self.api_client)
         self.settings_api = focs_gitea.SettingsApi(self.api_client)
         self.user_api = focs_gitea.UserApi(self.api_client)
+        logger.info("Gitea initialized.")
 
     @lru_cache()
     def _get_team_id_by_name(self, name: str) -> int:
@@ -67,7 +69,7 @@ class Gitea:
                     username = self._get_username_by_canvas_student(student)
                     self.organization_api.org_add_team_member(team_id, username)
                 except Exception as e:
-                    print(e)
+                    logger.error(e)
 
     def create_personal_repos_for_canvas_students(
         self,
@@ -93,9 +95,13 @@ class Gitea:
                     "trust_model": "default",
                 },
             )
-            self.repository_api.repo_add_collaborator(
-                self.org_name, repo.name, self._get_username_by_canvas_student(student)
-            )
+            try:
+                username = self._get_username_by_canvas_student(student)
+                self.repository_api.repo_add_collaborator(
+                    self.org_name, repo.name, username
+                )
+            except Exception as e:
+                logger.error(e)
         return repo_names
 
     def create_teams_and_repos_by_canvas_groups(
@@ -161,13 +167,17 @@ class Gitea:
                 )
         return repo_names
 
-    def get_public_key_of_canvas_students(
-        self, students: PaginatedList
-    ) -> List[List[Dict[str, Any]]]:
-        return [
-            self.user_api.user_list_keys(self._get_username_by_canvas_student(student))
-            for student in students
-        ]
+    def get_public_key_of_canvas_students(self, students: PaginatedList) -> List[str]:
+        res = []
+        for student in students:
+            try:
+                username = self._get_username_by_canvas_student(student)
+                res.extend(
+                    [item.key for item in self.user_api.user_list_keys(username)]
+                )
+            except Exception as e:
+                logger.error(e)
+        return res
 
     def get_repos_releases(self, repo_names: List[str]) -> List[List[Dict[str, Any]]]:
         return [

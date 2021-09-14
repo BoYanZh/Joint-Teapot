@@ -10,11 +10,11 @@ class Settings(BaseSettings):
 
     # canvas
     canvas_access_token: str = ""
-    course_id: int = 0
+    canvas_course_id: int = 0
 
     # gitea
     gitea_access_token: str = ""
-    org_name: str = ""
+    gitea_org_name: str = ""
 
     # git
     repos_dir: str = "./repos"
