@@ -47,12 +47,14 @@ class Gitea:
     def _get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
         if len(res["data"]) == 0:
-            raise Exception("Team not found by name")
+            raise Exception(f"Team not found by name {name}")
         return res["data"][0]["id"]
 
     @lru_cache()
     def _get_username_by_canvas_student(self, student: User) -> str:
         res = self.user_api.user_search(q=student.sis_login_id, limit=1)
+        if len(res["data"]) == 0:
+            raise Exception(f"User not found by canvas student {student}")
         return res["data"][0]["username"]
 
     def add_canvas_students_to_teams(
@@ -61,8 +63,11 @@ class Gitea:
         for team_name in team_names:
             team_id = self._get_team_id_by_name(team_name)
             for student in students:
-                username = self._get_username_by_canvas_student(student)
-                self.organization_api.org_add_team_member(team_id, username)
+                try:
+                    username = self._get_username_by_canvas_student(student)
+                    self.organization_api.org_add_team_member(team_id, username)
+                except Exception as e:
+                    print(e)
 
     def create_personal_repos_for_canvas_students(
         self,

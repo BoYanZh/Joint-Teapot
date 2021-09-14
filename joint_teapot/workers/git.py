@@ -1,6 +1,11 @@
 import os
+import sys
 
+current_path = sys.path[0]
+sys.path.remove(current_path)
 from git import Repo
+
+sys.path.insert(0, current_path)
 
 from joint_teapot.config import settings
 

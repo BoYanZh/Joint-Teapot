@@ -28,6 +28,9 @@ class Teapot:
             self._git = Git()
         return self._git
 
+    def add_all_canvas_students_to_teams(self, team_names: List[str]) -> None:
+        return self.gitea.add_canvas_students_to_teams(self.canvas.students, team_names)
+
     def create_personal_repos_for_all_canvas_students(self) -> List[str]:
         return self.gitea.create_personal_repos_for_canvas_students(
             self.canvas.students
