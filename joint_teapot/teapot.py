@@ -1,5 +1,6 @@
+import functools
 from datetime import datetime
-from typing import List
+from typing import Any, Callable, List
 
 from loguru import logger
 
@@ -8,6 +9,29 @@ from joint_teapot.utils import first
 from joint_teapot.workers import Canvas, Git, Gitea
 
 
+def for_all_methods(decorator: Callable[..., Any]) -> Callable[..., Any]:
+    def decorate(cls: Any) -> Any:
+        print(type(cls))
+        for attr in cls.__dict__:  # there's propably a better way to do this
+            if callable(getattr(cls, attr)):
+                setattr(cls, attr, decorator(getattr(cls, attr)))
+        return cls
+
+    return decorate
+
+
+def log_exception_in_loguru(func: Callable[..., Any]) -> Callable[..., Any]:
+    @functools.wraps(func)
+    def decorator(*args: Any, **kwargs: Any) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.exception(e)
+
+    return decorator
+
+
+@for_all_methods(log_exception_in_loguru)
 class Teapot:
     _canvas = None
     _gitea = None
