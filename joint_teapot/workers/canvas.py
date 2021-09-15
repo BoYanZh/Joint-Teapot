@@ -18,7 +18,7 @@ class Canvas:
         self.students = self.course.get_users(
             enrollment_type=["student"], include=["email"]
         )
-        for attr in ["sis_login_id", "sortable_name"]:
+        for attr in ["sis_login_id", "sortable_name", "name"]:
             if not hasattr(self.students[0], attr):
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"

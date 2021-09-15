@@ -7,6 +7,7 @@ import focs_gitea
 from canvasapi.group import Group, GroupMembership
 from canvasapi.paginated_list import PaginatedList
 from canvasapi.user import User
+from focs_gitea.rest import ApiException
 from loguru import logger
 
 from joint_teapot.config import settings
@@ -20,8 +21,9 @@ class PermissionEnum(Enum):
 
 
 def default_repo_name_convertor(user: User) -> Optional[str]:
-    id, name = user.sis_login_id, user.sortable_name
+    id, name = user.sis_login_id, user.name
     eng = re.sub("[\u4e00-\u9fa5]", "", name)
+    eng = eng.replace(",", "")
     eng = "".join([word[0].capitalize() + word[1:] for word in eng.split()])
     return f"{eng}{id}"
 
@@ -84,22 +86,25 @@ class Gitea:
             if repo_name is None:
                 continue
             repo_names.append(repo_name)
-            repo = self.organization_api.create_org_repo(
-                self.org_name,
-                body={
-                    "auto_init": False,
-                    "default_branch": "master",
-                    "name": repo_name,
-                    "private": True,
-                    "template": False,
-                    "trust_model": "default",
-                },
-            )
+            body = {
+                "auto_init": False,
+                "default_branch": "master",
+                "name": repo_name,
+                "private": True,
+                "template": False,
+                "trust_model": "default",
+            }
             try:
+                repo = self.organization_api.create_org_repo(self.org_name, body=body)
                 username = self._get_username_by_canvas_student(student)
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo.name, username
                 )
+            except ApiException as e:
+                if e.status == 409:
+                    logger.info(f"Peronsal repo for {student} already exists.")
+                else:
+                    logger.error(e)
             except Exception as e:
                 logger.error(e)
         return repo_names
