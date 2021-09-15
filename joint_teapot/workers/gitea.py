@@ -166,7 +166,7 @@ class Gitea:
                         f"student with user_id {membership.user_id} not found"
                     )
                 username = self._get_username_by_canvas_student(student)
-                self.organization_api.org_add_team_member(team.id)
+                self.organization_api.org_add_team_member(team.id, username)
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo_name, username
                 )
