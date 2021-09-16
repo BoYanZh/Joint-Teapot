@@ -3,10 +3,10 @@ __version__ = "0.0.0"
 from datetime import datetime
 from typing import List
 
-from loguru import logger
 from typer import Typer, echo
 
 from joint_teapot.teapot import Teapot
+from joint_teapot.utils.logger import logger
 
 app = Typer(add_completion=False)
 teapot = Teapot()
@@ -20,7 +20,8 @@ def add_all_canvas_students_to_teams(team_names: List[str]) -> None:
 
 
 @app.command(
-    "create-personal", help="create personal repos on gitea for all canvas students"
+    "create-personal-repos",
+    help="create personal repos on gitea for all canvas students",
 )
 def create_personal_repos_for_all_canvas_students() -> None:
     teapot.create_personal_repos_for_all_canvas_students()
@@ -36,9 +37,9 @@ def get_public_key_of_all_canvas_students() -> None:
     echo("\n".join(teapot.get_public_key_of_all_canvas_students()))
 
 
-@app.command("archieve", help="clone all gitea repos to local")
-def archieve_all_repos() -> None:
-    teapot.archieve_all_repos()
+@app.command("clone-all-repos", help="clone all gitea repos to local")
+def clone_all_repos() -> None:
+    teapot.clone_all_repos()
 
 
 @app.command("create-issues", help="create issues on gitea")
@@ -52,13 +53,25 @@ def check_exist_issue_by_title(repo_names: List[str], title: str) -> None:
 
 
 @app.command(
-    "get-release",
+    "get-releases",
     help="checkout git repo to git tag fetched from gitea by release name, with due date",
 )
 def checkout_to_repos_by_release_name(
     repo_names: List[str], release_name: str, due: datetime = datetime(3000, 1, 1)
 ) -> None:
     teapot.checkout_to_repos_by_release_name(repo_names, release_name, due)
+
+
+@app.command(
+    "close-all-issues", help="close all issues and pull requests in gitea organization"
+)
+def close_all_issues() -> None:
+    teapot.close_all_issues()
+
+
+@app.command("archieve-all-repos", help="archieve all repos in gitea organization")
+def archieve_all_repos() -> None:
+    teapot.archieve_all_repos()
 
 
 if __name__ == "__main__":

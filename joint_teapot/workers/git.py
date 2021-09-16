@@ -1,7 +1,7 @@
 import os
 import sys
 
-from loguru import logger
+from joint_teapot.utils.logger import logger
 
 current_path = sys.path[0]
 sys.path.remove(current_path)

@@ -8,10 +8,10 @@ from canvasapi.group import Group, GroupMembership
 from canvasapi.paginated_list import PaginatedList
 from canvasapi.user import User
 from focs_gitea.rest import ApiException
-from loguru import logger
 
 from joint_teapot.config import settings
-from joint_teapot.utils import first
+from joint_teapot.utils.logger import logger
+from joint_teapot.utils.main import first
 
 
 class PermissionEnum(Enum):
@@ -26,6 +26,19 @@ def default_repo_name_convertor(user: User) -> Optional[str]:
     eng = eng.replace(",", "")
     eng = "".join([word[0].capitalize() + word[1:] for word in eng.split()])
     return f"{eng}{id}"
+
+
+def list_all(method: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    all_res = []
+    page = 1
+    while True:
+        res = method(*args, **kwargs, page=page)
+        if not res:
+            break
+        for item in res:
+            all_res.append(item)
+        page += 1
+    return all_res
 
 
 class Gitea:
@@ -95,16 +108,19 @@ class Gitea:
                 "trust_model": "default",
             }
             try:
-                repo = self.organization_api.create_org_repo(self.org_name, body=body)
+                try:
+                    repo = self.organization_api.create_org_repo(
+                        self.org_name, body=body
+                    )
+                except ApiException as e:
+                    if e.status == 409:
+                        logger.warning(f"Peronsal repo for {student} already exists.")
+                    else:
+                        raise (e)
                 username = self._get_username_by_canvas_student(student)
                 self.repository_api.repo_add_collaborator(
-                    self.org_name, repo.name, username
+                    self.org_name, repo_name, username
                 )
-            except ApiException as e:
-                if e.status == 409:
-                    logger.info(f"Peronsal repo for {student} already exists.")
-                else:
-                    logger.error(e)
             except Exception as e:
                 logger.error(e)
         return repo_names
@@ -178,7 +194,10 @@ class Gitea:
             try:
                 username = self._get_username_by_canvas_student(student)
                 res.extend(
-                    [item.key for item in self.user_api.user_list_keys(username)]
+                    [
+                        item.key
+                        for item in list_all(self.user_api.user_list_keys, username)
+                    ]
                 )
             except Exception as e:
                 logger.error(e)
@@ -186,13 +205,14 @@ class Gitea:
 
     def get_repos_releases(self, repo_names: List[str]) -> List[List[Dict[str, Any]]]:
         return [
-            self.repository_api.repo_list_releases(self.org_name, repo_name)
+            list_all(self.repository_api.repo_list_releases, self.org_name, repo_name)
             for repo_name in repo_names
         ]
 
     def get_all_repo_names(self) -> List[str]:
         return [
-            data.name for data in self.organization_api.org_list_repos(self.org_name)
+            data.name
+            for data in list_all(self.organization_api.org_list_repos, self.org_name)
         ]
 
     def create_issue(
@@ -206,8 +226,10 @@ class Gitea:
         if assign_every_collaborators:
             assignees = [
                 item.username
-                for item in self.repository_api.repo_list_collaborators(
-                    self.org_name, repo_name
+                for item in list_all(
+                    self.repository_api.repo_list_collaborators,
+                    self.org_name,
+                    repo_name,
                 )
             ]
         self.issue_api.issue_create_issue(
@@ -217,10 +239,28 @@ class Gitea:
         )
 
     def check_exist_issue_by_title(self, repo_name: str, title: str) -> bool:
-        for issue in self.issue_api.issue_list_issues(self.org_name, repo_name):
+        for issue in list_all(
+            self.issue_api.issue_list_issues, self.org_name, repo_name
+        ):
             if issue.title == title:
                 return True
         return False
+
+    def close_all_issues(self) -> None:
+        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
+            for issue in list_all(
+                self.issue_api.issue_list_issues, self.org_name, repo.name
+            ):
+                if issue.state != "closed":
+                    self.issue_api.issue_edit_issue(
+                        self.org_name, repo.name, issue.number, body={"state": "closed"}
+                    )
+
+    def archieve_all_repos(self) -> None:
+        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
+            self.repository_api.repo_edit(
+                self.org_name, repo.name, body={"archived": True}
+            )
 
 
 if __name__ == "__main__":

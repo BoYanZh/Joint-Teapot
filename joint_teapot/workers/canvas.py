@@ -1,7 +1,7 @@
 from canvasapi import Canvas as PyCanvas
-from loguru import logger
 
 from joint_teapot.config import settings
+from joint_teapot.utils.logger import logger
 
 # from canvasapi.group import Group, GroupMembership
 

@@ -2,16 +2,14 @@ import functools
 from datetime import datetime
 from typing import Any, Callable, List
 
-from loguru import logger
-
 from joint_teapot.config import settings
-from joint_teapot.utils import first
+from joint_teapot.utils.logger import logger
+from joint_teapot.utils.main import first
 from joint_teapot.workers import Canvas, Git, Gitea
 
 
 def for_all_methods(decorator: Callable[..., Any]) -> Callable[..., Any]:
     def decorate(cls: Any) -> Any:
-        print(type(cls))
         for attr in cls.__dict__:  # there's propably a better way to do this
             if callable(getattr(cls, attr)):
                 setattr(cls, attr, decorator(getattr(cls, attr)))
@@ -77,7 +75,7 @@ class Teapot:
     def get_public_key_of_all_canvas_students(self) -> List[str]:
         return self.gitea.get_public_key_of_canvas_students(self.canvas.students)
 
-    def archieve_all_repos(self) -> List[str]:
+    def clone_all_repos(self) -> List[str]:
         return [
             self.git.repo_clean_and_checkout(repo_name, "master")
             for repo_name in self.gitea.get_all_repo_names()
@@ -117,6 +115,12 @@ class Teapot:
                 continue
             self.git.repo_clean_and_checkout(repo_name, f"tags/{release['tag_name']}")
         return failed_repos
+
+    def close_all_issues(self) -> None:
+        self.gitea.close_all_issues()
+
+    def archieve_all_repos(self) -> None:
+        self.gitea.archieve_all_repos()
 
 
 if __name__ == "__main__":

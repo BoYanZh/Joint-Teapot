@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # git
     repos_dir: str = "./repos"
 
+    # log file
+    log_file_path: str = "joint-teapot.log"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
