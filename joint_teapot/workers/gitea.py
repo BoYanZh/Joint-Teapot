@@ -58,7 +58,7 @@ class Gitea:
         self.repository_api = focs_gitea.RepositoryApi(self.api_client)
         self.settings_api = focs_gitea.SettingsApi(self.api_client)
         self.user_api = focs_gitea.UserApi(self.api_client)
-        logger.info("Gitea initialized.")
+        logger.debug("Gitea initialized.")
 
     @lru_cache()
     def _get_team_id_by_name(self, name: str) -> int:
@@ -79,12 +79,22 @@ class Gitea:
     ) -> None:
         for team_name in team_names:
             team_id = self._get_team_id_by_name(team_name)
+            team_members = self.organization_api.org_list_team_members(team_id)
             for student in students:
                 try:
                     username = self._get_username_by_canvas_student(student)
-                    self.organization_api.org_add_team_member(team_id, username)
+                    team_member = first(team_members, lambda x: x.login == username)
+                    if team_member is None:
+                        self.organization_api.org_add_team_member(team_id, username)
+                    else:
+                        team_members.remove(team_member)
                 except Exception as e:
                     logger.error(e)
+            for team_member in team_members:
+                logger.warning(
+                    f"{team_member.full_name} found in team {team_name} "
+                    + "but not found in Canvas students"
+                )
 
     def create_personal_repos_for_canvas_students(
         self,
@@ -114,7 +124,7 @@ class Gitea:
                     )
                 except ApiException as e:
                     if e.status == 409:
-                        logger.warning(f"Peronsal repo for {student} already exists.")
+                        logger.warning(f"Personal repo for {student} already exists.")
                     else:
                         raise (e)
                 username = self._get_username_by_canvas_student(student)
@@ -265,3 +275,5 @@ class Gitea:
 
 if __name__ == "__main__":
     gitea = Gitea()
+    res = gitea.get_all_repo_names()
+    print("\n".join(res))

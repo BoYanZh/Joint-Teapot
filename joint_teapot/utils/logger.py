@@ -5,5 +5,5 @@ from loguru import logger as logger
 from joint_teapot.config import settings
 
 logger.remove()
-logger.add(stderr)
-logger.add(settings.log_file_path)
+logger.add(stderr, level="INFO")
+logger.add(settings.log_file_path, level="INFO")

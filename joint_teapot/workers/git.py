@@ -22,7 +22,7 @@ class Git:
         if not os.path.isdir(repos_dir):
             raise Exception(f"{repos_dir} does not exist! Create it first.")
         self.repos_dir = repos_dir
-        logger.info("Git initialized.")
+        logger.debug("Git initialized.")
 
     def clone_repo(self, repo_name: str, branch: str = "master") -> Repo:
         repo_dir = os.path.join(self.repos_dir, repo_name)

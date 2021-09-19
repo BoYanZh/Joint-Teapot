@@ -57,7 +57,7 @@ class Teapot:
         logger.info(
             f"Settings loaded. Canvas Course ID: {settings.canvas_course_id}, Gitea Organization name: {settings.gitea_org_name}"
         )
-        logger.info("Teapot initialized.")
+        logger.debug("Teapot initialized.")
 
     def add_all_canvas_students_to_teams(self, team_names: List[str]) -> None:
         return self.gitea.add_canvas_students_to_teams(self.canvas.students, team_names)
