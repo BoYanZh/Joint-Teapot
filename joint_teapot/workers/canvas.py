@@ -23,12 +23,12 @@ class Canvas:
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"
                 )
-        logger.debug(f"Canvas students loaded.")
+        logger.debug(f"Canvas students loaded")
         self.assignments = self.course.get_assignments()
-        logger.debug(f"Canvas assignments loaded.")
+        logger.debug(f"Canvas assignments loaded")
         self.groups = self.course.get_groups()
-        logger.debug(f"Canvas groups loaded.")
-        logger.debug("Canvas initialized.")
+        logger.debug(f"Canvas groups loaded")
+        logger.debug("Canvas initialized")
 
 
 if __name__ == "__main__":

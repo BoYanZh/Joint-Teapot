@@ -58,20 +58,20 @@ class Gitea:
         self.repository_api = focs_gitea.RepositoryApi(self.api_client)
         self.settings_api = focs_gitea.SettingsApi(self.api_client)
         self.user_api = focs_gitea.UserApi(self.api_client)
-        logger.debug("Gitea initialized.")
+        logger.debug("Gitea initialized")
 
     @lru_cache()
     def _get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
         if len(res["data"]) == 0:
-            raise Exception(f"Team not found by name {name}")
+            raise Exception(f"{name} not found by name in Gitea")
         return res["data"][0]["id"]
 
     @lru_cache()
     def _get_username_by_canvas_student(self, student: User) -> str:
         res = self.user_api.user_search(q=student.sis_login_id, limit=1)
         if len(res["data"]) == 0:
-            raise Exception(f"User not found by canvas student {student}")
+            raise Exception(f"{student} not found in Gitea")
         return res["data"][0]["username"]
 
     def add_canvas_students_to_teams(
@@ -86,12 +86,14 @@ class Gitea:
                     team_member = first(team_members, lambda x: x.login == username)
                     if team_member is None:
                         self.organization_api.org_add_team_member(team_id, username)
+                        logger.info(f"{student} added to team {team_name}")
                     else:
                         team_members.remove(team_member)
+                        logger.warning(f"{student} already in team {team_name}")
                 except Exception as e:
                     logger.error(e)
             for team_member in team_members:
-                logger.warning(
+                logger.error(
                     f"{team_member.full_name} found in team {team_name} "
                     + "but not found in Canvas students"
                 )
@@ -122,9 +124,12 @@ class Gitea:
                     repo = self.organization_api.create_org_repo(
                         self.org_name, body=body
                     )
+                    logger.info(f"Personal repo {repo_name} for {student} created")
                 except ApiException as e:
                     if e.status == 409:
-                        logger.warning(f"Personal repo for {student} already exists.")
+                        logger.warning(
+                            f"Personal repo {repo_name} for {student} already exists"
+                        )
                     else:
                         raise (e)
                 username = self._get_username_by_canvas_student(student)
