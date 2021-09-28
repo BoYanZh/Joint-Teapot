@@ -32,7 +32,7 @@ def create_teams_and_repos_by_canvas_groups() -> None:
     teapot.create_teams_and_repos_by_canvas_groups()
 
 
-@app.command("get-public-keys", help="get all public keys on gitea")
+@app.command("get-public-keys", help="list all public keys on gitea")
 def get_public_key_of_all_canvas_students() -> None:
     echo("\n".join(teapot.get_public_key_of_all_canvas_students()))
 
@@ -53,7 +53,7 @@ def check_exist_issue_by_title(repo_names: List[str], title: str) -> None:
 
 
 @app.command(
-    "get-releases",
+    "checkout-releases",
     help="checkout git repo to git tag fetched from gitea by release name, with due date",
 )
 def checkout_to_repos_by_release_name(
@@ -72,6 +72,16 @@ def close_all_issues() -> None:
 @app.command("archieve-all-repos", help="archieve all repos in gitea organization")
 def archieve_all_repos() -> None:
     teapot.archieve_all_repos()
+
+
+@app.command("get-no-collaborator-repos", help="list all repos with no collaborators")
+def get_no_collaborator_repos() -> None:
+    teapot.get_no_collaborator_repos()
+
+
+@app.command("get-no-commit-repos", help="list all repos with no commit")
+def get_no_commit_repos() -> None:
+    teapot.get_no_commit_repos()
 
 
 if __name__ == "__main__":

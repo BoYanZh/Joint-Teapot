@@ -124,11 +124,13 @@ class Gitea:
                     repo = self.organization_api.create_org_repo(
                         self.org_name, body=body
                     )
-                    logger.info(f"Personal repo {repo_name} for {student} created")
+                    logger.info(
+                        f"Personal repo {self.org_name}/{repo_name} for {student} created"
+                    )
                 except ApiException as e:
                     if e.status == 409:
                         logger.warning(
-                            f"Personal repo {repo_name} for {student} already exists"
+                            f"Personal repo {self.org_name}/{repo_name} for {student} already exists"
                         )
                     else:
                         raise (e)
@@ -230,6 +232,33 @@ class Gitea:
             for data in list_all(self.organization_api.org_list_repos, self.org_name)
         ]
 
+    def get_no_collaborator_repos(self) -> List[str]:
+        res = []
+        for data in list_all(self.organization_api.org_list_repos, self.org_name):
+            collaborators = self.repository_api.repo_list_collaborators(
+                self.org_name, data.name
+            )
+            if collaborators:
+                continue
+            logger.info(f"{self.org_name}/{data.name} has no collaborators")
+            res.append(data.name)
+        return res
+
+    def get_no_commit_repos(self) -> List[str]:
+        res = []
+        for data in list_all(self.organization_api.org_list_repos, self.org_name):
+            try:
+                commits = self.repository_api.repo_get_all_commits(
+                    self.org_name, data.name
+                )
+            except ApiException as e:
+                if e.status == 409:
+                    logger.info(f"{self.org_name}/{data.name} has no commits")
+                    res.append(data.name)
+                else:
+                    raise (e)
+        return res
+
     def create_issue(
         self,
         repo_name: str,
@@ -280,5 +309,4 @@ class Gitea:
 
 if __name__ == "__main__":
     gitea = Gitea()
-    res = gitea.get_all_repo_names()
-    print("\n".join(res))
+    res = gitea.get_no_commit_repos()

@@ -122,6 +122,12 @@ class Teapot:
     def archieve_all_repos(self) -> None:
         self.gitea.archieve_all_repos()
 
+    def get_no_collaborator_repos(self) -> None:
+        self.gitea.get_no_collaborator_repos()
+
+    def get_no_commit_repos(self) -> None:
+        self.gitea.get_no_commit_repos()
+
 
 if __name__ == "__main__":
     teapot = Teapot()

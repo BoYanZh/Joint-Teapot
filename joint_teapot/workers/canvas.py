@@ -16,7 +16,7 @@ class Canvas:
         self.course = self.canvas.get_course(course_id)
         logger.info(f"Canvas course loaded. {self.course}")
         self.students = self.course.get_users(
-            enrollment_type=["student"], include=["email"]
+            enrollment_type=["student", "observer"], include=["email"]
         )
         for attr in ["sis_login_id", "sortable_name", "name"]:
             if not hasattr(self.students[0], attr):
