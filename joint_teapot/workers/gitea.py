@@ -220,31 +220,35 @@ class Gitea:
             except ApiException as e:
                 if e.status != 404:
                     raise
-            self.repository_api.repo_create_branch_protection(
-                self.org_name,
-                repo_name,
-                body={
-                    "block_on_official_review_requests": True,
-                    "block_on_outdated_branch": True,
-                    "block_on_rejected_reviews": True,
-                    "branch_name": "master",
-                    "dismiss_stale_approvals": True,
-                    "enable_approvals_whitelist": False,
-                    "enable_merge_whitelist": False,
-                    "enable_push": False,
-                    "enable_push_whitelist": False,
-                    "enable_status_check": False,
-                    "merge_whitelist_teams": [],
-                    "merge_whitelist_usernames": [],
-                    "protected_file_patterns": "",
-                    "push_whitelist_deploy_keys": False,
-                    "push_whitelist_teams": [],
-                    "push_whitelist_usernames": [],
-                    "require_signed_commits": False,
-                    "required_approvals": max(student_count - 1, 0),
-                    "status_check_contexts": [],
-                },
-            )
+            try:
+                self.repository_api.repo_create_branch_protection(
+                    self.org_name,
+                    repo_name,
+                    body={
+                        "block_on_official_review_requests": True,
+                        "block_on_outdated_branch": True,
+                        "block_on_rejected_reviews": True,
+                        "branch_name": "master",
+                        "dismiss_stale_approvals": True,
+                        "enable_approvals_whitelist": False,
+                        "enable_merge_whitelist": False,
+                        "enable_push": False,
+                        "enable_push_whitelist": False,
+                        "enable_status_check": False,
+                        "merge_whitelist_teams": [],
+                        "merge_whitelist_usernames": [],
+                        "protected_file_patterns": "",
+                        "push_whitelist_deploy_keys": False,
+                        "push_whitelist_teams": [],
+                        "push_whitelist_usernames": [],
+                        "require_signed_commits": False,
+                        "required_approvals": max(student_count - 1, 0),
+                        "status_check_contexts": [],
+                    },
+                )
+            except ApiException as e:
+                if e.status != 404:
+                    raise
             logger.info(f"{self.org_name}/{repo_name} jobs done")
         return repo_names
 
