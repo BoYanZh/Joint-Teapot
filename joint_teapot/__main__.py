@@ -29,8 +29,8 @@ def create_personal_repos_for_all_canvas_students() -> None:
 
 
 @app.command("create-teams", help="create teams on gitea by canvas groups")
-def create_teams_and_repos_by_canvas_groups() -> None:
-    teapot.create_teams_and_repos_by_canvas_groups()
+def create_teams_and_repos_by_canvas_groups(group_prefix: str) -> None:
+    teapot.create_teams_and_repos_by_canvas_groups(group_prefix)
 
 
 @app.command("get-public-keys", help="list all public keys on gitea")

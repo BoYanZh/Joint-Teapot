@@ -1,6 +1,6 @@
 import functools
 from datetime import datetime
-from typing import Any, Callable, List
+from typing import Any, Callable, List, Optional
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
@@ -67,8 +67,12 @@ class Teapot:
             self.canvas.students
         )
 
-    def create_teams_and_repos_by_canvas_groups(self) -> List[str]:
-        def convertor(name: str) -> str:
+    def create_teams_and_repos_by_canvas_groups(
+        self, group_prefix: str = ""
+    ) -> List[str]:
+        def convertor(name: str) -> Optional[str]:
+            if group_prefix and not name.startswith(group_prefix):
+                return None
             team_name, number_str = name.split(" ")
             number = int(number_str)
             return f"{team_name}-{number:02}"

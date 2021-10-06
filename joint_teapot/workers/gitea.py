@@ -200,6 +200,7 @@ class Gitea:
                 team.id, self.org_name, repo_name
             )
             membership: GroupMembership
+            student_count = 0
             for membership in group.get_memberships():
                 student = first(students, lambda s: s.id == membership.user_id)
                 if student is None:
@@ -211,6 +212,40 @@ class Gitea:
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo_name, username
                 )
+                student_count += 1
+            try:
+                self.repository_api.repo_delete_branch_protection(
+                    self.org_name, repo_name, "master"
+                )
+            except ApiException as e:
+                if e.status != 404:
+                    raise
+            self.repository_api.repo_create_branch_protection(
+                self.org_name,
+                repo_name,
+                body={
+                    "block_on_official_review_requests": True,
+                    "block_on_outdated_branch": True,
+                    "block_on_rejected_reviews": True,
+                    "branch_name": "master",
+                    "dismiss_stale_approvals": True,
+                    "enable_approvals_whitelist": False,
+                    "enable_merge_whitelist": False,
+                    "enable_push": False,
+                    "enable_push_whitelist": False,
+                    "enable_status_check": False,
+                    "merge_whitelist_teams": [],
+                    "merge_whitelist_usernames": [],
+                    "protected_file_patterns": "",
+                    "push_whitelist_deploy_keys": False,
+                    "push_whitelist_teams": [],
+                    "push_whitelist_usernames": [],
+                    "require_signed_commits": False,
+                    "required_approvals": max(student_count - 1, 0),
+                    "status_check_contexts": [],
+                },
+            )
+            logger.info(f"{self.org_name}/{repo_name} jobs done")
         return repo_names
 
     def get_public_key_of_canvas_students(self, students: PaginatedList) -> List[str]:
