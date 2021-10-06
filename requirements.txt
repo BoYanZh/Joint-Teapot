@@ -2,5 +2,6 @@ canvasapi>=2.2.0
 focs_gitea>=1.0.0
 GitPython>=3.1.18
 loguru>=0.5.3
+patool>=1.12
 pydantic[dotenv]>=1.8.1
 typer[all]>=0.3.2

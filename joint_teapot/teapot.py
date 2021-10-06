@@ -68,8 +68,13 @@ class Teapot:
         )
 
     def create_teams_and_repos_by_canvas_groups(self) -> List[str]:
+        def convertor(name: str) -> str:
+            team_name, number_str = name.split(" ")
+            number = int(number_str)
+            return f"{team_name}-{number:02}"
+
         return self.gitea.create_teams_and_repos_by_canvas_groups(
-            self.canvas.students, self.canvas.groups
+            self.canvas.students, self.canvas.groups, convertor, convertor
         )
 
     def get_public_key_of_all_canvas_students(self) -> List[str]:
@@ -115,18 +120,6 @@ class Teapot:
                 continue
             self.git.repo_clean_and_checkout(repo_name, f"tags/{release['tag_name']}")
         return failed_repos
-
-    def close_all_issues(self) -> None:
-        self.gitea.close_all_issues()
-
-    def archieve_all_repos(self) -> None:
-        self.gitea.archieve_all_repos()
-
-    def get_no_collaborator_repos(self) -> None:
-        self.gitea.get_no_collaborator_repos()
-
-    def get_no_commit_repos(self) -> None:
-        self.gitea.get_no_commit_repos()
 
 
 if __name__ == "__main__":

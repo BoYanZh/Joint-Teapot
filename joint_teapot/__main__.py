@@ -1,6 +1,7 @@
 __version__ = "0.0.0"
 
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 from typer import Typer, echo
@@ -66,22 +67,39 @@ def checkout_to_repos_by_release_name(
     "close-all-issues", help="close all issues and pull requests in gitea organization"
 )
 def close_all_issues() -> None:
-    teapot.close_all_issues()
+    teapot.gitea.close_all_issues()
 
 
 @app.command("archieve-all-repos", help="archieve all repos in gitea organization")
 def archieve_all_repos() -> None:
-    teapot.archieve_all_repos()
+    teapot.gitea.archieve_all_repos()
 
 
 @app.command("get-no-collaborator-repos", help="list all repos with no collaborators")
 def get_no_collaborator_repos() -> None:
-    teapot.get_no_collaborator_repos()
+    teapot.gitea.get_no_collaborator_repos()
 
 
 @app.command("get-no-commit-repos", help="list all repos with no commit")
 def get_no_commit_repos() -> None:
-    teapot.get_no_commit_repos()
+    teapot.gitea.get_no_commit_repos()
+
+
+@app.command(
+    "prepare-assignment-dir",
+    help='prepare assignment dir from extracted canvas "Download Submissions" zip',
+)
+def prepare_assignment_dir(dir: Path) -> None:
+    teapot.canvas.prepare_assignment_dir(str(dir))
+
+
+@app.command(
+    "upload-assignment-scores",
+    help="upload assignment scores to canvas from score file (SCORE.txt by default), "
+    + "read the first line as score, the rest as comments",
+)
+def upload_assignment_scores(dir: Path, assignment_name: str) -> None:
+    teapot.canvas.upload_assignment_scores(str(dir), assignment_name)
 
 
 if __name__ == "__main__":

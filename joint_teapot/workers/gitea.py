@@ -151,43 +151,51 @@ class Gitea:
         permission: PermissionEnum = PermissionEnum.write,
     ) -> List[str]:
         repo_names = []
+        teams = list_all(self.organization_api.org_list_teams, self.org_name)
+        repos = list_all(self.organization_api.org_list_repos, self.org_name)
         group: Group
         for group in groups:
             team_name = team_name_convertor(group.name)
             repo_name = repo_name_convertor(group.name)
             if team_name is None or repo_name is None:
                 continue
-            repo_names.append(repo_name)
-            team = self.organization_api.org_create_team(
-                self.org_name,
-                body={
-                    "can_create_org_repo": False,
-                    "includes_all_repositories": False,
-                    "name": team_name,
-                    "permission": permission.value,
-                    "units": [
-                        "repo.code",
-                        "repo.issues",
-                        "repo.ext_issues",
-                        "repo.wiki",
-                        "repo.pulls",
-                        "repo.releases",
-                        "repo.projects",
-                        "repo.ext_wiki",
-                    ],
-                },
-            )
-            repo = self.organization_api.create_org_repo(
-                self.org_name,
-                body={
-                    "auto_init": False,
-                    "default_branch": "master",
-                    "name": repo_name,
-                    "private": True,
-                    "template": False,
-                    "trust_model": "default",
-                },
-            )
+            team = first(teams, lambda team: team.name == team_name)
+            if team is None:
+                team = self.organization_api.org_create_team(
+                    self.org_name,
+                    body={
+                        "can_create_org_repo": False,
+                        "includes_all_repositories": False,
+                        "name": team_name,
+                        "permission": permission.value,
+                        "units": [
+                            "repo.code",
+                            "repo.issues",
+                            "repo.ext_issues",
+                            "repo.wiki",
+                            "repo.pulls",
+                            "repo.releases",
+                            "repo.projects",
+                            "repo.ext_wiki",
+                        ],
+                    },
+                )
+                logger.info(f"{self.org_name}/{team_name} created")
+            repo = first(repos, lambda repo: repo.name == repo_name)
+            if repo is None:
+                repo_names.append(repo_name)
+                repo = self.organization_api.create_org_repo(
+                    self.org_name,
+                    body={
+                        "auto_init": False,
+                        "default_branch": "master",
+                        "name": repo_name,
+                        "private": True,
+                        "template": False,
+                        "trust_model": "default",
+                    },
+                )
+                logger.info(f"Team {team_name} created")
             self.organization_api.org_add_team_repository(
                 team.id, self.org_name, repo_name
             )
