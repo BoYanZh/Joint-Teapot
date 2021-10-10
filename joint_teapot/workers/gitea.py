@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, List, Optional, Tuple
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -267,11 +267,15 @@ class Gitea:
                 logger.error(e)
         return res
 
-    def get_repos_releases(self, repo_names: List[str]) -> List[List[Dict[str, Any]]]:
-        return [
-            list_all(self.repository_api.repo_list_releases, self.org_name, repo_name)
-            for repo_name in repo_names
-        ]
+    def get_repo_releases(self, repo_name: str) -> List[Any]:
+        res = []
+        try:
+            args = self.repository_api.repo_list_releases, self.org_name, repo_name
+            res = list_all(*args)
+        except ApiException as e:
+            if e.status != 404:
+                raise
+        return res
 
     def get_all_repo_names(self) -> List[str]:
         return [
@@ -291,19 +295,24 @@ class Gitea:
             res.append(data.name)
         return res
 
-    def get_no_commit_repos(self) -> List[str]:
+    def get_repos_status(self) -> List[Tuple[str, int, int]]:
         res = []
-        for data in list_all(self.organization_api.org_list_repos, self.org_name):
+        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
             try:
                 commits = self.repository_api.repo_get_all_commits(
-                    self.org_name, data.name
+                    self.org_name, repo.name
                 )
             except ApiException as e:
-                if e.status == 409:
-                    logger.info(f"{self.org_name}/{data.name} has no commits")
-                    res.append(data.name)
-                else:
-                    raise (e)
+                if e.status != 409:
+                    raise
+                commits = []
+            issues = self.issue_api.issue_list_issues(
+                self.org_name, repo.name, state="all"
+            )
+            # if not commits:
+            #     logger.info(f"{self.org_name}/{repo.name} has no commits")
+            #     res.append(repo.name)
+            res.append((repo.name, len(commits), len(issues)))
         return res
 
     def create_issue(
@@ -356,4 +365,3 @@ class Gitea:
 
 if __name__ == "__main__":
     gitea = Gitea()
-    res = gitea.get_no_commit_repos()

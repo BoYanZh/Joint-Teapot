@@ -1,14 +1,19 @@
 import functools
 from datetime import datetime
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, TypeVar
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
 from joint_teapot.utils.main import first
 from joint_teapot.workers import Canvas, Git, Gitea
 
+_T = TypeVar("_T")
 
-def for_all_methods(decorator: Callable[..., Any]) -> Callable[..., Any]:
+
+def for_all_methods(
+    decorator: Callable[[Callable[[_T], _T]], Any]
+) -> Callable[[_T], _T]:
+    @functools.wraps(decorator)
     def decorate(cls: Any) -> Any:
         for attr in cls.__dict__:  # there's propably a better way to do this
             if callable(getattr(cls, attr)):
@@ -55,7 +60,9 @@ class Teapot:
 
     def __init__(self) -> None:
         logger.info(
-            f"Settings loaded. Canvas Course ID: {settings.canvas_course_id}, Gitea Organization name: {settings.gitea_org_name}"
+            "Settings loaded. "
+            f"Canvas Course ID: {settings.canvas_course_id}, "
+            f"Gitea Organization name: {settings.gitea_org_name}"
         )
         logger.debug("Teapot initialized.")
 
@@ -84,11 +91,10 @@ class Teapot:
     def get_public_key_of_all_canvas_students(self) -> List[str]:
         return self.gitea.get_public_key_of_canvas_students(self.canvas.students)
 
-    def clone_all_repos(self) -> List[str]:
-        return [
+    def clone_all_repos(self) -> None:
+        for i, repo_name in enumerate(self.gitea.get_all_repo_names()):
+            logger.info(f"{i}, {self.gitea.org_name}/{repo_name} cloning...")
             self.git.repo_clean_and_checkout(repo_name, "master")
-            for repo_name in self.gitea.get_all_repo_names()
-        ]
 
     def create_issue_for_repos(
         self, repo_names: List[str], title: str, body: str
@@ -112,18 +118,25 @@ class Teapot:
         due: datetime = datetime(3000, 1, 1),
     ) -> List[str]:
         failed_repos = []
-        repos_releases = self.gitea.get_repos_releases(repo_names)
-        for repo_name, repo_releases in zip(repo_names, repos_releases):
-            release = first(repo_releases, lambda item: item["name"] == release_name)
-            if (
-                release is None
-                or datetime.strptime(release["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                >= due
-            ):
+        for repo_name in repo_names:
+            repo_releases = self.gitea.get_repo_releases(repo_name)
+            release = first(repo_releases, lambda item: item.name == release_name)
+            if release is None or release.created_at.replace(tzinfo=None) >= due:
                 failed_repos.append(repo_name)
                 continue
-            self.git.repo_clean_and_checkout(repo_name, f"tags/{release['tag_name']}")
+            self.git.repo_clean_and_checkout(repo_name, f"tags/{release.tag_name}")
+            logger.info(
+                f"{self.gitea.org_name}/{repo_name} checkout to tags/{release.tag_name} succeed"
+            )
         return failed_repos
+
+    def get_repos_status(self, commit_lt: int, issue_lt: int) -> None:
+        for repo_name, commit_count, issue_count in self.gitea.get_repos_status():
+            if commit_count < commit_lt or issue_count < issue_lt:
+                logger.info(
+                    f"{self.gitea.org_name}/{repo_name} has "
+                    f"{commit_count} commit(s), {issue_count} issue(s)"
+                )
 
 
 if __name__ == "__main__":
