@@ -47,7 +47,11 @@ def create_teams_and_repos_by_canvas_groups(group_prefix: str) -> None:
 
 @app.command("get-public-keys", help="list all public keys on gitea")
 def get_public_key_of_all_canvas_students() -> None:
-    echo("\n".join(tea.pot.get_public_key_of_all_canvas_students()))
+    res = []
+    for k, v in tea.pot.get_public_key_of_all_canvas_students().items():
+        keys = "\\n".join(v)
+        res.append(f"{k},{keys}")
+    echo("\n".join(res))
 
 
 @app.command("clone-all-repos", help="clone all gitea repos to local")

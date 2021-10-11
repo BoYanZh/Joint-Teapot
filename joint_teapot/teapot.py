@@ -1,6 +1,6 @@
 import functools
 from datetime import datetime
-from typing import Any, Callable, List, Optional, TypeVar
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
@@ -88,7 +88,7 @@ class Teapot:
             self.canvas.students, self.canvas.groups, convertor, convertor
         )
 
-    def get_public_key_of_all_canvas_students(self) -> List[str]:
+    def get_public_key_of_all_canvas_students(self) -> Dict[str, List[str]]:
         return self.gitea.get_public_key_of_canvas_students(self.canvas.students)
 
     def clone_all_repos(self) -> None:

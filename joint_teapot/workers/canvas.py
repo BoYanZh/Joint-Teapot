@@ -20,9 +20,9 @@ class Canvas:
         self.canvas = PyCanvas("https://umjicanvas.com/", access_token)
         self.course = self.canvas.get_course(course_id)
         logger.info(f"Canvas course loaded. {self.course}")
-        self.students = self.course.get_users(
-            enrollment_type=["student"], include=["email"]
-        )
+        # types = ["student", "observer"]
+        types = ["student"]
+        self.students = self.course.get_users(enrollment_type=types, include=["email"])
         for attr in ["sis_login_id", "sortable_name", "name"]:
             if not hasattr(self.students[0], attr):
                 raise Exception(

@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -252,17 +252,21 @@ class Gitea:
             logger.info(f"{self.org_name}/{repo_name} jobs done")
         return repo_names
 
-    def get_public_key_of_canvas_students(self, students: PaginatedList) -> List[str]:
-        res = []
+    def get_public_key_of_canvas_students(
+        self, students: PaginatedList
+    ) -> Dict[str, List[str]]:
+        res = {}
         for student in students:
             try:
                 username = self._get_username_by_canvas_student(student)
-                res.extend(
-                    [
-                        item.key
-                        for item in list_all(self.user_api.user_list_keys, username)
-                    ]
-                )
+                keys = [
+                    item.key
+                    for item in list_all(self.user_api.user_list_keys, username)
+                ]
+                if not keys:
+                    logger.info(f"{student} has not uploaded ssh keys to gitea")
+                    continue
+                res[student.sis_login_id] = keys
             except Exception as e:
                 logger.error(e)
         return res
