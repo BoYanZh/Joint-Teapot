@@ -7,15 +7,15 @@ A handy tool for TAs in JI to handle works through [Gitea](https://focs.ji.sjtu.
 ### Setup venv (Optional)
 
 ```bash
-python3 -m venv env
-source env/Scripts/activate
+python3 -m venv env # you only need to do that once
+source env/Scripts/activate # each time when you need this venv
 ```
 
-### Install & Run
+### Install
 
 ```bash
 pip3 install -e .
-vi .env # configure environment
+cp .env.exmaple .env && vi .env # configure environment
 joint-teapot --help
 ```
 
