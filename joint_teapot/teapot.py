@@ -111,24 +111,19 @@ class Teapot:
                 res.append(repo_name)
         return res
 
-    def checkout_to_repos_by_release_name(
-        self,
-        repo_names: List[str],
-        release_name: str,
-        due: datetime = datetime(3000, 1, 1),
-    ) -> List[str]:
-        failed_repos = []
-        for repo_name in repo_names:
-            repo_releases = self.gitea.get_repo_releases(repo_name)
-            release = first(repo_releases, lambda item: item.name == release_name)
-            if release is None or release.created_at.replace(tzinfo=None) >= due:
-                failed_repos.append(repo_name)
-                continue
-            self.git.repo_clean_and_checkout(repo_name, f"tags/{release.tag_name}")
-            logger.info(
-                f"{self.gitea.org_name}/{repo_name} checkout to tags/{release.tag_name} succeed"
-            )
-        return failed_repos
+    def checkout_to_repo_by_release_name(
+        self, repo_name: str, release_name: str, due: datetime = datetime(3000, 1, 1)
+    ) -> bool:
+        repo_releases = self.gitea.get_repo_releases(repo_name)
+        release = first(repo_releases, lambda item: item.name == release_name)
+        if release is None or release.created_at.replace(tzinfo=None) >= due:
+            return False
+        self.git.repo_clean_and_checkout(repo_name, f"tags/{release.tag_name}")
+        logger.info(
+            f"{self.gitea.org_name}/{repo_name} checkout to "
+            f"tags/{release.tag_name} succeed"
+        )
+        return True
 
     def get_repos_status(self, commit_lt: int, issue_lt: int) -> None:
         for repo_name, commit_count, issue_count in self.gitea.get_repos_status():
