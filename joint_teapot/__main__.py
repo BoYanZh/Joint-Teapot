@@ -113,8 +113,8 @@ def get_repos_status(
     "prepare-assignment-dir",
     help='prepare assignment dir from extracted canvas "Download Submissions" zip',
 )
-def prepare_assignment_dir(dir: Path) -> None:
-    tea.pot.canvas.prepare_assignment_dir(str(dir))
+def prepare_assignment_dir(dir_or_zip_file: Path) -> None:
+    tea.pot.canvas.prepare_assignment_dir(str(dir_or_zip_file))
 
 
 @app.command(
