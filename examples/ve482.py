@@ -6,6 +6,7 @@ from joint_teapot import Teapot, logger
 
 class MyTeapot(Teapot):
     def ve482p1(self) -> None:
+        fault_repos = []
         for repo_name in self.gitea.get_all_repo_names():
             if not repo_name.endswith("p1"):
                 continue
@@ -14,7 +15,7 @@ class MyTeapot(Teapot):
             if succeed:
                 contain_c_file = False
                 contain_readme_file = False
-                for fn in glob.glob(f"{self.git.repos_dir}/{repo_name}/*.*"):
+                for fn in glob.glob(f"{self.git.repos_dir}/{repo_name}/*"):
                     basename = ntpath.basename(fn)
                     if basename.endswith(".c"):
                         contain_c_file = True
@@ -44,6 +45,8 @@ class MyTeapot(Teapot):
                         "title": "p1 submission pre-check failed",
                     },
                 )
+                fault_repos.append(repo_name)
+        logger.info(f"{len(fault_repos)} fault repo(s): {fault_repos}")
 
 
 if __name__ == "__main__":

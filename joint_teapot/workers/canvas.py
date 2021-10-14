@@ -49,6 +49,8 @@ class Canvas:
             new_path = os.path.join(dir, v)
             if not os.path.exists(new_path):
                 os.mkdir(new_path)
+            if create_score_file:
+                open(os.path.join(new_path, self.score_filename), mode="w")
         for path in glob(os.path.join(dir, "*")):
             file_name = os.path.basename(path)
             if "_" not in file_name:
@@ -68,8 +70,6 @@ class Canvas:
                 os.remove(path)
             except PatoolError:
                 os.rename(path, os.path.join(target_dir, file_name))
-            if create_score_file:
-                open(os.path.join(target_dir, self.score_filename), mode="w")
 
     def upload_assignment_scores(self, dir: str, assignment_name: str) -> None:
         assignment = first(self.assignments, lambda x: x.name == assignment_name)
@@ -88,7 +88,9 @@ class Canvas:
                 "submission": {"posted_grade": float(score)},
                 "comment": {"text_comment": "".join(comments)},
             }
-            logger.info(f"{assignment} {student} {data.__repr__()}")
+            logger.info(
+                f"Uploading grade for {assignment} {student}: {data.__repr__()}"
+            )
             submission.edit(**data)
 
 

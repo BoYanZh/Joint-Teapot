@@ -118,6 +118,7 @@ class Teapot:
         release = first(repo_releases, lambda item: item.name == release_name)
         if release is None or release.created_at.replace(tzinfo=None) >= due:
             return False
+        # TODO: checkout by commit hash to prevent re-create tag
         self.git.repo_clean_and_checkout(repo_name, f"tags/{release.tag_name}")
         logger.info(
             f"{self.gitea.org_name}/{repo_name} checkout to "

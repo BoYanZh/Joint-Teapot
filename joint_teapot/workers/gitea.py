@@ -351,13 +351,14 @@ class Gitea:
         return False
 
     def close_all_issues(self) -> None:
-        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
-            for issue in list_all(
-                self.issue_api.issue_list_issues, self.org_name, repo.name
-            ):
+        for repo_name in self.get_all_repo_names():
+            issues = list_all(
+                self.issue_api.issue_list_issues, self.org_name, repo_name
+            )
+            for issue in issues:
                 if issue.state != "closed":
                     self.issue_api.issue_edit_issue(
-                        self.org_name, repo.name, issue.number, body={"state": "closed"}
+                        self.org_name, repo_name, issue.number, body={"state": "closed"}
                     )
 
     def archieve_all_repos(self) -> None:
