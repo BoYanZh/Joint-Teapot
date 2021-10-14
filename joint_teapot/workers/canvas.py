@@ -54,14 +54,12 @@ class Canvas:
             if "_" not in file_name:
                 continue
             segments = file_name.split("_")
-            is_late = False
             if segments[1] == "late":
                 file_id = int(segments[2])
                 student = first(
                     self.students, lambda x: x.login_id == login_ids[file_id]
                 )
                 logger.info(f"{student} submits late")
-                is_late = True
             else:
                 file_id = int(segments[1])
             target_dir = os.path.join(dir, login_ids[file_id])
@@ -70,8 +68,6 @@ class Canvas:
                 os.remove(path)
             except PatoolError:
                 os.rename(path, os.path.join(target_dir, file_name))
-            if is_late:
-                open(os.path.join(target_dir, "SUBMIT_LATE"), mode="w")
             if create_score_file:
                 open(os.path.join(target_dir, self.score_filename), mode="w")
 
