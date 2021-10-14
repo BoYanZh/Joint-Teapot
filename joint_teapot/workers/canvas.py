@@ -43,6 +43,9 @@ class Canvas:
             dir = dir_or_zip_file
         else:
             dir = os.path.splitext(dir_or_zip_file)[0]
+            if os.path.exists(dir):
+                logger.error(f"{dir} exists, can not unzip submissions file")
+                return
             extract_archive(dir_or_zip_file, outdir=dir, verbosity=-1)
         login_ids = {stu.id: stu.login_id for stu in self.students}
         for v in login_ids.values():
@@ -51,25 +54,40 @@ class Canvas:
                 os.mkdir(new_path)
             if create_score_file:
                 open(os.path.join(new_path, self.score_filename), mode="w")
+        late_students = set()
+        submitted_ids = set()
         for path in glob(os.path.join(dir, "*")):
+            print(path)
             file_name = os.path.basename(path)
             if "_" not in file_name:
                 continue
             segments = file_name.split("_")
             if segments[1] == "late":
                 file_id = int(segments[2])
-                student = first(
-                    self.students, lambda x: x.login_id == login_ids[file_id]
-                )
-                logger.info(f"{student} submits late")
             else:
                 file_id = int(segments[1])
-            target_dir = os.path.join(dir, login_ids[file_id])
+            login_id = login_ids[file_id]
+            if segments[1] == "late":
+                student = first(self.students, lambda x: x.login_id == login_id)
+                late_students.add(student)
+            target_dir = os.path.join(dir, login_id)
             try:
                 extract_archive(path, outdir=target_dir, verbosity=-1)
                 os.remove(path)
             except PatoolError:
                 os.rename(path, os.path.join(target_dir, file_name))
+            submitted_ids.add(login_id)
+        if login_ids:
+            no_submission_students = [
+                first(self.students, lambda x: x.login_id == login_id)
+                for login_id in set(login_ids.values()) - submitted_ids
+            ]
+            if no_submission_students:
+                tmp = ", ".join([str(student) for student in no_submission_students])
+                logger.info(f"No submission student(s): {tmp}")
+        if late_students:
+            tmp = ", ".join([str(student) for student in late_students])
+            logger.info(f"Late student(s): {tmp}")
 
     def upload_assignment_scores(self, dir: str, assignment_name: str) -> None:
         assignment = first(self.assignments, lambda x: x.name == assignment_name)
