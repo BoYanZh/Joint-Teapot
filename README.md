@@ -2,6 +2,8 @@
 
 A handy tool for TAs in JI to handle works through [Gitea](https://focs.ji.sjtu.edu.cn/git/), [Canvas](https://umjicanvas.com/), and [JOJ](https://joj.sjtu.edu.cn/). Joint is related to JI and also this tool which join websites together. Teapot means to hold Gitea, inspired by [@nichujie](https://github.com/nichujie).
 
+This tool is still under heavy development. The docs may not be updated on time, and all the features are provided with the probability to change.
+
 ## Getting Started
 
 ### Setup venv (Optional)
@@ -36,3 +38,7 @@ pytest -svv
 - [x] create repos
 - [x] archive all repos of a course
 - [x] check whether an issue exists with appointed title
+
+## License
+
+MIT
