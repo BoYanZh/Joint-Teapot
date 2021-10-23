@@ -57,7 +57,6 @@ class Canvas:
         late_students = set()
         submitted_ids = set()
         for path in glob(os.path.join(dir, "*")):
-            print(path)
             file_name = os.path.basename(path)
             if "_" not in file_name:
                 continue
