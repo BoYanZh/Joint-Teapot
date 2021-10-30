@@ -118,12 +118,12 @@ def prepare_assignment_dir(dir_or_zip_file: Path) -> None:
 
 
 @app.command(
-    "upload-assignment-scores",
-    help="upload assignment scores to canvas from score file (SCORE.txt by default), "
-    + "read the first line as score, the rest as comments",
+    "upload-assignment-grades",
+    help="upload assignment grades to canvas from grade file (GRADE.txt by default), "
+    + "read the first line as grade, the rest as comments",
 )
-def upload_assignment_scores(dir: Path, assignment_name: str) -> None:
-    tea.pot.canvas.upload_assignment_scores(str(dir), assignment_name)
+def upload_assignment_grades(dir: Path, assignment_name: str) -> None:
+    tea.pot.canvas.upload_assignment_grades(str(dir), assignment_name)
 
 
 if __name__ == "__main__":

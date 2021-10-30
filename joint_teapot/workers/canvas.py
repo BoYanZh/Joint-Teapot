@@ -1,13 +1,15 @@
 import os
 from glob import glob
+from typing import cast
 
 from canvasapi import Canvas as PyCanvas
+from canvasapi.assignment import Assignment
 from patoolib import extract_archive
 from patoolib.util import PatoolError
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
-from joint_teapot.utils.main import first
+from joint_teapot.utils.main import first, percentile
 
 
 class Canvas:
@@ -15,7 +17,7 @@ class Canvas:
         self,
         access_token: str = settings.canvas_access_token,
         course_id: int = settings.canvas_course_id,
-        score_filename: str = "SCORE.txt",
+        grade_filename: str = "SCORE.txt",
     ):
         self.canvas = PyCanvas("https://umjicanvas.com/", access_token)
         self.course = self.canvas.get_course(course_id)
@@ -33,11 +35,11 @@ class Canvas:
         logger.debug(f"Canvas assignments loaded")
         self.groups = self.course.get_groups()
         logger.debug(f"Canvas groups loaded")
-        self.score_filename = score_filename
+        self.grade_filename = grade_filename
         logger.debug("Canvas initialized")
 
     def prepare_assignment_dir(
-        self, dir_or_zip_file: str, create_score_file: bool = True
+        self, dir_or_zip_file: str, create_grade_file: bool = True
     ) -> None:
         if os.path.isdir(dir_or_zip_file):
             dir = dir_or_zip_file
@@ -52,8 +54,10 @@ class Canvas:
             new_path = os.path.join(dir, v)
             if not os.path.exists(new_path):
                 os.mkdir(new_path)
-            if create_score_file:
-                open(os.path.join(new_path, self.score_filename), mode="w")
+            if create_grade_file:
+                grade_file_path = os.path.join(new_path, self.grade_filename)
+                if not os.path.exists(grade_file_path):
+                    open(grade_file_path, mode="w")
         late_students = set()
         submitted_ids = set()
         for path in glob(os.path.join(dir, "*")):
@@ -87,30 +91,70 @@ class Canvas:
         if late_students:
             tmp = ", ".join([str(student) for student in late_students])
             logger.info(f"Late student(s): {tmp}")
-        if create_score_file:
-            open(os.path.join(target_dir, self.score_filename), mode="w")
 
-    def upload_assignment_scores(self, dir: str, assignment_name: str) -> None:
+    def upload_assignment_grades(self, dir: str, assignment_name: str) -> None:
         assignment = first(self.assignments, lambda x: x.name == assignment_name)
         if assignment is None:
             logger.info(f"Canvas assignment {assignment_name} not found")
             return
+        assignment = cast(Assignment, assignment)
+        submission_dict = {}
+        float_grades = []
+        is_float_grades = True
         for submission in assignment.get_submissions():
             student = first(self.students, lambda x: x.id == submission.user_id)
             if student is None:
                 continue
-            score_file_path = os.path.join(
-                dir, student.sis_login_id, self.score_filename
+            grade_file_path = os.path.join(
+                dir, student.sis_login_id, self.grade_filename
             )
-            score, *comments = list(open(score_file_path))
-            data = {
-                "submission": {"posted_grade": float(score)},
-                "comment": {"text_comment": "".join(comments)},
-            }
+            try:
+                grade, *comments = list(open(grade_file_path))
+                grade = grade.strip()
+                try:
+                    float_grades.append(float(grade))
+                except ValueError:
+                    is_float_grades = False
+                data = {
+                    "submission": {"posted_grade": grade},
+                    "comment": {"text_comment": "".join(comments)},
+                }
+                submission_dict[(student, submission)] = data
+                comment_no_newline = (
+                    data["comment"]["text_comment"].strip().replace("\n", "  ")
+                )
+                logger.info(
+                    f"Grade file parsed for {assignment} {student}: "
+                    f"grade: {data['submission']['posted_grade']}, "
+                    f'comment: "{comment_no_newline}"'
+                )
+            except Exception:
+                logger.error(f"Can not parse grade file {grade_file_path}")
+                return
+        for (student, submission), data in submission_dict.items():
             logger.info(
                 f"Uploading grade for {assignment} {student}: {data.__repr__()}"
             )
             submission.edit(**data)
+        if is_float_grades and float_grades:
+            summary = [
+                min(float_grades),
+                percentile(float_grades, 0.25),
+                percentile(float_grades, 0.5),
+                percentile(float_grades, 0.75),
+                max(float_grades),
+            ]
+            average_grade = sum(float_grades) / len(float_grades)
+            logger.info(
+                f"Grades summary: "
+                f"Min: {summary[0]:.2f}, "
+                f"Q1: {summary[1]:.2f}, "
+                f"Q2: {summary[2]:.2f}, "
+                f"Q3: {summary[3]:.2f}, "
+                f"Max: {summary[4]:.2f}, "
+                f"Average: {average_grade:.2f}"
+            )
+        logger.info(f"Canvas assginemnt {assignment} grades upload succeed")
 
 
 if __name__ == "__main__":
