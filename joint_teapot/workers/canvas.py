@@ -57,10 +57,10 @@ class Canvas:
         late_students = set()
         submitted_ids = set()
         for path in glob(os.path.join(dir, "*")):
-            file_name = os.path.basename(path)
-            if "_" not in file_name:
+            filename = os.path.basename(path)
+            if "_" not in filename:
                 continue
-            segments = file_name.split("_")
+            segments = filename.split("_")
             if segments[1] == "late":
                 file_id = int(segments[2])
             else:
@@ -74,7 +74,7 @@ class Canvas:
                 extract_archive(path, outdir=target_dir, verbosity=-1)
                 os.remove(path)
             except PatoolError:
-                os.rename(path, os.path.join(target_dir, file_name))
+                os.rename(path, os.path.join(target_dir, filename))
             submitted_ids.add(login_id)
         if login_ids:
             no_submission_students = [
@@ -87,6 +87,8 @@ class Canvas:
         if late_students:
             tmp = ", ".join([str(student) for student in late_students])
             logger.info(f"Late student(s): {tmp}")
+        if create_score_file:
+            open(os.path.join(target_dir, self.score_filename), mode="w")
 
     def upload_assignment_scores(self, dir: str, assignment_name: str) -> None:
         assignment = first(self.assignments, lambda x: x.name == assignment_name)
