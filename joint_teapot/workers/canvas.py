@@ -17,7 +17,7 @@ class Canvas:
         self,
         access_token: str = settings.canvas_access_token,
         course_id: int = settings.canvas_course_id,
-        grade_filename: str = "SCORE.txt",
+        grade_filename: str = "GRADE.txt",
     ):
         self.canvas = PyCanvas("https://umjicanvas.com/", access_token)
         self.course = self.canvas.get_course(course_id)
@@ -70,10 +70,15 @@ class Canvas:
             else:
                 file_id = int(segments[1])
             login_id = login_ids[file_id]
+            target_dir = os.path.join(dir, login_id)
             if segments[1] == "late":
+                # TODO: check the delay time of late submission
+                if create_grade_file:
+                    grade_file_path = os.path.join(path, self.grade_filename)
+                    if os.path.exists(grade_file_path):
+                        open(grade_file_path, mode="a").write("LATE SUBMISSION\n")
                 student = first(self.students, lambda x: x.login_id == login_id)
                 late_students.add(student)
-            target_dir = os.path.join(dir, login_id)
             try:
                 extract_archive(path, outdir=target_dir, verbosity=-1)
                 os.remove(path)
