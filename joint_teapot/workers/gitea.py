@@ -234,7 +234,6 @@ class Gitea:
                         "enable_merge_whitelist": False,
                         "enable_push": True,
                         "enable_push_whitelist": True,
-                        "enable_status_check": False,
                         "merge_whitelist_teams": [],
                         "merge_whitelist_usernames": [],
                         "protected_file_patterns": "",
@@ -243,7 +242,8 @@ class Gitea:
                         "push_whitelist_usernames": [],
                         "require_signed_commits": False,
                         "required_approvals": max(student_count - 1, 0),
-                        "status_check_contexts": [],
+                        "enable_status_check": True,
+                        "status_check_contexts": ["continuous-integration/drone/pr"],
                     },
                 )
             except ApiException as e:
@@ -272,14 +272,13 @@ class Gitea:
         return res
 
     def get_repo_releases(self, repo_name: str) -> List[Any]:
-        res = []
         try:
             args = self.repository_api.repo_list_releases, self.org_name, repo_name
-            res = list_all(*args)
+            return list_all(*args)
         except ApiException as e:
             if e.status != 404:
                 raise
-        return res
+        return []
 
     def get_all_repo_names(self) -> List[str]:
         return [

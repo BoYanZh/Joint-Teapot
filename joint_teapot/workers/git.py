@@ -83,7 +83,7 @@ class Git:
             except GitCommandError as e:
                 if "Connection refused" in e.stderr or "Connection reset" in e.stderr:
                     logger.warning(
-                        f"{repo_name} connection refused/reset in clone. "
+                        f"{repo_name} connection refused/reset in fetch. "
                         "Probably by JI firewall."
                     )
                     logger.info(f"wait for {retry_interval} seconds to retry...")
