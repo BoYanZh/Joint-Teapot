@@ -99,7 +99,9 @@ class Canvas:
             tmp = ", ".join([str(student) for student in late_students])
             logger.info(f"Late student(s): {tmp}")
 
-    def upload_assignment_grades(self, dir: str, assignment_name: str) -> None:
+    def upload_assignment_grades(
+        self, assignments_dir: str, assignment_name: str
+    ) -> None:
         assignment = first(self.assignments, lambda x: x.name == assignment_name)
         if assignment is None:
             logger.info(f"Canvas assignment {assignment_name} not found")
@@ -113,7 +115,7 @@ class Canvas:
             if student is None:
                 continue
             grade_file_path = os.path.join(
-                dir, student.sis_login_id, self.grade_filename
+                assignments_dir, student.sis_login_id, self.grade_filename
             )
             try:
                 grade, *comments = list(open(grade_file_path))
