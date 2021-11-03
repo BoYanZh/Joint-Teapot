@@ -1,5 +1,7 @@
 # Joint Teapot
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/352635b2c8534b0086b5a153db7c82e9)](https://app.codacy.com/gh/BoYanZh/Joint-Teapot?utm_source=github.com&utm_medium=referral&utm_content=BoYanZh/Joint-Teapot&utm_campaign=Badge_Grade_Settings)
+
 A handy tool for TAs in JI to handle works through [Gitea](https://focs.ji.sjtu.edu.cn/git/), [Canvas](https://umjicanvas.com/), and [JOJ](https://joj.sjtu.edu.cn/). Joint is related to JI and also this tool which join websites together. Teapot means to hold Gitea, inspired by [@nichujie](https://github.com/nichujie).
 
 This tool is still under heavy development. The docs may not be updated on time, and all the features are provided with the probability to change.
