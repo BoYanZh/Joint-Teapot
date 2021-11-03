@@ -76,7 +76,7 @@ class Git:
         while retry_interval and auto_retry:
             try:
                 repo.git.fetch("--tags", "--all", "-f")
-                repo.git.reset("--hard", f"origin/master")
+                repo.git.reset("--hard", "origin/master")
                 repo.git.clean("-d", "-f", "-x")
                 repo.git.checkout(checkout_dest)
                 retry_interval = 0

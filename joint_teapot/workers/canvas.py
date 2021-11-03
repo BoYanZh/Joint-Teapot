@@ -30,11 +30,11 @@ class Canvas:
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"
                 )
-        logger.debug(f"Canvas students loaded")
+        logger.debug("Canvas students loaded")
         self.assignments = self.course.get_assignments()
-        logger.debug(f"Canvas assignments loaded")
+        logger.debug("Canvas assignments loaded")
         self.groups = self.course.get_groups()
-        logger.debug(f"Canvas groups loaded")
+        logger.debug("Canvas groups loaded")
         self.grade_filename = grade_filename
         logger.debug("Canvas initialized")
 
@@ -42,16 +42,18 @@ class Canvas:
         self, dir_or_zip_file: str, create_grade_file: bool = True
     ) -> None:
         if os.path.isdir(dir_or_zip_file):
-            dir = dir_or_zip_file
+            assignments_dir = dir_or_zip_file
         else:
-            dir = os.path.splitext(dir_or_zip_file)[0]
-            if os.path.exists(dir):
-                logger.error(f"{dir} exists, can not unzip submissions file")
+            assignments_dir = os.path.splitext(dir_or_zip_file)[0]
+            if os.path.exists(assignments_dir):
+                logger.error(
+                    f"{assignments_dir} exists, can not unzip submissions file"
+                )
                 return
-            extract_archive(dir_or_zip_file, outdir=dir, verbosity=-1)
+            extract_archive(dir_or_zip_file, outdir=assignments_dir, verbosity=-1)
         login_ids = {stu.id: stu.login_id for stu in self.students}
         for v in login_ids.values():
-            new_path = os.path.join(dir, v)
+            new_path = os.path.join(assignments_dir, v)
             if not os.path.exists(new_path):
                 os.mkdir(new_path)
             if create_grade_file:
@@ -60,7 +62,7 @@ class Canvas:
                     open(grade_file_path, mode="w")
         late_students = set()
         submitted_ids = set()
-        for path in glob(os.path.join(dir, "*")):
+        for path in glob(os.path.join(assignments_dir, "*")):
             filename = os.path.basename(path)
             if "_" not in filename:
                 continue
@@ -70,7 +72,7 @@ class Canvas:
             else:
                 file_id = int(segments[1])
             login_id = login_ids[file_id]
-            target_dir = os.path.join(dir, login_id)
+            target_dir = os.path.join(assignments_dir, login_id)
             if segments[1] == "late":
                 # TODO: check the delay time of late submission
                 if create_grade_file:

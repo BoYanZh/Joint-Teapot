@@ -21,11 +21,11 @@ class PermissionEnum(Enum):
 
 
 def default_repo_name_convertor(user: User) -> Optional[str]:
-    id, name = user.sis_login_id, user.name
+    sis_login_id, name = user.sis_login_id, user.name
     eng = re.sub("[\u4e00-\u9fa5]", "", name)
     eng = eng.replace(",", "")
     eng = "".join([word[0].capitalize() + word[1:] for word in eng.split()])
-    return f"{eng}{id}"
+    return f"{eng}{sis_login_id}"
 
 
 def list_all(method: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
@@ -121,9 +121,7 @@ class Gitea:
             }
             try:
                 try:
-                    repo = self.organization_api.create_org_repo(
-                        self.org_name, body=body
-                    )
+                    self.organization_api.create_org_repo(self.org_name, body=body)
                     logger.info(
                         f"Personal repo {self.org_name}/{repo_name} for {student} created"
                     )
