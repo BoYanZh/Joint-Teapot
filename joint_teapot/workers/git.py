@@ -41,6 +41,7 @@ class Git:
                     repo_dir,
                     branch=branch,
                 )
+                retry_interval = 0
             except GitCommandError as e:
                 if "Connection refused" in e.stderr or "Connection reset" in e.stderr:
                     logger.warning(
