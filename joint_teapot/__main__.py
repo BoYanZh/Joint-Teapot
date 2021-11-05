@@ -77,10 +77,14 @@ def checkout_to_repos_by_release_name(
     repo_names: List[str], release_name: str, due: datetime = Argument("3000-01-01")
 ) -> None:
     failed_repos = []
+    succeed_repos = []
     for repo_name in repo_names:
         succeed = tea.pot.checkout_to_repo_by_release_name(repo_name, release_name, due)
         if not succeed:
             failed_repos.append(repo_name)
+        else:
+            succeed_repos.append(repo_name)
+    echo(f"succeed repos: {succeed_repos}")
     echo(f"failed repos: {failed_repos}")
 
 
