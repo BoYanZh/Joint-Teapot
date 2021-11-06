@@ -78,7 +78,7 @@ class Canvas:
             if segments[1] == "late":
                 # TODO: check the delay time of late submission
                 if create_grade_file:
-                    grade_file_path = os.path.join(path, self.grade_filename)
+                    grade_file_path = os.path.join(target_dir, self.grade_filename)
                     if os.path.exists(grade_file_path):
                         open(grade_file_path, mode="a").write("LATE SUBMISSION\n")
                 late_students.add(student)
