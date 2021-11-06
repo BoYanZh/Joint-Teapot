@@ -7,9 +7,9 @@ from setuptools import find_packages, setup
 
 def get_version(package: str) -> str:
     """
-    Return package version as listed in `__version__` in `__main__.py`.
+    Return package version as listed in `__version__` in `__init__.py`.
     """
-    path = os.path.join(package, "__main__.py")
+    path = os.path.join(package, "__init__.py")
     main_py = open(path, "r", encoding="utf8").read()
     match = re.search("__version__ = ['\"]([^'\"]+)['\"]", main_py)
     if match is None:
@@ -25,6 +25,9 @@ def get_long_description() -> str:
 
 
 def get_install_requires() -> List[str]:
+    """
+    Return each line of requirements.txt.
+    """
     return open("requirements.txt").read().splitlines()
 
 

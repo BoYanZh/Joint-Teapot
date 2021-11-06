@@ -61,6 +61,7 @@ class Canvas:
                 if not os.path.exists(grade_file_path):
                     open(grade_file_path, mode="w")
         late_students = set()
+        error_students = set()
         submitted_ids = set()
         for path in glob(os.path.join(assignments_dir, "*")):
             filename = os.path.basename(path)
@@ -72,6 +73,7 @@ class Canvas:
             else:
                 file_id = int(segments[1])
             login_id = login_ids[file_id]
+            student = first(self.students, lambda x: x.login_id == login_id)
             target_dir = os.path.join(assignments_dir, login_id)
             if segments[1] == "late":
                 # TODO: check the delay time of late submission
@@ -79,12 +81,15 @@ class Canvas:
                     grade_file_path = os.path.join(path, self.grade_filename)
                     if os.path.exists(grade_file_path):
                         open(grade_file_path, mode="a").write("LATE SUBMISSION\n")
-                student = first(self.students, lambda x: x.login_id == login_id)
                 late_students.add(student)
             try:
                 extract_archive(path, outdir=target_dir, verbosity=-1)
+                logger.info(f"Extract succeed: {student}")
                 os.remove(path)
-            except PatoolError:
+            except PatoolError as e:
+                if not str(e).startswith("unknown archive format"):
+                    logger.exception(f"Extract failed: {student}")
+                    error_students.add(student)
                 os.rename(path, os.path.join(target_dir, filename))
             submitted_ids.add(login_id)
         if login_ids:
@@ -98,6 +103,9 @@ class Canvas:
         if late_students:
             tmp = ", ".join([str(student) for student in late_students])
             logger.info(f"Late student(s): {tmp}")
+        if error_students:
+            tmp = ", ".join([str(student) for student in error_students])
+            logger.info(f"Extract error student(s): {tmp}")
 
     def upload_assignment_grades(
         self, assignments_dir: str, assignment_name: str
