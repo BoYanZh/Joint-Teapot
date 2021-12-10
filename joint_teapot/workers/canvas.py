@@ -64,15 +64,19 @@ class Canvas:
         error_students = set()
         submitted_ids = set()
         for path in glob(os.path.join(assignments_dir, "*")):
-            filename = os.path.basename(path)
-            if "_" not in filename:
+            try:
+                filename = os.path.basename(path)
+                if "_" not in filename:
+                    continue
+                segments = filename.split("_")
+                if segments[1] == "late":
+                    file_id = int(segments[2])
+                else:
+                    file_id = int(segments[1])
+                login_id = login_ids[file_id]
+            except Exception:
+                logger.error(f"Error on parsing path: {path}")
                 continue
-            segments = filename.split("_")
-            if segments[1] == "late":
-                file_id = int(segments[2])
-            else:
-                file_id = int(segments[1])
-            login_id = login_ids[file_id]
             student = first(self.students, lambda x: x.login_id == login_id)
             target_dir = os.path.join(assignments_dir, login_id)
             if segments[1] == "late":
