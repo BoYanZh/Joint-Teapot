@@ -6,6 +6,7 @@ from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
 from joint_teapot.utils.main import first
 from joint_teapot.workers import Canvas, Git, Gitea
+from joint_teapot.workers.joj import JOJ
 
 _T = TypeVar("_T")
 
@@ -39,6 +40,7 @@ class Teapot:
     _canvas = None
     _gitea = None
     _git = None
+    _joj = None
 
     @property
     def canvas(self) -> Canvas:
@@ -57,6 +59,12 @@ class Teapot:
         if not self._git:
             self._git = Git()
         return self._git
+
+    @property
+    def joj(self) -> JOJ:
+        if not self._joj:
+            self._joj = JOJ()
+        return self._joj
 
     def __init__(self) -> None:
         logger.info(

@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # git
     repos_dir: str = "./repos"
 
+    # sid
+    joj_sid: str = ""
+
     # log file
     log_file_path: str = "joint-teapot.log"
 
