@@ -19,7 +19,7 @@ source env/Scripts/activate # each time when you need this venv
 
 ```bash
 pip3 install -e .
-cp .env.exmaple .env && vi .env # configure environment
+cp .env.example .env && vi .env # configure environment
 joint-teapot --help
 ```
 
@@ -31,15 +31,22 @@ pre-commit install
 pytest -svv
 ```
 
-## Features
+## Commands & Features
 
-- [x] retrieve the hw/project releases for all students
-- [x] open "bulk issues" to report something wrong
-- [x] collect all the public keys
-- [x] import groups (create teams)
-- [x] create repos
-- [x] archive all repos of a course
-- [x] check whether an issue exists with appointed title
+- archive-all-repos          archive all repos in gitea organization
+- check-issues               check the existence of issue by title on gitea
+- checkout-releases          checkout git repo to git tag fetched from gitea by release name, with due date
+- clone-all-repos            clone all gitea repos to local
+- close-all-issues           close all issues and pull requests in gitea organization
+- create-issues              create issues on gitea
+- create-personal-repos      create personal repos on gitea for all canvas students
+- create-teams               create teams on gitea by canvas groups
+- get-no-collaborator-repos  list all repos with no collaborators
+- get-public-keys            list all public keys on gitea
+- get-repos-status           list status of all repos with conditions
+- invite-to-teams            invite all canvas students to gitea teams by team name
+- prepare-assignment-dir     prepare assignment dir from extracted canvas "Download Submissions" zip
+- upload-assignment-grades   upload assignment grades to canvas from grade file (GRADE.txt by default), read the first line as grade, the rest as comments
 
 ## License
 

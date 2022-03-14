@@ -1,0 +1,2 @@
+# .env.example make the repo not pure python
+.env.example linguist-vendored

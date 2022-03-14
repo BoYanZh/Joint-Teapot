@@ -93,9 +93,9 @@ def close_all_issues() -> None:
     tea.pot.gitea.close_all_issues()
 
 
-@app.command("archieve-all-repos", help="archieve all repos in gitea organization")
-def archieve_all_repos() -> None:
-    tea.pot.gitea.archieve_all_repos()
+@app.command("archive-all-repos", help="archive all repos in gitea organization")
+def archive_all_repos() -> None:
+    tea.pot.gitea.archive_all_repos()
 
 
 @app.command("get-no-collaborator-repos", help="list all repos with no collaborators")

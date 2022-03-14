@@ -349,7 +349,7 @@ class Gitea:
                         self.org_name, repo_name, issue.number, body={"state": "closed"}
                     )
 
-    def archieve_all_repos(self) -> None:
+    def archive_all_repos(self) -> None:
         for repo in list_all(self.organization_api.org_list_repos, self.org_name):
             self.repository_api.repo_edit(
                 self.org_name, repo.name, body={"archived": True}
