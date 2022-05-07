@@ -12,7 +12,7 @@ This tool is still under heavy development. The docs may not be updated on time,
 
 ```bash
 python3 -m venv env # you only need to do that once
-source env/Scripts/activate # each time when you need this venv
+source env/bin/activate # each time when you need this venv
 ```
 
 ### Install
