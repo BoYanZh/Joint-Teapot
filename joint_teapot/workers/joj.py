@@ -16,6 +16,8 @@ class JOJ:
         self.submitter = JOJSubmitter(sid, logger)
 
     def submit_dir(self, problem_url: str, path: str, lang: str) -> Tuple[int, str]:
+        if lang not in list(Language):
+            raise Exception(f"unsupported language '{lang}' for JOJ")
         exclude_paths = [".git"]
         zip_buffer = io.BytesIO()
         zip_buffer.name = f"{os.path.basename(path)}.zip"

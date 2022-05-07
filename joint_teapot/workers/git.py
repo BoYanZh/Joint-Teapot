@@ -7,7 +7,7 @@ from joint_teapot.utils.logger import logger
 
 current_path = sys.path[0]
 sys.path.remove(current_path)
-from git import Repo
+from git import Repo  # type: ignore
 from git.exc import GitCommandError
 
 sys.path.insert(0, current_path)
