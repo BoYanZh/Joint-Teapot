@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from functools import lru_cache
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -328,6 +329,23 @@ class Gitea:
             self.org_name,
             repo_name,
             body={"title": title, "body": body, "assignees": assignees},
+        )
+
+    def create_milestone(
+        self,
+        repo_name: str,
+        title: str,
+        description: str,
+        due_on: datetime,
+    ) -> None:
+        self.issue_api.issue_create_milestone(
+            self.org_name,
+            repo_name,
+            body={
+                "title": title,
+                "description": description,
+                "due_on": due_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            },
         )
 
     def check_exist_issue_by_title(self, repo_name: str, title: str) -> bool:

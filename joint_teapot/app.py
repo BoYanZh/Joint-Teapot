@@ -62,6 +62,13 @@ def create_issue_for_repos(repo_names: List[str], title: str, body: str) -> None
     tea.pot.create_issue_for_repos(repo_names, title, body)
 
 
+@app.command("create-milestones", help="create milestones on gitea")
+def create_milestone_for_repos(
+    repo_names: List[str], title: str, description: str, due_on: datetime
+) -> None:
+    tea.pot.create_milestone_for_repos(repo_names, title, description, due_on)
+
+
 @app.command("check-issues", help="check the existence of issue by title on gitea")
 def check_exist_issue_by_title(repo_names: List[str], title: str) -> None:
     echo("\n".join(tea.pot.check_exist_issue_by_title(repo_names, title)))
