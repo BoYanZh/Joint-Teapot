@@ -38,9 +38,11 @@ pytest -svv
 - `checkout-releases`:          checkout git repo to git tag fetched from gitea by release name, with due date
 - `clone-all-repos`:            clone all gitea repos to local
 - `close-all-issues`:           close all issues and pull requests in gitea organization
+- `create-channels-on-mm`:      create channels for student groups according to group information on gitea
 - `create-issues`:              create issues on gitea
 - `create-personal-repos`:      create personal repos on gitea for all canvas students
 - `create-teams`:               create teams on gitea by canvas groups
+- `create-webhooks-for-mm`:     create a pair of webhooks on gitea and mm for all student groups on gitea, and configure them so that updates on gitea will be pushed to the mm channel
 - `get-no-collaborator-repos`:  list all repos with no collaborators
 - `get-public-keys`:            list all public keys on gitea
 - `get-repos-status`:           list status of all repos with conditions
