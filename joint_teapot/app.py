@@ -135,6 +135,26 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
     tea.pot.canvas.upload_assignment_grades(str(assignments_dir), assignment_name)
 
 
+@app.command(
+    "create-channels-on-mm",
+    help="create channels for student groups according to group information on"
+    " gitea",
+)
+def create_channels_on_mm() -> None:
+    tea.pot.mattermost.create_channels_for_groups(tea.pot.gitea.get_all_teams())
+
+
+@app.command(
+    "create-webhooks-for-mm",
+    help="create a pair of webhooks on gitea and mm for all student groups on gitea, "
+    "and configure them so that updates on gitea will be pushed to the mm channel",
+)
+def create_webhooks_for_mm() -> None:
+    tea.pot.mattermost.create_webhooks_for_repos(
+        [group.name for group in tea.pot.gitea.get_all_teams()], tea.pot.gitea
+    )
+
+
 if __name__ == "__main__":
     try:
         app()

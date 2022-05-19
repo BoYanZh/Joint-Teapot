@@ -63,6 +63,7 @@ class Mattermost:
                         f"User {member} is not found on the Mattermost server"
                     )
                     continue
+                # code for adding student to mm, disabled since there is no need to do that
                 # try:
                 #     mmuser = self.endpoint.users.create_user({'email':f"{member}@sjtu.edu.cn", 'username':member, auth_service:"gitlab"})
                 # except e:
@@ -128,3 +129,16 @@ class Mattermost:
                 )
             except Exception as e:
                 logger.warning(f"Error when creating outgoing webhook at Gitea: {e}")
+
+    # unused since we can give students invitation links instead
+    def invite_students_to_team(self, students: List[str]) -> None:
+        for student in students:
+            try:
+                mmuser = self.endpoint.users.get_user_by_username(student)
+            except Exception as e:
+                logger.warning(f"User {student} is not found on the Mattermost server")
+                continue
+            self.endpoint.teams.add_user_to_team(
+                self.team["id"], {"user_id": mmuser["id"], "team_id": self.team["id"]}
+            )
+            logger.info(f"Added user {student} to team {self.team['name']}")
