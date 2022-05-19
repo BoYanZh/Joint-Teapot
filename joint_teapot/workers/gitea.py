@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -20,7 +20,10 @@ class PermissionEnum(Enum):
     admin = "admin"
 
 
-def list_all(method: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+T = TypeVar("T")
+
+
+def list_all(method: Callable[..., Iterable[T]], *args: Any, **kwargs: Any) -> List[T]:
     all_res = []
     page = 1
     while True:
@@ -171,10 +174,9 @@ class Gitea:
                     },
                 )
                 logger.info(f"{self.org_name}/{team_name} created")
-            repo = first(repos, lambda repo: repo.name == repo_name)
-            if repo is None:
+            if first(repos, lambda repo: repo.name == repo_name) is None:
                 repo_names.append(repo_name)
-                repo = self.organization_api.create_org_repo(
+                self.organization_api.create_org_repo(
                     self.org_name,
                     body={
                         "auto_init": False,
