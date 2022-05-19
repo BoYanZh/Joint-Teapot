@@ -10,6 +10,7 @@ from canvasapi.user import User
 from focs_gitea.rest import ApiException
 
 from joint_teapot.config import settings
+from joint_teapot.student_group import StudentGroup
 from joint_teapot.utils.logger import logger
 from joint_teapot.utils.main import default_repo_name_convertor, first
 
@@ -374,6 +375,32 @@ class Gitea:
             self.repository_api.repo_edit(
                 self.org_name, repo.name, body={"archived": True}
             )
+
+    def get_all_teams(
+        self,
+    ) -> List[StudentGroup]:
+        ret: List[StudentGroup] = []
+        try:
+            teams_raw = self.organization_api.org_list_teams(self.org_name)
+        except ApiException as e:
+            logger.error(f"Failed to get teams from organization {self.org_name}: {e}")
+            exit(1)
+        for team_raw in teams_raw:
+            if team_raw.name == "Owners":
+                continue
+            id = team_raw.id
+            try:
+                members = [
+                    m.login.lower()
+                    for m in self.organization_api.org_list_team_members(id)
+                ]
+            except ApiException as e:
+                logger.warning(
+                    f"Failed to get members of team {id} in {self.org_name}: {e}"
+                )
+                continue
+            ret.append(StudentGroup(team_raw.name, members))
+        return ret
 
 
 if __name__ == "__main__":

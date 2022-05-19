@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     # git
     repos_dir: str = "./repos"
 
+    # mattermost
+    mattermost_url: str = "focs.ji.sjtu.edu.cn"
+    mattermost_suffix: str = "/mm"
+    mattermost_access_token: str = ""
+    mattermost_team: str = ""
+
     # sid
     joj_sid: str = ""
 

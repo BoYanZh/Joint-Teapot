@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, TypeVar
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
 from joint_teapot.utils.main import first
-from joint_teapot.workers import Canvas, Git, Gitea
+from joint_teapot.workers import Canvas, Git, Gitea, Mattermost
 from joint_teapot.workers.joj import JOJ
 
 _T = TypeVar("_T")
@@ -41,6 +41,7 @@ class Teapot:
     _gitea = None
     _git = None
     _joj = None
+    _mattermost = None
 
     @property
     def canvas(self) -> Canvas:
@@ -66,11 +67,18 @@ class Teapot:
             self._joj = JOJ()
         return self._joj
 
+    @property
+    def mattermost(self) -> Mattermost:
+        if not self._mattermost:
+            self._mattermost = Mattermost()
+        return self._mattermost
+
     def __init__(self) -> None:
         logger.info(
             "Settings loaded. "
             f"Canvas Course ID: {settings.canvas_course_id}, "
-            f"Gitea Organization name: {settings.gitea_org_name}"
+            f"Gitea Organization name: {settings.gitea_org_name}, "
+            f"Mattermost Team name: {settings.mattermost_team} @ {settings.mattermost_url}/{settings.mattermost_suffix}"
         )
         logger.debug("Teapot initialized.")
 
