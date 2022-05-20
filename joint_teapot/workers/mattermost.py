@@ -48,12 +48,14 @@ class Mattermost:
                         "team_id": self.team["id"],
                         "name": group.name,
                         "display_name": group.name,
-                        "type": "P",
+                        "type": "P",  # create private channels
                     }
                 )
                 logger.info(f"Added group {group.name} to Mattermost")
             except Exception as e:
-                logger.warning(f"Error when creating channel {group.name}: {e}")
+                logger.warning(
+                    f"Error when creating channel {group.name}: {e} Perhaps channel already exists?"
+                )
                 continue
             for member in group.members:
                 try:
@@ -69,9 +71,12 @@ class Mattermost:
                 # except e:
                 #     logger.error(f"Error creating user {member}")
                 #     continue
-                self.endpoint.channels.add_user(
-                    channel["id"], {"user_id": mmuser["id"]}
-                )
+                try:
+                    self.endpoint.channels.add_user(
+                        channel["id"], {"user_id": mmuser["id"]}
+                    )
+                except Exception as e:
+                    logger.warning(f"User {member} is not in the team")
                 logger.info(f"Added member {member} to channel {group.name}")
 
     def create_webhooks_for_repos(self, repos: List[str], gitea: Gitea) -> None:

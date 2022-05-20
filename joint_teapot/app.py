@@ -140,8 +140,10 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
     help="create channels for student groups according to group information on"
     " gitea",
 )
-def create_channels_on_mm() -> None:
-    tea.pot.mattermost.create_channels_for_groups(tea.pot.gitea.get_all_teams())
+def create_channels_on_mm(prefix: str = Argument("")) -> None:
+    tea.pot.mattermost.create_channels_for_groups(
+        [team for team in tea.pot.gitea.get_all_teams() if team.name.startswith(prefix)]
+    )
 
 
 @app.command(
@@ -149,9 +151,14 @@ def create_channels_on_mm() -> None:
     help="create a pair of webhooks on gitea and mm for all student groups on gitea, "
     "and configure them so that updates on gitea will be pushed to the mm channel",
 )
-def create_webhooks_for_mm() -> None:
+def create_webhooks_for_mm(prefix: str = Argument("")) -> None:
     tea.pot.mattermost.create_webhooks_for_repos(
-        [group.name for group in tea.pot.gitea.get_all_teams()], tea.pot.gitea
+        [
+            group.name
+            for group in tea.pot.gitea.get_all_teams()
+            if group.name.startswith(prefix)
+        ],
+        tea.pot.gitea,
     )
 
 
