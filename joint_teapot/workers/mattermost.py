@@ -29,11 +29,11 @@ class Mattermost:
         )
         try:
             operator = self.endpoint.login()
-        except Exception as e:
-            logger.error("Cannot login to Mattermost.")
+        except Exception:
+            logger.error("Cannot login to Mattermost")
             return
-        if "system_admin" not in operator["roles"]:
-            logger.error("Please login as system admin on the Mattermost server")
+        if "admin" not in operator["roles"]:
+            logger.error("Please make sure you have enough permission")
         try:
             self.team = self.endpoint.teams.get_team_by_name(team_name)
         except Exception as e:
@@ -60,7 +60,7 @@ class Mattermost:
             for member in group.members:
                 try:
                     mmuser = self.endpoint.users.get_user_by_username(member)
-                except Exception as e:
+                except Exception:
                     logger.warning(
                         f"User {member} is not found on the Mattermost server"
                     )
@@ -75,7 +75,7 @@ class Mattermost:
                     self.endpoint.channels.add_user(
                         channel["id"], {"user_id": mmuser["id"]}
                     )
-                except Exception as e:
+                except Exception:
                     logger.warning(f"User {member} is not in the team")
                 logger.info(f"Added member {member} to channel {group.name}")
 
@@ -104,7 +104,7 @@ class Mattermost:
                 logger.error(f"Error when creating incoming webhook at Mattermost: {e}")
                 continue
             try:
-                gitea_webhook = gitea.repository_api.repo_create_hook(
+                gitea.repository_api.repo_create_hook(
                     gitea.org_name,
                     repo,
                     body=focs_gitea.CreateHookOption(
@@ -140,7 +140,7 @@ class Mattermost:
         for student in students:
             try:
                 mmuser = self.endpoint.users.get_user_by_username(student)
-            except Exception as e:
+            except Exception:
                 logger.warning(f"User {student} is not found on the Mattermost server")
                 continue
             self.endpoint.teams.add_user_to_team(

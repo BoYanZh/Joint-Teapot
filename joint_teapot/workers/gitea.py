@@ -391,15 +391,15 @@ class Gitea:
         for team_raw in teams_raw:
             if team_raw.name == "Owners":
                 continue
-            id = team_raw.id
+            team_id = team_raw.id
             try:
                 members = [
                     m.login.lower()
-                    for m in self.organization_api.org_list_team_members(id)
+                    for m in self.organization_api.org_list_team_members(team_id)
                 ]
             except ApiException as e:
                 logger.warning(
-                    f"Failed to get members of team {id} in {self.org_name}: {e}"
+                    f"Failed to get members of team {team_id} in {self.org_name}: {e}"
                 )
                 continue
             ret.append(StudentGroup(team_raw.name, members))
