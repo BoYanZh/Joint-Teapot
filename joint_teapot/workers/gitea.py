@@ -42,10 +42,13 @@ class Gitea:
         self,
         access_token: str = settings.gitea_access_token,
         org_name: str = settings.gitea_org_name,
+        domain_name: str = settings.gitea_domain_name,
+        suffix: str = settings.gitea_suffix,
     ):
         self.org_name = org_name
         configuration = focs_gitea.Configuration()
         configuration.api_key["access_token"] = access_token
+        configuration.host = f"https://{domain_name}{suffix}/api/v1"
         self.api_client = focs_gitea.ApiClient(configuration)
         self.admin_api = focs_gitea.AdminApi(self.api_client)
         self.miscellaneous_api = focs_gitea.MiscellaneousApi(self.api_client)

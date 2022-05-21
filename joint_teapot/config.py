@@ -13,15 +13,16 @@ class Settings(BaseSettings):
     canvas_course_id: int = 0
 
     # gitea
+    gitea_domain_name: str = "focs.ji.sjtu.edu.cn"
+    gitea_suffix: str = "/git"
     gitea_access_token: str = ""
     gitea_org_name: str = ""
-    gitea_suffix: str = "/git"
 
     # git
     repos_dir: str = "./repos"
 
     # mattermost
-    mattermost_url: str = "focs.ji.sjtu.edu.cn"
+    mattermost_domain_name: str = "focs.ji.sjtu.edu.cn"
     mattermost_suffix: str = "/mm"
     mattermost_access_token: str = ""
     mattermost_team: str = ""

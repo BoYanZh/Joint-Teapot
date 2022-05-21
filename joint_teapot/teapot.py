@@ -78,7 +78,7 @@ class Teapot:
             "Settings loaded. "
             f"Canvas Course ID: {settings.canvas_course_id}, "
             f"Gitea Organization name: {settings.gitea_org_name}, "
-            f"Mattermost Team name: {settings.mattermost_team}@{settings.mattermost_url}{settings.mattermost_suffix}"
+            f"Mattermost Team name: {settings.mattermost_team}@{settings.mattermost_domain_name}{settings.mattermost_suffix}"
         )
         logger.debug("Teapot initialized.")
 

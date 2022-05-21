@@ -13,17 +13,17 @@ class Mattermost:
     def __init__(
         self,
         access_token: str = settings.mattermost_access_token,
-        url_suffix: str = settings.mattermost_suffix,
         team_name: str = settings.mattermost_team,
-        url: str = settings.mattermost_url,
+        domain_name: str = settings.mattermost_domain_name,
+        suffix: str = settings.mattermost_suffix,
     ):
-        self.url = url
-        self.url_suffix = url_suffix
+        self.url = domain_name
+        self.url_suffix = suffix
         self.endpoint = Driver(
             {
-                "url": url,
+                "url": domain_name,
                 "port": 443,
-                "basepath": url_suffix + "/api/v4",
+                "basepath": suffix + "/api/v4",
                 "token": access_token,
             }
         )
