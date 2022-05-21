@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     # gitea
     gitea_access_token: str = ""
     gitea_org_name: str = ""
+    gitea_suffix: str = "/git"
 
     # git
     repos_dir: str = "./repos"

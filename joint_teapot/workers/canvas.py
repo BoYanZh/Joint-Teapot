@@ -1,6 +1,6 @@
 import os
 from glob import glob
-from typing import List, cast
+from typing import cast
 
 from canvasapi import Canvas as PyCanvas
 from canvasapi.assignment import Assignment
@@ -176,9 +176,6 @@ class Canvas:
                 f"Average: {average_grade:.2f}"
             )
         logger.info(f"Canvas assginemnt {assignment} grades upload succeed")
-
-    def get_student_uniqnames(self) -> List[str]:
-        return [stu.email.split("@")[0] for stu in self.students]
 
 
 if __name__ == "__main__":
