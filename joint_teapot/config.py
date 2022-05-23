@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     """
 
     # canvas
+    canvas_domain_name: str = "umjicanvas.com"
+    canvas_suffix: str = "/"
     canvas_access_token: str = ""
     canvas_course_id: int = 0
 
