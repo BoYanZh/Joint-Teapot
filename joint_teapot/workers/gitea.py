@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -10,7 +10,6 @@ from canvasapi.user import User
 from focs_gitea.rest import ApiException
 
 from joint_teapot.config import settings
-from joint_teapot.student_group import StudentGroup
 from joint_teapot.utils.logger import logger
 from joint_teapot.utils.main import default_repo_name_convertor, first
 
@@ -152,8 +151,8 @@ class Gitea:
         repos = list_all(self.organization_api.org_list_repos, self.org_name)
         group: Group
         for group in groups:
-            team_name = team_name_convertor(group.name)
-            repo_name = repo_name_convertor(group.name)
+            team_name = team_name_convertor(group["name"])
+            repo_name = repo_name_convertor(group["name"])
             if team_name is None or repo_name is None:
                 continue
             team = first(teams, lambda team: team.name == team_name)
@@ -381,8 +380,8 @@ class Gitea:
 
     def get_all_teams(
         self,
-    ) -> List[StudentGroup]:
-        ret: List[StudentGroup] = []
+    ) -> List[Dict[str, Union[str, List[str]]]]:
+        ret: List[Dict[str, Union[str, List[str]]]] = []
         try:
             teams_raw = self.organization_api.org_list_teams(self.org_name)
         except ApiException as e:
@@ -402,7 +401,7 @@ class Gitea:
                     f"Failed to get members of team {team_id} in {self.org_name}: {e}"
                 )
                 continue
-            ret.append(StudentGroup(team_raw.name, members))
+            ret.append({"name": team_raw.name, "members": members})
         return ret
 
 

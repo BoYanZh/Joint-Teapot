@@ -1,10 +1,9 @@
-from typing import List
+from typing import Dict, List, Union
 
 import focs_gitea
 from mattermostdriver import Driver
 
 from joint_teapot.config import settings
-from joint_teapot.student_group import StudentGroup
 from joint_teapot.utils.logger import logger
 from joint_teapot.workers.gitea import Gitea
 
@@ -40,24 +39,26 @@ class Mattermost:
             logger.error(f"Cannot get team {team_name}: {e}")
             return
 
-    def create_channels_for_groups(self, groups: List[StudentGroup]) -> None:
+    def create_channels_for_groups(
+        self, groups: List[Dict[str, Union[str, List[str]]]]
+    ) -> None:
         for group in groups:
             try:
                 channel = self.endpoint.channels.create_channel(
                     {
                         "team_id": self.team["id"],
-                        "name": group.name,
-                        "display_name": group.name,
+                        "name": group["name"],
+                        "display_name": group["name"],
                         "type": "P",  # create private channels
                     }
                 )
-                logger.info(f"Added group {group.name} to Mattermost")
+                logger.info(f"Added group {group['name']} to Mattermost")
             except Exception as e:
                 logger.warning(
-                    f"Error when creating channel {group.name}: {e} Perhaps channel already exists?"
+                    f"Error when creating channel {group['name']}: {e} Perhaps channel already exists?"
                 )
                 continue
-            for member in group.members:
+            for member in group["members"]:
                 try:
                     mmuser = self.endpoint.users.get_user_by_username(member)
                 except Exception:
@@ -77,7 +78,7 @@ class Mattermost:
                     )
                 except Exception:
                     logger.warning(f"User {member} is not in the team")
-                logger.info(f"Added member {member} to channel {group.name}")
+                logger.info(f"Added member {member} to channel {group['name']}")
 
     def create_webhooks_for_repos(self, repos: List[str], gitea: Gitea) -> None:
         # one group corresponds to one repo so these concepts can be used interchangably

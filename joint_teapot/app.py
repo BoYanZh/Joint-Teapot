@@ -141,9 +141,15 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
     " gitea",
 )
 def create_channels_on_mm(prefix: str = Argument("")) -> None:
-    tea.pot.mattermost.create_channels_for_groups(
-        [team for team in tea.pot.gitea.get_all_teams() if team.name.startswith(prefix)]
+    groups = [
+        group
+        for group in tea.pot.gitea.get_all_teams()
+        if isinstance(group["name"], str) and group["name"].startswith(prefix)
+    ]
+    logger.info(
+        f"{len(groups)} channels to be created: {groups[0]['name']} ... {groups[-1]['name']}"
     )
+    tea.pot.mattermost.create_channels_for_groups(groups)
 
 
 @app.command(
@@ -152,14 +158,13 @@ def create_channels_on_mm(prefix: str = Argument("")) -> None:
     "and configure them so that updates on gitea will be pushed to the mm channel",
 )
 def create_webhooks_for_mm(prefix: str = Argument("")) -> None:
-    tea.pot.mattermost.create_webhooks_for_repos(
-        [
-            group.name
-            for group in tea.pot.gitea.get_all_teams()
-            if group.name.startswith(prefix)
-        ],
-        tea.pot.gitea,
-    )
+    groups = [
+        group["name"]
+        for group in tea.pot.gitea.get_all_teams()
+        if isinstance(group["name"], str) and group["name"].startswith(prefix)
+    ]
+    logger.info(f"{len(groups)} pairs to be created: {groups[0]} ... {groups[-1]}")
+    tea.pot.mattermost.create_webhooks_for_repos(groups, tea.pot.gitea)
 
 
 if __name__ == "__main__":
