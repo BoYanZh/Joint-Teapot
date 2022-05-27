@@ -144,7 +144,10 @@ class Teapot:
         return True
 
     def get_repos_status(self, commit_lt: int, issue_lt: int) -> None:
-        for repo_name, commit_count, issue_count in self.gitea.get_repos_status():
+        for repo_name, (
+            commit_count,
+            issue_count,
+        ) in self.gitea.get_repos_status().items():
             if commit_count < commit_lt or issue_count < issue_lt:
                 logger.info(
                     f"{self.gitea.org_name}/{repo_name} has "

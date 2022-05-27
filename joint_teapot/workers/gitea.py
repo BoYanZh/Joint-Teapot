@@ -290,9 +290,11 @@ class Gitea:
             res.append(data.name)
         return res
 
-    def get_repos_status(self) -> List[Tuple[str, int, int]]:
-        res = []
+    def get_repos_status(self) -> Dict[str, Tuple[int, int]]:
+        res = {}
         for repo in list_all(self.organization_api.org_list_repos, self.org_name):
+            commits = []
+            issues = []
             try:
                 commits = self.repository_api.repo_get_all_commits(
                     self.org_name, repo.name
@@ -300,14 +302,12 @@ class Gitea:
             except ApiException as e:
                 if e.status != 409:
                     raise
-                commits = []
             issues = self.issue_api.issue_list_issues(
                 self.org_name, repo.name, state="all"
             )
             # if not commits:
             #     logger.info(f"{self.org_name}/{repo.name} has no commits")
-            #     res.append(repo.name)
-            res.append((repo.name, len(commits), len(issues)))
+            res[repo.name] = (len(commits), len(issues))
         return res
 
     def create_issue(
