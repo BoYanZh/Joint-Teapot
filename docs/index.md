@@ -15,7 +15,7 @@ source env/Scripts/activate # each time when you need this venv
 
 ```bash
 pip3 install -e .
-cp .env.exmaple .env && vi .env # configure environment
+cp .env.example .env && vi .env # configure environment
 joint-teapot --help
 ```
 

@@ -16,7 +16,7 @@ def for_all_methods(
 ) -> Callable[[_T], _T]:
     @functools.wraps(decorator)
     def decorate(cls: Any) -> Any:
-        for attr in cls.__dict__:  # there's propably a better way to do this
+        for attr in cls.__dict__:  # there's probably a better way to do this
             if callable(getattr(cls, attr)):
                 setattr(cls, attr, decorator(getattr(cls, attr)))
         return cls

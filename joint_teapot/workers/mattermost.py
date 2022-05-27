@@ -79,7 +79,7 @@ class Mattermost:
                 logger.info(f"Added member {member} to channel {group_name}")
 
     def create_webhooks_for_repos(self, repos: List[str], gitea: Gitea) -> None:
-        # one group corresponds to one repo so these concepts can be used interchangably
+        # one group corresponds to one repo so these concepts can be used interchangeably
         for repo in repos:
             logger.info(f"Creating webhooks for repo {gitea.org_name}/{repo}")
             try:
