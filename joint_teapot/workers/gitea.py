@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -378,19 +378,12 @@ class Gitea:
                 self.org_name, repo.name, body={"archived": True}
             )
 
-    def get_all_teams(
-        self,
-    ) -> List[Dict[str, Union[str, List[str]]]]:
-        ret: List[Dict[str, Union[str, List[str]]]] = []
-        try:
-            teams_raw = self.organization_api.org_list_teams(self.org_name)
-        except ApiException as e:
-            logger.error(f"Failed to get teams from organization {self.org_name}: {e}")
-            exit(1)
-        for team_raw in teams_raw:
-            if team_raw.name == "Owners":
+    def get_all_teams(self) -> Dict[str, List[str]]:
+        res: Dict[str, List[str]] = {}
+        for team in list_all(self.organization_api.org_list_teams, self.org_name):
+            if team.name == "Owners":
                 continue
-            team_id = team_raw.id
+            team_id = team.id
             try:
                 members = [
                     m.login.lower()
@@ -401,8 +394,8 @@ class Gitea:
                     f"Failed to get members of team {team_id} in {self.org_name}: {e}"
                 )
                 continue
-            ret.append({"name": team_raw.name, "members": members})
-        return ret
+            res[team.name] = members
+        return res
 
 
 if __name__ == "__main__":
