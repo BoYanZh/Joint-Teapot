@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     # log file
     log_file_path: str = "joint-teapot.log"
+    stderr_log_level: str = "INFO"
 
     class Config:
         env_file = ".env"
