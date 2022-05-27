@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
 import focs_gitea
 from canvasapi.group import Group, GroupMembership
@@ -41,10 +41,13 @@ class Gitea:
         self,
         access_token: str = settings.gitea_access_token,
         org_name: str = settings.gitea_org_name,
+        domain_name: str = settings.gitea_domain_name,
+        suffix: str = settings.gitea_suffix,
     ):
         self.org_name = org_name
         configuration = focs_gitea.Configuration()
         configuration.api_key["access_token"] = access_token
+        configuration.host = f"https://{domain_name}{suffix}/api/v1"
         self.api_client = focs_gitea.ApiClient(configuration)
         self.admin_api = focs_gitea.AdminApi(self.api_client)
         self.miscellaneous_api = focs_gitea.MiscellaneousApi(self.api_client)
@@ -148,8 +151,8 @@ class Gitea:
         repos = list_all(self.organization_api.org_list_repos, self.org_name)
         group: Group
         for group in groups:
-            team_name = team_name_convertor(group.name)
-            repo_name = repo_name_convertor(group.name)
+            team_name = team_name_convertor(group["name"])
+            repo_name = repo_name_convertor(group["name"])
             if team_name is None or repo_name is None:
                 continue
             team = first(teams, lambda team: team.name == team_name)
@@ -374,6 +377,32 @@ class Gitea:
             self.repository_api.repo_edit(
                 self.org_name, repo.name, body={"archived": True}
             )
+
+    def get_all_teams(
+        self,
+    ) -> List[Dict[str, Union[str, List[str]]]]:
+        ret: List[Dict[str, Union[str, List[str]]]] = []
+        try:
+            teams_raw = self.organization_api.org_list_teams(self.org_name)
+        except ApiException as e:
+            logger.error(f"Failed to get teams from organization {self.org_name}: {e}")
+            exit(1)
+        for team_raw in teams_raw:
+            if team_raw.name == "Owners":
+                continue
+            team_id = team_raw.id
+            try:
+                members = [
+                    m.login.lower()
+                    for m in self.organization_api.org_list_team_members(team_id)
+                ]
+            except ApiException as e:
+                logger.warning(
+                    f"Failed to get members of team {team_id} in {self.org_name}: {e}"
+                )
+                continue
+            ret.append({"name": team_raw.name, "members": members})
+        return ret
 
 
 if __name__ == "__main__":

@@ -293,6 +293,9 @@ dmypy.json
 !.vscode/extensions.json
 *.code-workspace
 
+# vim
+.vimspector.json
+
 # End of https://www.toptal.com/developers/gitignore/api/vscode,python
 
 repos/

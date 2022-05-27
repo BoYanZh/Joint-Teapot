@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: pyupgrade
   - repo: https://github.com/hadialqattan/pycln
-    rev: v0.0.1-beta.3 # Possible releases: https://github.com/hadialqattan/pycln/tags
+    rev: v1.3.2 # Possible releases: https://github.com/hadialqattan/pycln/tags
     hooks:
       - id: pycln
   - repo: https://github.com/PyCQA/bandit

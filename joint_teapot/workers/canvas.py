@@ -15,11 +15,13 @@ from joint_teapot.utils.main import first, percentile
 class Canvas:
     def __init__(
         self,
+        domain_name: str = settings.canvas_domain_name,
+        suffix: str = settings.canvas_suffix,
         access_token: str = settings.canvas_access_token,
         course_id: int = settings.canvas_course_id,
         grade_filename: str = "GRADE.txt",
     ):
-        self.canvas = PyCanvas("https://umjicanvas.com/", access_token)
+        self.canvas = PyCanvas(f"https://{domain_name}{suffix}", access_token)
         self.course = self.canvas.get_course(course_id)
         logger.info(f"Canvas course loaded. {self.course}")
         # types = ["student", "observer"]

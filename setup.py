@@ -36,7 +36,7 @@ setup(
     version=get_version("joint_teapot"),
     url="https://github.com/BoYanZh/joint-teapot",
     license="MIT",
-    description="A handy tool for TAs in JI to handle stuffs through Gitea, Canvas, and JOJ.",
+    description="A handy tool for TAs in JI to handle stuffs through Gitea, Canvas, JOJ and Mattermost.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     author="BoYanZh",
