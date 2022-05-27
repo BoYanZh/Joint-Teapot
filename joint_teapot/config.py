@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     gitea_org_name: str = ""
 
     # git
+    git_host: str = "ssh://git@focs.ji.sjtu.edu.cn:2222"
     repos_dir: str = "./repos"
 
     # mattermost

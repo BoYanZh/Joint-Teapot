@@ -7,7 +7,7 @@ from joint_teapot.utils.logger import logger
 
 current_path = sys.path[0]
 sys.path.remove(current_path)
-from git import Repo  # type: ignore
+from git import Repo
 from git.exc import GitCommandError
 
 sys.path.insert(0, current_path)
@@ -18,9 +18,11 @@ from joint_teapot.config import settings
 class Git:
     def __init__(
         self,
+        git_host: str = settings.git_host,
         org_name: str = settings.gitea_org_name,
         repos_dir: str = settings.repos_dir,
     ):
+        self.git_host = git_host
         self.org_name = org_name
         if not os.path.isdir(repos_dir):
             raise Exception(f"{repos_dir} does not exist! Create it first.")
@@ -36,7 +38,7 @@ class Git:
         while retry_interval and auto_retry:
             try:
                 repo = Repo.clone_from(
-                    f"ssh://git@focs.ji.sjtu.edu.cn:2222/{self.org_name}/{repo_name}.git",
+                    f"{self.git_host}/{self.org_name}/{repo_name}.git",
                     repo_dir,
                     branch=branch,
                 )
