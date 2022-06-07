@@ -399,24 +399,23 @@ class Gitea:
         return res
 
     def unsubscribe_from_repos(self, pattern: str) -> None:
-        regex = re.compile(pattern)
         subscriptions = [
             sub
             for sub in self.user_api.user_current_list_subscriptions()
             if sub.owner.login == self.org_name
-            and re.search(regex, sub.name) is not None
+            and re.search(pattern, sub.name) is not None
         ]
         if len(subscriptions) == 0:
             logger.warning(f"No subscribed repo matches the pattern {pattern}")
-        else:
-            logger.info(
-                f"{len(subscriptions)} subscriptions match the pattern {pattern}: {subscriptions[0].name} ... {subscriptions[-1].name}"
+            return
+        logger.info(
+            f"{len(subscriptions)} subscriptions match the pattern {pattern}: {[s.name for s in subscriptions]}"
+        )
+        for sub in subscriptions:
+            self.repository_api.user_current_delete_subscription(
+                self.org_name, sub.name
             )
-            for sub in subscriptions:
-                self.repository_api.user_current_delete_subscription(
-                    self.org_name, sub.name
-                )
-                logger.info(f"Unsubscribed from {sub.name}")
+            logger.info(f"Unsubscribed from {sub.name}")
 
 
 if __name__ == "__main__":
