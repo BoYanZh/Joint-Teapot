@@ -2,7 +2,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/352635b2c8534b0086b5a153db7c82e9)](https://app.codacy.com/gh/BoYanZh/Joint-Teapot?utm_source=github.com&utm_medium=referral&utm_content=BoYanZh/Joint-Teapot&utm_campaign=Badge_Grade_Settings)
 
-A handy tool for TAs in JI to handle works through [Gitea](https://focs.ji.sjtu.edu.cn/git/), [Canvas](https://umjicanvas.com/), and [JOJ](https://joj.sjtu.edu.cn/). Joint is related to JI and also this tool which join websites together. Teapot means to hold Gitea, inspired by [@nichujie](https://github.com/nichujie).
+A handy tool for TAs in JI to handle works through [Gitea](https://focs.ji.sjtu.edu.cn/git/), [Canvas](https://umjicanvas.com/), [JOJ](https://joj.sjtu.edu.cn/) and [Mattermost](https://focs.ji.sjtu.edu.cn/mm/). Joint is related to JI and also this tool which join websites together. Teapot means to hold Gitea, inspired by [@nichujie](https://github.com/nichujie).
 
 This tool is still under heavy development. The docs may not be updated on time, and all the features are provided with the probability to change.
 
@@ -84,6 +84,11 @@ invite all canvas students to gitea teams by team name
 
 ### `prepare-assignment-dir`
 prepare assignment dir from extracted canvas "Download Submissions" zip
+
+### `unsubscribe-from-repos`
+Unsubscribe from all repos in the organization specified in the config file where the repo name matches a given regex expression.
+
+Example: `python3 -m joint_teapot unsubscribe-from-repos '\d{12}$'` will remove all repos whose names end with a student ID number from your gitea subscription list. Refer to the Python `re` module docs for more info about regex.
 
 ### `upload-assignment-grades`
 upload assignment grades to canvas from grade file (GRADE.txt by default), read the first line as grade, the rest as comments

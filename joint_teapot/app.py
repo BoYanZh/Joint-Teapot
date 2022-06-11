@@ -165,6 +165,14 @@ def create_webhooks_for_mm(prefix: str = Argument("")) -> None:
     tea.pot.mattermost.create_webhooks_for_repos(repo_names, tea.pot.gitea)
 
 
+@app.command(
+    "unsubscribe-from-repos",
+    help="unsubscribe from all repos whose name match the given regex pattern",
+)
+def unsubscribe_from_repos(pattern: str = Argument("")) -> None:
+    tea.pot.gitea.unsubscribe_from_repos(pattern)
+
+
 if __name__ == "__main__":
     try:
         app()

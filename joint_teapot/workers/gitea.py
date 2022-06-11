@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
@@ -396,6 +397,25 @@ class Gitea:
                 continue
             res[team.name] = members
         return res
+
+    def unsubscribe_from_repos(self, pattern: str) -> None:
+        subscriptions = [
+            sub
+            for sub in self.user_api.user_current_list_subscriptions()
+            if sub.owner.login == self.org_name
+            and re.search(pattern, sub.name) is not None
+        ]
+        if len(subscriptions) == 0:
+            logger.warning(f"No subscribed repo matches the pattern {pattern}")
+            return
+        logger.info(
+            f"{len(subscriptions)} subscriptions match the pattern {pattern}: {[s.name for s in subscriptions]}"
+        )
+        for sub in subscriptions:
+            self.repository_api.user_current_delete_subscription(
+                self.org_name, sub.name
+            )
+            logger.info(f"Unsubscribed from {sub.name}")
 
 
 if __name__ == "__main__":
