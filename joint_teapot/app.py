@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from typer import Argument, Typer, echo
+from typer import Argument, Option, Typer, echo
 
 from joint_teapot.teapot import Teapot
 from joint_teapot.utils.logger import logger
@@ -140,14 +140,18 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
     help="create channels for student groups according to group information on"
     " gitea",
 )
-def create_channels_on_mm(prefix: str = Argument("")) -> None:
+def create_channels_on_mm(prefix: str = Option(""), suffix: str = Option("")) -> None:
     groups = {
         group_name: members
         for group_name, members in tea.pot.gitea.get_all_teams().items()
         if group_name.startswith(prefix)
     }
-    logger.info(f"{len(groups)} channel(s) to be created: {groups.keys()}")
-    tea.pot.mattermost.create_channels_for_groups(groups)
+    logger.info(
+        f"{len(groups)} channel(s) to be created "
+        + (f"with suffix {suffix}" if suffix else "")
+        + f": {','.join(groups.keys())}"
+    )
+    tea.pot.mattermost.create_channels_for_groups(groups, suffix)
 
 
 @app.command(

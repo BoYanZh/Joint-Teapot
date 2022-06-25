@@ -39,21 +39,24 @@ class Mattermost:
             logger.error(f"Cannot get team {team_name}: {e}")
             return
 
-    def create_channels_for_groups(self, groups: Dict[str, List[str]]) -> None:
+    def create_channels_for_groups(
+        self, groups: Dict[str, List[str]], suffix: str = ""
+    ) -> None:
         for group_name, members in groups.items():
+            channel_name = group_name + suffix
             try:
                 channel = self.endpoint.channels.create_channel(
                     {
                         "team_id": self.team["id"],
-                        "name": group_name,
-                        "display_name": group_name,
+                        "name": channel_name,
+                        "display_name": channel_name,
                         "type": "P",  # create private channels
                     }
                 )
-                logger.info(f"Added group {group_name} to Mattermost")
+                logger.info(f"Added group {channel_name} to Mattermost")
             except Exception as e:
                 logger.warning(
-                    f"Error when creating channel {group_name}: {e} Perhaps channel already exists?"
+                    f"Error when creating channel {channel_name}: {e} Perhaps channel already exists?"
                 )
                 continue
             for member in members:
@@ -76,7 +79,7 @@ class Mattermost:
                     )
                 except Exception:
                     logger.warning(f"User {member} is not in the team")
-                logger.info(f"Added member {member} to channel {group_name}")
+                logger.info(f"Added member {member} to channel {channel_name}")
 
     def create_webhooks_for_repos(self, repos: List[str], gitea: Gitea) -> None:
         # one group corresponds to one repo so these concepts can be used interchangeably
