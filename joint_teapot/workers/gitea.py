@@ -152,8 +152,8 @@ class Gitea:
         repos = list_all(self.organization_api.org_list_repos, self.org_name)
         group: Group
         for group in groups:
-            team_name = team_name_convertor(group["name"])
-            repo_name = repo_name_convertor(group["name"])
+            team_name = team_name_convertor(group.name)
+            repo_name = repo_name_convertor(group.name)
             if team_name is None or repo_name is None:
                 continue
             team = first(teams, lambda team: team.name == team_name)
