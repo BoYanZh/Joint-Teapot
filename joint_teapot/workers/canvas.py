@@ -27,7 +27,7 @@ class Canvas:
         # types = ["student", "observer"]
         types = ["student"]
         self.students = self.course.get_users(enrollment_type=types, include=["email"])
-        for attr in ["sis_login_id", "sortable_name", "name"]:
+        for attr in ["login_id", "sortable_name", "name"]:
             if not hasattr(self.students[0], attr):
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"
@@ -129,7 +129,7 @@ class Canvas:
             if student is None:
                 continue
             grade_file_path = os.path.join(
-                assignments_dir, student.sis_login_id, self.grade_filename
+                assignments_dir, student.login_id, self.grade_filename
             )
             try:
                 grade, *comments = list(open(grade_file_path))
