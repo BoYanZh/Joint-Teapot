@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     mattermost_suffix: str = "/mm"
     mattermost_access_token: str = ""
     mattermost_team: str = ""
+    mattermost_teaching_team = [
+        "manuel",
+    ]
 
     # sid
     joj_sid: str = ""

@@ -140,18 +140,23 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
     help="create channels for student groups according to group information on"
     " gitea",
 )
-def create_channels_on_mm(prefix: str = Option(""), suffix: str = Option("")) -> None:
+def create_channels_on_mm(
+    prefix: str = Option(""),
+    suffix: str = Option(""),
+    invite_teaching_team: bool = Option(False)
+) -> None:
     groups = {
         group_name: members
         for group_name, members in tea.pot.gitea.get_all_teams().items()
         if group_name.startswith(prefix)
     }
     logger.info(
-        f"{len(groups)} channel(s) to be created "
-        + (f"with suffix {suffix}" if suffix else "")
+        f"{len(groups)} channel(s) to be created"
+        + (f" with suffix {suffix}" if suffix else "")
+        + (f", inviting teaching team" if invite_teaching_team else "")
         + f": {','.join(groups.keys())}"
     )
-    tea.pot.mattermost.create_channels_for_groups(groups, suffix)
+    tea.pot.mattermost.create_channels_for_groups(groups, suffix, invite_teaching_team)
 
 
 @app.command(

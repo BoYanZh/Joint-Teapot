@@ -40,7 +40,7 @@ class Mattermost:
             return
 
     def create_channels_for_groups(
-        self, groups: Dict[str, List[str]], suffix: str = ""
+        self, groups: Dict[str, List[str]], suffix: str = "", invite_teaching_team: bool = False
     ) -> None:
         for group_name, members in groups.items():
             channel_name = group_name + suffix
@@ -59,6 +59,8 @@ class Mattermost:
                     f"Error when creating channel {channel_name}: {e} Perhaps channel already exists?"
                 )
                 continue
+            if invite_teaching_team:
+                members.extend(settings.mattermost_teaching_team)
             for member in members:
                 try:
                     mmuser = self.endpoint.users.get_user_by_username(member)
