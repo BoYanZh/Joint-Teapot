@@ -206,7 +206,7 @@ class Gitea:
                     )
                 try:
                     username = self._get_username_by_canvas_student(student)
-                except:
+                except Exception as e:
                     logger.warning(f"{student} not found on Gitea")
                     continue
                 self.organization_api.org_add_team_member(team.id, username)
