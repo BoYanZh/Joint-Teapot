@@ -68,7 +68,7 @@ class Gitea:
 
     @lru_cache()
     def _get_username_by_canvas_student(self, student: User) -> str:
-        res = self.user_api.user_search(q=student.sis_login_id, limit=1)
+        res = self.user_api.user_search(q=student.login_id, limit=1)
         if len(res["data"]) == 0:
             raise Exception(f"{student} not found in Gitea")
         return res["data"][0]["username"]
@@ -199,16 +199,20 @@ class Gitea:
             student_count = 0
             for membership in group.get_memberships():
                 student = first(students, lambda s: s.id == membership.user_id)
+                student_count += 1
                 if student is None:
                     raise Exception(
                         f"student with user_id {membership.user_id} not found"
                     )
-                username = self._get_username_by_canvas_student(student)
+                try:
+                    username = self._get_username_by_canvas_student(student)
+                except:
+                    logger.warning(f"{student} not found on Gitea")
+                    continue
                 self.organization_api.org_add_team_member(team.id, username)
                 self.repository_api.repo_add_collaborator(
                     self.org_name, repo_name, username
                 )
-                student_count += 1
             try:
                 self.repository_api.repo_delete_branch_protection(
                     self.org_name, repo_name, "master"
@@ -262,7 +266,7 @@ class Gitea:
                 if not keys:
                     logger.info(f"{student} has not uploaded ssh keys to gitea")
                     continue
-                res[student.sis_login_id] = keys
+                res[student.login_id] = keys
             except Exception as e:
                 logger.error(e)
         return res
