@@ -64,7 +64,12 @@ Example: `python3 -m joint_teapot create_channels_for_groups --prefix p1 -suffix
 
 ### `create-issues`
 
-create issues on gitea
+create issues on gitea. Specify a list of repos (use `--regex` to match against list of patterns), a title, and a body (use `--file` to read from file), in this order.
+
+Examples (run both with `python3 -m joint_teapot create-issues`):
+
+- `pgroup-08 pgroup-17 "Hurry up" "You are running out of time"` will create an issue in these two pgroups.
+- `--regex "^pgroup" "Final submission" --file "./issues/final-submission.md"` will create an issue in all pgroups, with body content read from said file.
 
 ### `create-personal-repos`
 
