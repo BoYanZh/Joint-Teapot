@@ -328,7 +328,7 @@ class Gitea:
         assignees = []
         if assign_every_collaborators:
             assignees = [
-                item.username
+                item.login
                 for item in list_all(
                     self.repository_api.repo_list_collaborators,
                     self.org_name,
@@ -340,6 +340,7 @@ class Gitea:
             repo_name,
             body={"title": title, "body": body, "assignees": assignees},
         )
+        logger.info(f"Created issue \"{title}\" in {repo_name}")
 
     def create_milestone(
         self,
