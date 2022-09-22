@@ -58,8 +58,13 @@ def clone_all_repos() -> None:
 
 
 @app.command("create-issues", help="create issues on gitea")
-def create_issue_for_repos(repo_names: List[str], title: str, body: str) -> None:
-    tea.pot.create_issue_for_repos(repo_names, title, body)
+def create_issue_for_repos(
+    repo_names: List[str],
+    title: str,
+    body: str = Argument(..., help="issue body, or, if --from-file is set, filepath to issue body"),
+    from_file: bool = Option(False, "--file/--body"),
+) -> None:
+    tea.pot.create_issue_for_repos(repo_names, title, body, from_file)
 
 
 @app.command("create-milestones", help="create milestones on gitea")

@@ -113,10 +113,26 @@ class Teapot:
             self.git.repo_clean_and_checkout(repo_name, "master")
 
     def create_issue_for_repos(
-        self, repo_names: List[str], title: str, body: str
+        self, repo_names: List[str], title: str, body: str, from_file: bool = False
     ) -> None:
+        if from_file:
+            try:
+                f = open(body)
+                content = f.read()
+                f.close()
+            except FileNotFoundError:
+                logger.error(f"file {body} not found")
+                return
+            except Exception as e:
+                logger.exception("Error occurred when opening file {body}:")
+                logger.error(e)
+                return
+        else:
+            content = body
+
         for repo_name in repo_names:
-            self.gitea.create_issue(repo_name, title, body)
+            self.gitea.create_issue(repo_name, title, content)
+
 
     def create_milestone_for_repos(
         self, repo_names: List[str], title: str, description: str, due_on: datetime
