@@ -63,8 +63,9 @@ def create_issue_for_repos(
     title: str,
     body: str = Argument(..., help="issue body, or, if --from-file is set, filepath to issue body"),
     from_file: bool = Option(False, "--file/--body"),
+    use_regex: bool = Option(False, "--regex", help="repo_names takes list of regexes if set"),
 ) -> None:
-    tea.pot.create_issue_for_repos(repo_names, title, body, from_file)
+    tea.pot.create_issue_for_repos(repo_names, title, body, from_file, use_regex)
 
 
 @app.command("create-milestones", help="create milestones on gitea")

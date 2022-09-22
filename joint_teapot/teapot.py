@@ -1,4 +1,5 @@
 import functools
+import re
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, TypeVar
 
@@ -113,7 +114,12 @@ class Teapot:
             self.git.repo_clean_and_checkout(repo_name, "master")
 
     def create_issue_for_repos(
-        self, repo_names: List[str], title: str, body: str, from_file: bool = False
+        self,
+        repo_names: List[str],
+        title: str,
+        body: str,
+        from_file: bool = False,
+        use_regex: bool = False,
     ) -> None:
         if from_file:
             try:
@@ -130,7 +136,19 @@ class Teapot:
         else:
             content = body
 
-        for repo_name in repo_names:
+        affected_repos = []
+        if use_regex:
+            all_repos = self.gitea.get_all_repo_names()
+            for pattern in repo_names:
+                affected_repos.extend([
+                    repo
+                    for repo in all_repos
+                    if re.search(pattern, repo) is not None
+                ])
+        else:
+            affected_repos = repo_names
+
+        for repo_name in affected_repos:
             self.gitea.create_issue(repo_name, title, content)
 
 
