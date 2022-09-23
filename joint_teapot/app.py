@@ -34,8 +34,10 @@ def add_all_canvas_students_to_teams(team_names: List[str]) -> None:
     "create-personal-repos",
     help="create personal repos on gitea for all canvas students",
 )
-def create_personal_repos_for_all_canvas_students() -> None:
-    tea.pot.create_personal_repos_for_all_canvas_students()
+def create_personal_repos_for_all_canvas_students(
+    suffix: str = Option("")
+) -> None:
+    tea.pot.create_personal_repos_for_all_canvas_students(suffix)
 
 
 @app.command("create-teams", help="create teams on gitea by canvas groups")

@@ -73,7 +73,9 @@ Examples (run both with `python3 -m joint_teapot create-issues`):
 
 ### `create-personal-repos`
 
-create personal repos on gitea for all canvas students
+create personal repos on gitea for all canvas students. You may specify an optional suffix.
+
+Example: `python3 -m joint_teapot create-personal-repos --suffix "-p1"` will create repos named `StudentNameStudentID-p1`.
 
 ### `create-teams`
 
