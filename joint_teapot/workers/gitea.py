@@ -68,7 +68,7 @@ class Gitea:
 
     @lru_cache()
     def _get_username_by_canvas_student(self, student: User) -> str:
-        if student.integration_id == None:
+        if student.integration_id is None:
             raise Exception(f"{student} id not found in Gitea")
         return student.integration_id
 
