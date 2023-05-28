@@ -68,9 +68,9 @@ class Gitea:
 
     @lru_cache()
     def _get_username_by_canvas_student(self, student: User) -> str:
-        if student.email == None or student.email.find("@") == -1:
-            raise Exception(f"{student} not found in Gitea")
-        return student.email.split("@")[0]
+        if student.integration_id is None:
+            raise Exception(f"{student} id not found in Gitea")
+        return student.integration_id
 
     def add_canvas_students_to_teams(
         self, students: PaginatedList, team_names: List[str]
