@@ -62,7 +62,7 @@ class Gitea:
     @lru_cache()
     def _get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
-        if len(res["data"]) == 0:
+        if len(res["data"] or []) == 0:
             raise Exception(f"{name} not found by name in Gitea")
         return res["data"][0]["id"]
 
@@ -339,7 +339,7 @@ class Gitea:
             repo_name,
             body={"title": title, "body": body, "assignees": assignees},
         )
-        logger.info(f"Created issue \"{title}\" in {repo_name}")
+        logger.info(f'Created issue "{title}" in {repo_name}')
 
     def create_milestone(
         self,
