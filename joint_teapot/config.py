@@ -1,6 +1,7 @@
 from functools import lru_cache
+from typing import List
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -29,7 +30,7 @@ class Settings(BaseSettings):
     mattermost_suffix: str = "/mm"
     mattermost_access_token: str = ""
     mattermost_team: str = ""
-    mattermost_teaching_team = [
+    mattermost_teaching_team: List[str] = [
         "manuel",
     ]
 
@@ -39,10 +40,7 @@ class Settings(BaseSettings):
     # log file
     log_file_path: str = "joint-teapot.log"
     stderr_log_level: str = "INFO"
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
 @lru_cache()
