@@ -66,7 +66,9 @@ class Gitea:
     def _get_team_id_by_name(self, name: str) -> int:
         res = self.organization_api.team_search(self.org_name, q=str(name), limit=1)
         if len(res["data"] or []) == 0:
-            raise Exception(f"{name} not found by name in Gitea")
+            raise Exception(
+                f"{name} not found by name in Gitea. Possible reason: you did not join this team."
+            )
         return res["data"][0]["id"]
 
     @lru_cache()
