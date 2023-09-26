@@ -32,10 +32,6 @@ class Settings(BaseSettings):
     mattermost_team: str = ""
     mattermost_teaching_team: List[str] = [
         "charlem",
-        "jiaotianqin",
-        "wyh2004",
-        "allen_wr",
-        "wwy125",
     ]
 
     # sid
