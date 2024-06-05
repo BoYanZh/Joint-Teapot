@@ -448,6 +448,11 @@ class Gitea:
                 f"Scoreboard file should be a .csv file, but now it is {scoreboard_file_name}"
             )
             return
+        if remote_repo != "" and os.path.exists(repo_path):
+            logger.error(
+                f"Local file or folder {repo_path} already exists, you are not allowed to clone there. Please first remove that manually!"
+            )
+            return
 
         # Init gitea repo
         if remote_repo == "":
