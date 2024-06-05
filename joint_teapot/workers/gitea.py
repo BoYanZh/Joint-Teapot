@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 from datetime import datetime
 from enum import Enum
 from functools import lru_cache
@@ -431,7 +432,11 @@ class Gitea:
             logger.info(f"Unsubscribed from {sub.name}")
 
     def JOJ3_scoreboard(
-        self, scorefile_path: str, repo_path: str, scoreboard_file_name: str
+        self,
+        scorefile_path: str,
+        repo_path: str,
+        scoreboard_file_name: str,
+        remote_repo: str,
     ) -> None:
         if not scorefile_path.endswith(".json"):
             logger.error(
@@ -445,10 +450,13 @@ class Gitea:
             return
 
         # Init gitea repo
-        repo = git.Repo(repo_path)
-        if repo.bare:
-            logger.error(f"{repo_path} is not a valid git repo!")
-            return
+        if remote_repo == "":
+            repo = git.Repo(repo_path)
+            if repo.bare:
+                logger.error(f"{repo_path} is not a valid git repo!")
+                return
+        else:
+            repo = git.Repo.clone_from(remote_repo, repo_path, branch="grading")
         origin = repo.remote(name="origin")
         origin.pull()
 
@@ -522,6 +530,10 @@ class Gitea:
         repo.index.add([scoreboard_file_name])
         repo.index.commit(f"test: JOJ3-dev testing at {now}")
         origin.push()
+
+        # Remove local repo
+        if remote_repo != "":
+            shutil.rmtree(repo_path)
 
 
 if __name__ == "__main__":
