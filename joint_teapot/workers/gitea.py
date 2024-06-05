@@ -1,3 +1,5 @@
+import json
+import os
 import re
 from datetime import datetime
 from enum import Enum
@@ -5,6 +7,8 @@ from functools import lru_cache
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
 
 import focs_gitea
+import git
+import pandas as pd
 from canvasapi.group import Group, GroupMembership
 from canvasapi.paginated_list import PaginatedList
 from canvasapi.user import User
@@ -425,6 +429,99 @@ class Gitea:
                 self.org_name, sub.name
             )
             logger.info(f"Unsubscribed from {sub.name}")
+
+    def JOJ3_scoreboard(
+        self, scorefile_path: str, repo_path: str, scoreboard_file_name: str
+    ) -> None:
+        if not scorefile_path.endswith(".json"):
+            logger.error(
+                f"Score file should be a .json file, but now it is {scorefile_path}"
+            )
+            return
+        if not scoreboard_file_name.endswith(".csv"):
+            logger.error(
+                f"Scoreboard file should be a .csv file, but now it is {scoreboard_file_name}"
+            )
+            return
+
+        # Init gitea repo
+        repo = git.Repo(repo_path)
+        if repo.bare:
+            logger.error(f"{repo_path} is not a valid git repo!")
+            return
+        origin = repo.remote(name="origin")
+        origin.pull()
+
+        # Switch to grading branch
+        if "grading" in repo.branches:
+            repo.git.checkout("grading")
+        else:
+            logger.error('Please first create a "grading" branch in that repo!')
+            return
+
+        # Load the csv file if it already exists
+        if os.path.exists(os.path.join(repo_path, scoreboard_file_name)):
+            df = pd.read_csv(os.path.join(repo_path, scoreboard_file_name))
+            columns = ["" if x == "Unnamed: 0" else x for x in df.columns]
+            df.columns = columns
+            for col in df.columns[2:]:
+                df[col] = df[col].astype("Int64")
+        else:
+            data: Dict[str, List[Any]] = {
+                "": [],
+                "last_edit": [],  # This is just to make changes in the file so that it can be pushed.
+                # Only used in development stage. Will be removed in the future.
+                "total": [],
+            }
+            df = pd.DataFrame(data)
+
+        # Update data
+        with open(scorefile_path) as json_file:
+            scoreboard: Dict[str, Any] = json.load(json_file)
+
+        student = f"{scoreboard['studentname']} {scoreboard['studentid']}"
+        if not (df.iloc[:, 0].isin([student]).any()):
+            newrow = [student, 0, ""] + [None] * (
+                len(df.columns) - 3
+            )  # In formal version should be -2
+            df.loc[len(df)] = newrow
+
+        for stagerecord in scoreboard["stagerecords"]:
+            stagename = stagerecord["stagename"]
+            for stageresult in stagerecord["stageresults"]:
+                name = stageresult["name"]
+                for i, result in enumerate(stageresult["results"]):
+                    score = result["score"]
+                    colname = f"{stagename}/{name}"
+                    if len(stageresult["results"]) != 1:
+                        colname = f"{colname}/{i}"
+                    if colname not in df.columns:
+                        df[colname] = pd.Series([None] * len(df), dtype="Int64")
+                    df.loc[df.iloc[:, 0] == student, colname] = score
+
+        total = 0
+        for col in df.columns:
+            if (col in ["", "total", "last_edit"]) or (
+                df.loc[df.iloc[:, 0] == student, col].isna().values[0]
+            ):
+                continue
+            total += df.loc[df.iloc[:, 0] == student, col]
+
+        df.loc[df.iloc[:, 0] == student, "total"] = total
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        df.loc[
+            df.iloc[:, 0] == student, "last_edit"
+        ] = now  # Delete this in formal version
+
+        # Write back to the csv file:
+        df = df.sort_values(by="total", ascending=False)
+        df.to_csv(os.path.join(repo_path, scoreboard_file_name), index=False)
+
+        # Push to gitea
+        repo.index.add([scoreboard_file_name])
+        repo.index.commit(f"test: JOJ3-dev testing at {now}")
+        origin.push()
 
 
 if __name__ == "__main__":

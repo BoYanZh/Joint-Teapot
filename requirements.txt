@@ -5,6 +5,7 @@ GitPython>=3.1.18
 joj-submitter>=0.0.8
 loguru>=0.5.3
 mattermostdriver>=7.3.2
+pandas>=2.0.0
 patool>=1.12
 pydantic>=2.0.2
 pydantic-settings>=2.0.1
