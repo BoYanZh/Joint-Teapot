@@ -34,9 +34,7 @@ def add_all_canvas_students_to_teams(team_names: List[str]) -> None:
     "create-personal-repos",
     help="create personal repos on gitea for all canvas students",
 )
-def create_personal_repos_for_all_canvas_students(
-    suffix: str = Option("")
-) -> None:
+def create_personal_repos_for_all_canvas_students(suffix: str = Option("")) -> None:
     tea.pot.create_personal_repos_for_all_canvas_students(suffix)
 
 
@@ -63,9 +61,13 @@ def clone_all_repos() -> None:
 def create_issue_for_repos(
     repo_names: List[str],
     title: str,
-    body: str = Argument(..., help="issue body, or, if --from-file is set, filepath to issue body"),
+    body: str = Argument(
+        ..., help="issue body, or, if --from-file is set, filepath to issue body"
+    ),
     from_file: bool = Option(False, "--file/--body"),
-    use_regex: bool = Option(False, "--regex", help="repo_names takes list of regexes if set"),
+    use_regex: bool = Option(
+        False, "--regex", help="repo_names takes list of regexes if set"
+    ),
 ) -> None:
     tea.pot.create_issue_for_repos(repo_names, title, body, from_file, use_regex)
 
@@ -151,7 +153,7 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
 def create_channels_on_mm(
     prefix: str = Option(""),
     suffix: str = Option(""),
-    invite_teaching_team: bool = Option(False)
+    invite_teaching_team: bool = Option(False),
 ) -> None:
     groups = {
         group_name: members
