@@ -163,7 +163,7 @@ def create_channels_on_mm(
     logger.info(
         f"{len(groups)} channel(s) to be created"
         + (f" with suffix {suffix}" if suffix else "")
-        + (f", inviting teaching team" if invite_teaching_team else "")
+        + (", inviting teaching team" if invite_teaching_team else "")
         + f": {','.join(groups.keys())}"
     )
     tea.pot.mattermost.create_channels_for_groups(groups, suffix, invite_teaching_team)
@@ -177,7 +177,7 @@ def create_channels_on_mm(
 def create_webhooks_for_mm(prefix: str = Argument("")) -> None:
     repo_names = [
         group_name
-        for group_name in tea.pot.gitea.get_all_teams().keys()
+        for group_name in tea.pot.gitea.get_all_teams()
         if group_name.startswith(prefix)
     ]
     logger.info(f"{len(repo_names)} pair(s) of webhooks to be created: {repo_names}")
