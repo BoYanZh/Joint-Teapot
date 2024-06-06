@@ -209,11 +209,6 @@ def JOJ3_scoreboard(
     scoreboard_file_name: str = Argument(
         "", help="name of scoreboard file in the gitea repo"
     ),
-    remote_repo: str = Option(
-        "",
-        "--clone-from",
-        help="specify it to clone from remote repo instead of init from local, cloned repo will be removed after completed.",
-    ),
 ) -> None:
     # Does not allow to handle existing local repo
     if os.path.exists(os.path.join(tea.pot.git.repos_dir, repo_name)):
