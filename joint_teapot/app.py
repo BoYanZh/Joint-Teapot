@@ -210,6 +210,12 @@ def JOJ3_scoreboard(
         "", help="name of scoreboard file in the gitea repo"
     ),
 ) -> None:
+    # Does not allow to handle existing local repo
+    if os.path.exists(os.path.join(tea.pot.git.repos_dir, repo_name)):
+        logger.error(
+            "This function does not allow to handle existing local repo, delete it first."
+        )
+        return
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
     joj3.generate_scoreboard(
         scorefile_path, os.path.join(repo_path, scoreboard_file_name)
