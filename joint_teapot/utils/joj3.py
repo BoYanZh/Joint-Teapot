@@ -34,9 +34,9 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
     column_updated = [False] * len(columns)  # Record wether a score has been updated
     # Update data
     with open(score_file_path) as json_file:
-        scoreboard: Dict[str, Any] = json.load(json_file)
+        scorefile: Dict[str, Any] = json.load(json_file)
 
-    student = f"{scoreboard['studentname']} {scoreboard['studentid']}"
+    student = f"{scorefile['studentname']} {scorefile['studentid']}"
     student_found = False
     for row in data:
         if row[0] == student:
@@ -49,7 +49,7 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
         )  # In formal version should be -2
         data.append(student_row)
 
-    for stagerecord in scoreboard["stagerecords"]:
+    for stagerecord in scorefile["stagerecords"]:
         stagename = stagerecord["stagename"]
         for stageresult in stagerecord["stageresults"]:
             name = stageresult["name"]
