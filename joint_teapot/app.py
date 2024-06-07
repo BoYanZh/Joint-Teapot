@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from git import Repo
 from typer import Argument, Option, Typer, echo
 
 from joint_teapot.teapot import Teapot
@@ -210,8 +211,6 @@ def JOJ3_scoreboard(
         "", help="name of scoreboard file in the gitea repo"
     ),
 ) -> None:
-    from git import Repo
-
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
     repo: Repo = tea.pot.git.get_repo(repo_name)
     if "grading" not in repo.remote().refs:
