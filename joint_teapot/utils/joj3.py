@@ -8,11 +8,6 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None:
-    if not score_file_path.endswith(".json"):
-        logger.error(
-            f"Score file should be a .json file, but now it is {score_file_path}"
-        )
-        return
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
             f"Scoreboard file should be a .csv file, but now it is {scoreboard_file_path}"
