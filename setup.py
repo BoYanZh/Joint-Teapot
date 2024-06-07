@@ -10,7 +10,7 @@ def get_version(package: str) -> str:
     Return package version as listed in `__version__` in `__init__.py`.
     """
     path = os.path.join(package, "__init__.py")
-    main_py = open(path, "r", encoding="utf8").read()
+    main_py = open(path, encoding="utf8").read()
     match = re.search("__version__ = ['\"]([^'\"]+)['\"]", main_py)
     if match is None:
         return "0.0.0"
@@ -21,7 +21,7 @@ def get_long_description() -> str:
     """
     Return the README.
     """
-    return open("README.md", "r", encoding="utf8").read()
+    return open("README.md", encoding="utf8").read()
 
 
 def get_install_requires() -> List[str]:

@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
-from joint_teapot.utils.main import first, default_repo_name_convertor
+from joint_teapot.utils.main import default_repo_name_convertor, first
 from joint_teapot.workers import Canvas, Git, Gitea, Mattermost
 from joint_teapot.workers.joj import JOJ
 
@@ -86,10 +86,12 @@ class Teapot:
     def add_all_canvas_students_to_teams(self, team_names: List[str]) -> None:
         return self.gitea.add_canvas_students_to_teams(self.canvas.students, team_names)
 
-    def create_personal_repos_for_all_canvas_students(self, suffix: str = "") -> List[str]:
+    def create_personal_repos_for_all_canvas_students(
+        self, suffix: str = ""
+    ) -> List[str]:
         return self.gitea.create_personal_repos_for_canvas_students(
             self.canvas.students,
-            lambda user: default_repo_name_convertor(user) + suffix
+            lambda user: default_repo_name_convertor(user) + suffix,
         )
 
     def create_teams_and_repos_by_canvas_groups(
@@ -141,17 +143,14 @@ class Teapot:
         if use_regex:
             all_repos = self.gitea.get_all_repo_names()
             for pattern in repo_names:
-                affected_repos.extend([
-                    repo
-                    for repo in all_repos
-                    if re.search(pattern, repo) is not None
-                ])
+                affected_repos.extend(
+                    [repo for repo in all_repos if re.search(pattern, repo) is not None]
+                )
         else:
             affected_repos = repo_names
 
         for repo_name in affected_repos:
             self.gitea.create_issue(repo_name, title, content)
-
 
     def create_milestone_for_repos(
         self, repo_names: List[str], title: str, description: str, due_on: datetime
