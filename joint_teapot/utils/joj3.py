@@ -29,7 +29,8 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
     else:
         columns = [
             "",
-            "last_edit",  # This is just to make changes in the file so that it can be pushed.
+            "last_edit",  # FIXME:
+            # This is just to make changes in the file so that it can be pushed.
             # Only used in development stage. Will be removed in the future.
             "total",
         ]
@@ -87,7 +88,9 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
     student_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    student_row[columns.index("last_edit")] = now  # Delete this in formal version
+    student_row[
+        columns.index("last_edit")
+    ] = now  # FIXME: Delete this in formal version
 
     # Sort data by total
     data.sort(key=lambda x: int(x[columns.index("total")]), reverse=True)
