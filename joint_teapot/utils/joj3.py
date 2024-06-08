@@ -7,7 +7,9 @@ from typing import Any, Dict
 from joint_teapot.utils.logger import logger
 
 
-def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None:
+def generate_scoreboard(
+    score_file_path: str, student_name: str, student_id: str, scoreboard_file_path: str
+) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
             f"Scoreboard file should be a .csv file, but now it is {scoreboard_file_path}"
@@ -36,7 +38,7 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
     with open(score_file_path) as json_file:
         scorefile: Dict[str, Any] = json.load(json_file)
 
-    student = f"{scorefile['studentname']} {scorefile['studentid']}"
+    student = f"{student_name} {student_id}"
     student_found = False
     for row in data:
         if row[0] == student:
@@ -46,7 +48,7 @@ def generate_scoreboard(score_file_path: str, scoreboard_file_path: str) -> None
     if not student_found:
         student_row = [student, "", "0"] + [""] * (
             len(columns) - 3
-        )  # In formal version should be -2
+        )  # FIXME: In formal version should be -2
         data.append(student_row)
 
     for stagerecord in scorefile["stagerecords"]:
