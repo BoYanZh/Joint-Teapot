@@ -1,7 +1,7 @@
 import os
 import sys
 from time import sleep
-from typing import Optional
+from typing import List, Optional
 
 from joint_teapot.utils.logger import logger
 
@@ -97,3 +97,19 @@ class Git:
                 else:
                     raise
         return repo_dir
+
+    def add_commit_and_push(
+        self, repo_name: str, files_to_add: List[str], commit_message: str
+    ) -> None:
+        repo: Repo = self.get_repo(repo_name)
+        for file in files_to_add:
+            try:
+                repo.index.add(file)
+            except OSError:
+                logger.warning(
+                    f'File path "{file}" does not exist. Skipping this file.'
+                )
+                continue
+        repo.index.commit(commit_message)
+        origin = repo.remote(name="origin")
+        origin.push()
