@@ -8,7 +8,7 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(
-    score_file_path: str, student_name: str, student_id: str, scoreboard_file_path: str
+    score_file_path: str, submitter: str, scoreboard_file_path: str
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -38,18 +38,17 @@ def generate_scoreboard(
     with open(score_file_path) as json_file:
         scorefile: Dict[str, Any] = json.load(json_file)
 
-    student = f"{student_name} {student_id}"
-    student_found = False
+    submitter_found = False
     for row in data:
-        if row[0] == student:
-            student_row = row  # This is a reference of the original data
-            student_found = True
+        if row[0] == submitter:
+            submitter_row = row  # This is a reference of the original data
+            submitter_found = True
             break
-    if not student_found:
-        student_row = [student, "", "0"] + [""] * (
+    if not submitter_found:
+        submitter_row = [submitter, "", "0"] + [""] * (
             len(columns) - 3
         )  # FIXME: In formal version should be -2
-        data.append(student_row)
+        data.append(submitter_row)
 
     for stagerecord in scorefile["stagerecords"]:
         stagename = stagerecord["stagename"]
@@ -65,27 +64,27 @@ def generate_scoreboard(
                     column_updated.append(True)
                     for row in data:
                         row.append("")
-                student_row[columns.index(colname)] = score
+                submitter_row[columns.index(colname)] = score
                 column_updated[columns.index(colname)] = True
     # Score of any unupdated columns should be cleared
     for i, column in enumerate(columns):
         if column in ["", "last_edit", "total"]:
             continue
         if column_updated[i] == False:
-            student_row[i] = ""
+            submitter_row[i] = ""
 
     total = 0
     for col in columns:
         if col in ["", "total", "last_edit"]:
             continue
         idx = columns.index(col)
-        if (student_row[idx] is not None) and (student_row[idx] != ""):
-            total += int(student_row[idx])
+        if (submitter_row[idx] is not None) and (submitter_row[idx] != ""):
+            total += int(submitter_row[idx])
 
-    student_row[columns.index("total")] = str(total)
+    submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    student_row[
+    submitter_row[
         columns.index("last_edit")
     ] = now  # FIXME: Delete this in formal version
 
