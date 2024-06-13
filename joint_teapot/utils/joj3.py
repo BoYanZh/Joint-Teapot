@@ -4,7 +4,7 @@ import csv
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from joint_teapot.utils.logger import logger
 
