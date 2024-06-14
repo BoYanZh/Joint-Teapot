@@ -9,19 +9,19 @@ from typing import Any
 from joint_teapot.utils.logger import logger
 
 
-class Failed_Table:
+class FailedTable:
     class Row:
         class Link:
             def __init__(self) -> None:
                 self.text: str = ""
                 self.url: str = ""
 
-            def init(self, text: str, url: str) -> Failed_Table.Row.Link:
+            def init(self, text: str, url: str) -> FailedTable.Row.Link:
                 self.text = text
                 self.url = url
                 return self
 
-            def init_from_string(self, s: str) -> Failed_Table.Row.Link:
+            def init_from_string(self, s: str) -> FailedTable.Row.Link:
                 if s[0] == "[":
                     self.text = s[s.index("[") + 1 : s.index("]")]
                     self.url = s[s.index("(") + 1 : s.index(")")]
@@ -30,7 +30,7 @@ class Failed_Table:
                 return self
 
             def __eq__(self, other: object) -> bool:
-                if isinstance(other, Failed_Table.Row.Link):
+                if isinstance(other, FailedTable.Row.Link):
                     if self.text == other.text and self.url == other.url:
                         return True
                 return False
@@ -53,13 +53,13 @@ class Failed_Table:
             repo_link: str,
             failure_name: str,
             failure_link: str,
-        ) -> Failed_Table.Row:
+        ) -> FailedTable.Row:
             self.date = date
             self.repository.init(repo_name, repo_link)
             self.failure.init(failure_name, failure_link)
             return self
 
-        def init_from_line(self, line: list[str]) -> Failed_Table.Row:
+        def init_from_line(self, line: list[str]) -> FailedTable.Row:
             self.date = line[0]
             self.repository.init_from_string(line[1])
             self.failure.init_from_string(line[2])
@@ -108,14 +108,14 @@ class Failed_Table:
             scorefile: dict[str, Any] = json.load(json_file)
         failed_name = ""
         fail_found = False
-        for testrecord in scorefile["testrecords"]:
+        for test_record in scorefile["testrecords"]:
             if fail_found:
                 break
-            testname = testrecord["testname"]
-            for result in testrecord["stageresults"]:
+            test_name = test_record["testname"]
+            for result in test_record["stageresults"]:
                 name = result["name"]
                 if result["force_quit"] == True:
-                    failed_name = f"{testname}/{name}"
+                    failed_name = f"{test_name}/{name}"
                     fail_found = True
 
         self.append(repo_name, repo_link, failed_name, "")
@@ -175,22 +175,22 @@ def generate_scoreboard(
         )  # FIXME: In formal version should be -2
         data.append(submitter_row)
 
-    for testrecord in scorefile["testrecords"]:
-        testname = testrecord["testname"]
-        for stageresult in testrecord["stageresults"]:
+    for test_record in scorefile["testrecords"]:
+        test_name = test_record["testname"]
+        for stageresult in test_record["stageresults"]:
             name = stageresult["name"]
             for i, result in enumerate(stageresult["results"]):
                 score = result["score"]
-                colname = f"{testname}/{name}"
+                column_name = f"{test_name}/{name}"
                 if len(stageresult["results"]) != 1:
-                    colname = f"{colname}/{i}"
-                if colname not in columns:
-                    columns.append(colname)
+                    column_name = f"{column_name}/{i}"
+                if column_name not in columns:
+                    columns.append(column_name)
                     column_updated.append(True)
                     for row in data:
                         row.append("")
-                submitter_row[columns.index(colname)] = score
-                column_updated[columns.index(colname)] = True
+                submitter_row[columns.index(column_name)] = score
+                column_updated[columns.index(column_name)] = True
     # Score of any unupdated columns should be cleared
     for i, column in enumerate(columns):
         if column in ["", "last_edit", "total"]:
@@ -232,7 +232,7 @@ def generate_failed_table(
         )
         return
 
-    failed_table = Failed_Table(table_file_path)
+    failed_table = FailedTable(table_file_path)
     failed_table.append_from_score_file(score_file_path, repo_name, repo_link)
     failed_table.write_into_file(table_file_path)
 

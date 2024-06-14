@@ -237,7 +237,7 @@ def JOJ3_scoreboard(
 
 
 @app.command(
-    "JOJ3-failedtable",
+    "JOJ3-failed-table",
     help="parse JOJ3 score json file into failed table markdown file and upload to gitea",
 )
 def JOJ3_failed_table(
