@@ -89,8 +89,6 @@ class Teapot:
     def create_personal_repos_for_all_canvas_students(
         self, suffix: str = ""
     ) -> List[str]:
-        if suffix != "" and not suffix.startswith("-"):
-            suffix = "-" + suffix
         return self.gitea.create_personal_repos_for_canvas_students(
             self.canvas.students,
             lambda user: default_repo_name_convertor(user) + suffix,
