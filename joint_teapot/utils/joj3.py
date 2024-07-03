@@ -1,3 +1,4 @@
+import bisect
 import csv
 import json
 import os
@@ -8,7 +9,7 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(
-    score_file_path: str, submitter: str, scoreboard_file_path: str
+    score_file_path: str, submitter: str, exercise_name: str, scoreboard_file_path: str
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -33,11 +34,6 @@ def generate_scoreboard(
         ]
         data = []
 
-    column_updated = [False] * len(columns)  # Record wether a score has been updated
-    # Update data
-    with open(score_file_path) as json_file:
-        scorefile: Dict[str, Any] = json.load(json_file)
-
     submitter_found = False
     for row in data:
         if row[0] == submitter:
@@ -50,28 +46,25 @@ def generate_scoreboard(
         )  # FIXME: In formal version should be -2
         data.append(submitter_row)
 
-    for test_record in scorefile["testrecords"]:
-        test_name = test_record["testname"]
-        for stageresult in test_record["stageresults"]:
-            name = stageresult["name"]
-            for i, result in enumerate(stageresult["results"]):
-                score = result["score"]
-                column_name = f"{test_name}/{name}"
-                if len(stageresult["results"]) != 1:
-                    column_name = f"{column_name}/{i}"
-                if column_name not in columns:
-                    columns.append(column_name)
-                    column_updated.append(True)
-                    for row in data:
-                        row.append("")
-                submitter_row[columns.index(column_name)] = score
-                column_updated[columns.index(column_name)] = True
-    # Score of any unupdated columns should be cleared
-    for i, column in enumerate(columns):
-        if column in ["", "last_edit", "total"]:
-            continue
-        if column_updated[i] == False:
-            submitter_row[i] = ""
+    # Find if exercise in table:
+    if exercise_name not in columns:
+        column_tail = columns[3:]
+        bisect.insort(column_tail, exercise_name)
+        columns[3:] = column_tail
+        index = columns.index(exercise_name)
+        for row in data:
+            row.insert(index, "")
+
+    # Update data
+    with open(score_file_path) as json_file:
+        scorefile: Dict[str, Any] = json.load(json_file)
+
+    exercise_total_score = 0
+    for stage_name in scorefile:
+        for stage_result in scorefile[stage_name]:
+            for result in stage_result["results"]:
+                exercise_total_score += result["score"]
+    submitter_row[columns.index(exercise_name)] = str(exercise_total_score)
 
     total = 0
     for col in columns:

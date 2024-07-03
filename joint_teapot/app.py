@@ -210,6 +210,7 @@ def JOJ3_scoreboard(
         "",
         help="name of local gitea repo folder, or link to remote gitea repo, to push scoreboard file",
     ),
+    exercise_name: str = Argument("", help="exercise name of this json score file"),
     scoreboard_file_name: str = Argument(
         "", help="name of scoreboard file in the gitea repo"
     ),
@@ -228,6 +229,7 @@ def JOJ3_scoreboard(
     joj3.generate_scoreboard(
         scorefile_path,
         submitter,
+        exercise_name,
         os.path.join(repo_path, scoreboard_file_name),
     )
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
