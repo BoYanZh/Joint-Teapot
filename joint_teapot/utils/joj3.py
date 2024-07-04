@@ -57,13 +57,12 @@ def generate_scoreboard(
 
     # Update data
     with open(score_file_path) as json_file:
-        scorefile: Dict[str, Any] = json.load(json_file)
+        scorefile: List[Dict[str, Any]] = json.load(json_file)
 
     exercise_total_score = 0
-    for stage_name in scorefile:
-        for stage_result in scorefile[stage_name]:
-            for result in stage_result["results"]:
-                exercise_total_score += result["score"]
+    for stage in scorefile:
+        for result in stage["results"]:
+            exercise_total_score += result["score"]
     submitter_row[columns.index(exercise_name)] = str(exercise_total_score)
 
     total = 0
