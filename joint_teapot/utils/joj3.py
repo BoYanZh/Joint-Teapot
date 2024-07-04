@@ -107,18 +107,13 @@ def update_failed_table_from_score_file(
 ) -> None:
     # get info from score file
     with open(score_file_path) as json_file:
-        scorefile: Dict[str, Any] = json.load(json_file)
+        scorefile: List[Dict[str, Any]] = json.load(json_file)
+
     failed_name = ""
-    fail_found = False
-    for test_record in scorefile["testrecords"]:
-        if fail_found:
+    for stage in scorefile:
+        if stage["force_quit"] == True:
+            failed_name = stage["name"]
             break
-        test_name = test_record["testname"]
-        for result in test_record["stageresults"]:
-            name = result["name"]
-            if result["force_quit"] == True:
-                failed_name = f"{test_name}/{name}"
-                fail_found = True
 
     # append to failed table
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
