@@ -97,7 +97,7 @@ def get_failed_table_from_file(table_file_path: str) -> List[List[str]]:
             for i, line in enumerate(table_file):
                 if i < 2:
                     continue
-                stripped_line = line.strip()[1:-1].split("|")
+                stripped_line = line.strip().strip("|").split("|")
                 data.append(stripped_line)
     return data
 
