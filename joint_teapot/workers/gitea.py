@@ -346,6 +346,20 @@ class Gitea:
         )
         logger.info(f'Created issue "{title}" in {repo_name}')
 
+    def create_comment(
+        self,
+        repo_name: str,
+        index: int,
+        body: str,
+    ) -> None:
+        self.issue_api.issue_create_comment(
+            self.org_name,
+            repo_name,
+            index,
+            body={"body": body},
+        )
+        logger.info(f"Created comment in {repo_name}/issues/{index}")
+
     def create_milestone(
         self,
         repo_name: str,

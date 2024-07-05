@@ -152,6 +152,14 @@ class Teapot:
         for repo_name in affected_repos:
             self.gitea.create_issue(repo_name, title, content)
 
+    def create_comment(
+        self,
+        repo_name: str,
+        index: int,
+        body: str,
+    ) -> None:
+        self.gitea.create_comment(repo_name, index, body)
+
     def create_milestone_for_repos(
         self, repo_names: List[str], title: str, description: str, due_on: datetime
     ) -> None:

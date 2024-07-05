@@ -75,6 +75,15 @@ def create_issue_for_repos(
     tea.pot.create_issue_for_repos(repo_names, title, body, from_file, use_regex)
 
 
+@app.command("create-comment", help="create a comment for an issue on gitea")
+def create_comment(
+    repo_name: str,
+    index: int,
+    body: str = Argument(..., help="comment body"),
+) -> None:
+    tea.pot.create_comment(repo_name, index, body)
+
+
 @app.command("create-milestones", help="create milestones on gitea")
 def create_milestone_for_repos(
     repo_names: List[str], title: str, description: str, due_on: datetime

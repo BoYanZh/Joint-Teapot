@@ -62,6 +62,10 @@ create channels for student groups according to group information on gitea. Opti
 
 Example: `python3 -m joint_teapot create-channels-on-mm --prefix p1 --suffix -private --invite-teaching-team` will fetch all repos whose names start with `"p1"` and create channels on mm for these repos like "p1team1-private". Members of a repo will be added to the corresponding channel. And teaching team (adjust in `.env`) will be invited to the channels.
 
+### `create-comment`
+
+create a comment for an issue on gitea.
+
 ### `create-issues`
 
 create issues on gitea. Specify a list of repos (use `--regex` to match against list of patterns), a title, and a body (use `--file` to read from file), in this order.
