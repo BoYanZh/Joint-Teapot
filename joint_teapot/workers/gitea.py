@@ -213,10 +213,14 @@ class Gitea:
                 except Exception as e:
                     logger.warning(e)
                     continue
-                self.organization_api.org_add_team_member(team.id, username)
-                self.repository_api.repo_add_collaborator(
-                    self.org_name, repo_name, username
-                )
+                try:
+                    self.organization_api.org_add_team_member(team.id, username)
+                    self.repository_api.repo_add_collaborator(
+                        self.org_name, repo_name, username
+                    )
+                except Exception as e:
+                    logger.error(e)
+                    continue
             try:
                 self.repository_api.repo_delete_branch_protection(
                     self.org_name, repo_name, "master"
