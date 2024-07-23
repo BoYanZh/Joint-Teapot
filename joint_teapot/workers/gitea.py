@@ -196,9 +196,12 @@ class Gitea:
                     },
                 )
                 logger.info(f"Team {team_name} created")
-            self.organization_api.org_add_team_repository(
-                team.id, self.org_name, repo_name
-            )
+            try:
+                self.organization_api.org_add_team_repository(
+                    team.id, self.org_name, repo_name
+                )
+            except Exception as e:
+                logger.warning(e)
             membership: GroupMembership
             student_count = 0
             for membership in group.get_memberships():
