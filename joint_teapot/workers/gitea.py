@@ -196,9 +196,12 @@ class Gitea:
                     },
                 )
                 logger.info(f"Team {team_name} created")
-            self.organization_api.org_add_team_repository(
-                team.id, self.org_name, repo_name
-            )
+            try:
+                self.organization_api.org_add_team_repository(
+                    team.id, self.org_name, repo_name
+                )
+            except Exception as e:
+                logger.warning(e)
             membership: GroupMembership
             student_count = 0
             for membership in group.get_memberships():
@@ -213,10 +216,14 @@ class Gitea:
                 except Exception as e:
                     logger.warning(e)
                     continue
-                self.organization_api.org_add_team_member(team.id, username)
-                self.repository_api.repo_add_collaborator(
-                    self.org_name, repo_name, username
-                )
+                try:
+                    self.organization_api.org_add_team_member(team.id, username)
+                    self.repository_api.repo_add_collaborator(
+                        self.org_name, repo_name, username
+                    )
+                except Exception as e:
+                    logger.error(e)
+                    continue
             try:
                 self.repository_api.repo_delete_branch_protection(
                     self.org_name, repo_name, "master"
