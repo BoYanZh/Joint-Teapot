@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     mattermost_access_token: str = ""
     mattermost_team: str = ""
     mattermost_teaching_team: List[str] = [
-        "manuel",
+        "charlem",
     ]
 
     # sid

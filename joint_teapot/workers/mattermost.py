@@ -40,7 +40,10 @@ class Mattermost:
             return
 
     def create_channels_for_groups(
-        self, groups: Dict[str, List[str]], suffix: str = "", invite_teaching_team: bool = False
+        self,
+        groups: Dict[str, List[str]],
+        suffix: str = "",
+        invite_teaching_team: bool = False,
     ) -> None:
         for group_name, members in groups.items():
             channel_name = group_name + suffix
@@ -115,15 +118,9 @@ class Mattermost:
                         active=True,
                         type="slack",
                         events=[
-                            "create",
-                            "delete",
-                            "push",
-                            "release",
                             "issues_only",
-                            "issue_assign",
                             "issue_comment",
                             "pull_request_only",
-                            "pull_request_assign",
                             "pull_request_comment",
                             "pull_request_review",
                         ],
