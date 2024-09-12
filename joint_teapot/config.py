@@ -48,4 +48,9 @@ def get_settings() -> Settings:
     return Settings()
 
 
+def set_settings(new_settings: Settings) -> None:
+    for field, value in new_settings.model_dump(exclude_unset=True).items():
+        setattr(settings, field, value)
+
+
 settings: Settings = get_settings()
