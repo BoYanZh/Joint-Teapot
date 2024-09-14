@@ -9,7 +9,7 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(
-    score_file_path: str, submitter: str, exercise_name: str, scoreboard_file_path: str
+    score_file_path: str, submitter: str, scoreboard_file_path: str
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -46,6 +46,15 @@ def generate_scoreboard(
         )  # FIXME: In formal version should be -2
         data.append(submitter_row)
 
+    # Update data
+    with open(score_file_path) as json_file:
+        stages: List[Dict[str, Any]] = json.load(json_file)
+
+    exercise_name = "unknown"
+    for stage in stages:
+        if stage["name"] == "metadata":
+            comment = stage["results"][0]["comment"]
+            exercise_name = comment.split("-")[0]
     # Find if exercise in table:
     if exercise_name not in columns:
         column_tail = columns[3:]
@@ -54,10 +63,6 @@ def generate_scoreboard(
         index = columns.index(exercise_name)
         for row in data:
             row.insert(index, "")
-
-    # Update data
-    with open(score_file_path) as json_file:
-        stages: List[Dict[str, Any]] = json.load(json_file)
 
     exercise_total_score = 0
     for stage in stages:
