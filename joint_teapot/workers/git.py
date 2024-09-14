@@ -18,16 +18,20 @@ from joint_teapot.config import settings
 class Git:
     def __init__(
         self,
-        git_host: str = settings.git_host,
-        org_name: str = settings.gitea_org_name,
-        repos_dir: str = settings.repos_dir,
+        git_host: str = "",
+        org_name: str = "",
+        repos_dir: str = "",
     ):
+        git_host = git_host or settings.git_host
+        org_name = org_name or settings.gitea_org_name
+        repos_dir = repos_dir or settings.repos_dir
         self.git_host = git_host
         self.org_name = org_name
-        if not os.path.isdir(repos_dir):
-            raise Exception(f"{repos_dir} does not exist! Create it first.")
         self.repos_dir = repos_dir
+        if not os.path.isdir(self.repos_dir):
+            raise Exception(f"{self.repos_dir} does not exist! Create it first.")
         logger.debug("Git initialized")
+        logger.info(f"repos dir: {self.repos_dir}")
 
     def clone_repo(
         self, repo_name: str, branch: str = "master", auto_retry: bool = True

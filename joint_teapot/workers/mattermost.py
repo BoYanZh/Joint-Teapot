@@ -11,11 +11,15 @@ from joint_teapot.workers.gitea import Gitea
 class Mattermost:
     def __init__(
         self,
-        access_token: str = settings.mattermost_access_token,
-        team_name: str = settings.mattermost_team,
-        domain_name: str = settings.mattermost_domain_name,
-        suffix: str = settings.mattermost_suffix,
+        access_token: str = "",  # nosec
+        team_name: str = "",
+        domain_name: str = "",
+        suffix: str = "",
     ):
+        access_token = access_token or settings.mattermost_access_token
+        team_name = team_name or settings.mattermost_team
+        domain_name = domain_name or settings.mattermost_domain_name
+        suffix = suffix or settings.mattermost_suffix
         self.url = domain_name
         self.url_suffix = suffix
         self.endpoint = Driver(

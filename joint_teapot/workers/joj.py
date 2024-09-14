@@ -11,7 +11,8 @@ from joint_teapot.utils.logger import logger
 
 
 class JOJ:
-    def __init__(self, sid: str = settings.joj_sid):
+    def __init__(self, sid: str = ""):
+        sid = sid or settings.joj_sid
         init()
         self.submitter = JOJSubmitter(sid, logger)
 

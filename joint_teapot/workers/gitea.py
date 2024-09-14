@@ -40,11 +40,15 @@ def list_all(method: Callable[..., Iterable[T]], *args: Any, **kwargs: Any) -> L
 class Gitea:
     def __init__(
         self,
-        access_token: str = settings.gitea_access_token,
-        org_name: str = settings.gitea_org_name,
-        domain_name: str = settings.gitea_domain_name,
-        suffix: str = settings.gitea_suffix,
+        access_token: str = "",  # nosec
+        org_name: str = "",
+        domain_name: str = "",
+        suffix: str = "",
     ):
+        access_token = access_token or settings.gitea_access_token
+        org_name = org_name or settings.gitea_org_name
+        domain_name = domain_name or settings.gitea_domain_name
+        suffix = suffix or settings.gitea_suffix
         self.org_name = org_name
         configuration = focs_gitea.Configuration()
         configuration.api_key["access_token"] = access_token
@@ -64,7 +68,9 @@ class Gitea:
 
     @lru_cache()
     def _get_team_id_by_name(self, name: str) -> int:
-        res = self.organization_api.team_search(self.org_name, q=str(name), limit=1).to_dict()
+        res = self.organization_api.team_search(
+            self.org_name, q=str(name), limit=1
+        ).to_dict()
         if len(res["data"] or []) == 0:
             raise Exception(
                 f"{name} not found by name in Gitea. Possible reason: you did not join this team."
