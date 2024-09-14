@@ -1,9 +1,10 @@
 import bisect
 import csv
+import enum
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from joint_teapot.utils.logger import logger
 
@@ -112,10 +113,10 @@ def update_failed_table_from_score_file(
 ) -> None:
     # get info from score file
     with open(score_file_path) as json_file:
-        scorefile: List[Dict[str, Any]] = json.load(json_file)
+        stages: List[Dict[str, Any]] = json.load(json_file)
 
     failed_name = ""
-    for stage in scorefile:
+    for stage in stages:
         if stage["force_quit"] == True:
             failed_name = stage["name"]
             break
@@ -163,6 +164,20 @@ def generate_failed_table(
     write_failed_table_into_file(data, table_file_path)
 
 
-def generate_comment(score_file_path: str) -> str:
-    # TODO
-    return ""
+def generate_title_and_comment(score_file_path: str) -> Tuple[str, str]:
+    with open(score_file_path) as json_file:
+        stages: List[Dict[str, Any]] = json.load(json_file)
+
+    total_score = 0
+    comment = ""
+    for stage in stages:
+        comment += f"## {stage['name']}\n"
+        for i, result in enumerate(stage["results"]):
+            comment += f"### case {i}\n"
+            comment += f"score: {result['score']}\n"
+            comment += f"comment: {result['comment']}\n"
+            total_score += result["score"]
+        comment += "\n"
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    title = f"JOJ3 Result {now} - Total Score: {total_score}"
+    return title, comment

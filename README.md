@@ -124,3 +124,7 @@ upload assignment grades to canvas from grade file (GRADE.txt by default), read 
 ## License
 
 MIT
+
+## Compile
+
+- case 0: 0
