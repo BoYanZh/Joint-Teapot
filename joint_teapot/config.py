@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     gitea_suffix: str = "/git"
     gitea_access_token: str = ""
     gitea_org_name: str = ""
+    gitea_debug: bool = False
 
     # git
     git_host: str = "ssh://git@focs.ji.sjtu.edu.cn:2222"

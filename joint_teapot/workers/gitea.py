@@ -53,7 +53,7 @@ class Gitea:
         configuration = focs_gitea.Configuration()
         configuration.api_key["access_token"] = access_token
         configuration.host = f"https://{domain_name}{suffix}/api/v1"
-        configuration.debug = True
+        configuration.debug = settings.gitea_debug
         for v in configuration.logger.values():
             v.handlers = []
         self.api_client = focs_gitea.ApiClient(configuration)
