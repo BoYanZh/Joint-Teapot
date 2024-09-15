@@ -308,9 +308,18 @@ def joj3_create_result_issue(
         "",
         help="repository's name of the submitter",
     ),
+    run_number: str = Argument(
+        "",
+        help="gitea actions run number",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    title, comment = joj3.generate_title_and_comment(scorefile_path)
+    action_link = (
+        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
+        + f"actions/runs/{run_number}"
+    )
+    title, comment = joj3.generate_title_and_comment(scorefile_path, action_link)
     tea.pot.gitea.create_issue(submitter_repo_name, title, comment, False)
 
 

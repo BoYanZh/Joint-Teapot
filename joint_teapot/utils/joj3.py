@@ -164,12 +164,14 @@ def generate_failed_table(
     write_failed_table_into_file(data, table_file_path)
 
 
-def generate_title_and_comment(score_file_path: str) -> Tuple[str, str]:
+def generate_title_and_comment(
+    score_file_path: str, action_link: str
+) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
 
     total_score = 0
-    comment = ""
+    comment = f"[Gitea Actions]({action_link})\n"
     for stage in stages:
         comment += f"## {stage['name']}\n"
         for i, result in enumerate(stage["results"]):
