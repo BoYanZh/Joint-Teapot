@@ -33,5 +33,5 @@ def default_repo_name_convertor(user: User) -> str:
     login_id, name = user.login_id, user.name
     eng = re.sub("[\u4e00-\u9fa5]", "", name)
     eng = eng.replace(",", "")
-    eng = eng.title().replace(" ", "")
+    eng = eng.title().replace(" ", "").replace(u'\xa0', '')
     return f"{eng}{login_id}"
