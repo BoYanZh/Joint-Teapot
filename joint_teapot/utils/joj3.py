@@ -53,9 +53,10 @@ def generate_scoreboard(
 
     exercise_name = "unknown"
     for stage in stages:
-        if stage["name"] == "metadata":
-            comment = stage["results"][0]["comment"]
-            exercise_name = comment.split("-")[0]
+        if stage["name"] != "metadata":
+            continue
+        comment = stage["results"][0]["comment"]
+        exercise_name = comment.split("-")[0]
     # Find if exercise in table:
     if exercise_name not in columns:
         column_tail = columns[3:]
@@ -183,3 +184,15 @@ def generate_title_and_comment(
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title = f"JOJ3 Result {now} - Total Score: {total_score}"
     return title, comment
+
+
+def check_skipped(score_file_path: str, keyword: str) -> bool:
+    with open(score_file_path) as json_file:
+        stages: List[Dict[str, Any]] = json.load(json_file)
+    for stage in stages:
+        if stage["name"] != "metadata":
+            continue
+        comment = stage["results"][0]["comment"]
+        if keyword in comment or "skip-teapot" in comment:
+            return True
+    return False
