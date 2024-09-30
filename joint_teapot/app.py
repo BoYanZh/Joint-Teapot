@@ -325,7 +325,9 @@ def joj3_create_result_issue(
         + f"{settings.gitea_org_name}/{submitter_repo_name}/"
         + f"actions/runs/{run_number}"
     )
-    title, comment = joj3.generate_title_and_comment(score_file_path, action_link)
+    title, comment = joj3.generate_title_and_comment(
+        score_file_path, action_link, run_number
+    )
     tea.pot.gitea.create_issue(submitter_repo_name, title, comment, False)
 
 
