@@ -114,6 +114,6 @@ class Git:
                     f'File path "{file}" does not exist. Skipping this file.'
                 )
                 continue
-        repo.index.commit(commit_message)
-        origin = repo.remote(name="origin")
-        origin.push()
+        if repo.is_dirty(untracked_files=True) or repo.index.diff(None):
+            repo.index.commit(commit_message)
+            repo.remote(name="origin").push()
