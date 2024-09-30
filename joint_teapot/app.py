@@ -242,9 +242,8 @@ def joj3_scoreboard(
         submitter,
         os.path.join(repo_path, scoreboard_file_name),
     )
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tea.pot.git.add_commit_and_push(
-        repo_name, [scoreboard_file_name], f"test: JOJ3-dev testing at {now}"
+        repo_name, [scoreboard_file_name], f"joj3: update scoreboard by {submitter}"
     )
 
 
@@ -293,9 +292,10 @@ def joj3_failed_table(
         submitter_repo_link,
         os.path.join(repo_path, failed_table_file_name),
     )
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tea.pot.git.add_commit_and_push(
-        repo_name, [failed_table_file_name], f"test: JOJ3-dev testing at {now}"
+        repo_name,
+        [failed_table_file_name],
+        f"joj3: update failed table by {submitter_repo_name}",
     )
 
 
