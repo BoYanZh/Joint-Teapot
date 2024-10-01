@@ -264,12 +264,12 @@ def joj3_failed_table(
         "",
         help="repository's name of the submitter",
     ),
-    failed_table_file_name: str = Argument(
-        "failed-table.md", help="name of failed table file in the gitea repo"
-    ),
     run_number: str = Argument(
         "",
         help="gitea actions run number",
+    ),
+    failed_table_file_name: str = Argument(
+        "failed-table.md", help="name of failed table file in the gitea repo"
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
