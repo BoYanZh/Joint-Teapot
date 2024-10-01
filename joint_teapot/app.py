@@ -225,6 +225,7 @@ def joj3_scoreboard(
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
@@ -275,6 +276,7 @@ def joj3_failed_table(
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
@@ -331,6 +333,7 @@ def joj3_create_result_issue(
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-result-issue"):
         return
     action_link = (
