@@ -29,10 +29,20 @@ class InterceptHandler(logging.Handler):
         )
 
 
-def set_logger(stderr_log_level: str = settings.stderr_log_level) -> None:
+def set_logger(
+    stderr_log_level: str = settings.stderr_log_level,
+    *,
+    diagnose: bool = True,
+    backtrace: bool = True,
+) -> None:
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     logger.remove()
-    logger.add(stderr, level=stderr_log_level)
+    logger.add(
+        stderr,
+        level=stderr_log_level,
+        diagnose=diagnose,
+        backtrace=backtrace,
+    )
     logger.add(settings.log_file_path, level="DEBUG")
 
 

@@ -9,7 +9,7 @@ from typer import Argument, Option, Typer, echo
 from joint_teapot.config import Settings, set_settings, settings
 from joint_teapot.teapot import Teapot
 from joint_teapot.utils import joj3
-from joint_teapot.utils.logger import logger
+from joint_teapot.utils.logger import logger, set_logger
 
 app = Typer(add_completion=False)
 
@@ -224,6 +224,7 @@ def joj3_scoreboard(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
@@ -273,6 +274,7 @@ def joj3_failed_table(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
     repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
@@ -328,6 +330,7 @@ def joj3_create_result_issue(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
     if joj3.check_skipped(score_file_path, "skip-result-issue"):
         return
     action_link = (
