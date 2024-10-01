@@ -110,7 +110,11 @@ def get_failed_table_from_file(table_file_path: str) -> List[List[str]]:
 
 
 def update_failed_table_from_score_file(
-    data: List[List[str]], score_file_path: str, repo_name: str, repo_link: str
+    data: List[List[str]],
+    score_file_path: str,
+    repo_name: str,
+    repo_link: str,
+    action_link: str,
 ) -> None:
     # get info from score file
     with open(score_file_path) as json_file:
@@ -125,7 +129,7 @@ def update_failed_table_from_score_file(
     # append to failed table
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     repo = f"[{repo_name}]({repo_link})"
-    failure = f"[{failed_name}]({'#'})"  # TODO: Update failure link
+    failure = f"[{failed_name}]({action_link})"
     row_found = False
     for i, row in enumerate(data[:]):
         if row[1] == repo:
@@ -152,7 +156,11 @@ def write_failed_table_into_file(data: List[List[str]], table_file_path: str) ->
 
 
 def generate_failed_table(
-    score_file_path: str, repo_name: str, repo_link: str, table_file_path: str
+    score_file_path: str,
+    repo_name: str,
+    repo_link: str,
+    table_file_path: str,
+    action_link: str,
 ) -> None:
     if not table_file_path.endswith(".md"):
         logger.error(
@@ -161,7 +169,13 @@ def generate_failed_table(
         return
 
     data = get_failed_table_from_file(table_file_path)
-    update_failed_table_from_score_file(data, score_file_path, repo_name, repo_link)
+    update_failed_table_from_score_file(
+        data,
+        score_file_path,
+        repo_name,
+        repo_link,
+        action_link,
+    )
     write_failed_table_into_file(data, table_file_path)
 
 

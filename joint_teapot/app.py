@@ -267,6 +267,10 @@ def joj3_failed_table(
     failed_table_file_name: str = Argument(
         "failed-table.md", help="name of failed table file in the gitea repo"
     ),
+    run_number: str = Argument(
+        "",
+        help="gitea actions run number",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
@@ -286,11 +290,17 @@ def joj3_failed_table(
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}"
     )
+    action_link = (
+        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
+        + f"actions/runs/{run_number}"
+    )
     joj3.generate_failed_table(
         score_file_path,
         submitter_repo_name,
         submitter_repo_link,
         os.path.join(repo_path, failed_table_file_name),
+        action_link,
     )
     tea.pot.git.add_commit_and_push(
         repo_name,
