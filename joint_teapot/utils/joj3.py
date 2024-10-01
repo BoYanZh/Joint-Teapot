@@ -87,8 +87,8 @@ def generate_scoreboard(
         columns.index("last_edit")
     ] = now  # FIXME: Delete this in formal version
 
-    # Sort data by total
-    data.sort(key=lambda x: int(x[columns.index("total")]), reverse=True)
+    # Sort data by total， from low to high
+    data.sort(key=lambda x: int(x[columns.index("total")]))
 
     # Write back to the csv file:
     with open(scoreboard_file_path, mode="w", newline="") as file:
