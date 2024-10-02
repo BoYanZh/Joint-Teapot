@@ -415,6 +415,12 @@ class Gitea:
                 self.org_name, repo.name, body={"archived": True}
             )
 
+    def unwatch_all_repos(self) -> None:
+        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
+            self.repository_api.user_current_delete_subscription(
+                self.org_name, repo.name
+            )
+
     def get_all_teams(self) -> Dict[str, List[str]]:
         res: Dict[str, List[str]] = {}
         for team in list_all(self.organization_api.org_list_teams, self.org_name):

@@ -128,6 +128,11 @@ def archive_all_repos() -> None:
     tea.pot.gitea.archive_all_repos()
 
 
+@app.command("unwatch-all-repos", help="unwatch all repos in gitea organization")
+def unwatch_all_repos() -> None:
+    tea.pot.gitea.unwatch_all_repos()
+
+
 @app.command("get-no-collaborator-repos", help="list all repos with no collaborators")
 def get_no_collaborator_repos() -> None:
     tea.pot.gitea.get_no_collaborator_repos()

@@ -40,6 +40,10 @@ pytest -svv
 
 archive all repos in gitea organization
 
+### `unwatch-all-repos`
+
+unwatch all repos in gitea organization
+
 ### `check-issues`
 
 check the existence of issue by title on gitea
@@ -124,7 +128,3 @@ upload assignment grades to canvas from grade file (GRADE.txt by default), read 
 ## License
 
 MIT
-
-## Compile
-
-- case 0: 0
