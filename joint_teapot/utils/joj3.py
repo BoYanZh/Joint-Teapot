@@ -1,6 +1,5 @@
 import bisect
 import csv
-import enum
 import json
 import os
 from datetime import datetime
@@ -145,7 +144,7 @@ def update_failed_table_from_score_file(
 
 
 def write_failed_table_into_file(data: List[List[str]], table_file_path: str) -> None:
-    data = sorted(data, key=lambda x: x[1])
+    data.sort(key=lambda x: datetime.strptime(x[0], "%Y-%m-%d %H:%M"), reverse=True)
     text = "|date|repository|failure|\n"
     text += "|----|----|----|\n"
     for row in data:
