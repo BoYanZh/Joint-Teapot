@@ -204,18 +204,13 @@ def generate_title_and_comment(
                 comment += (
                     f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
                 )
+            else:
+                comment += "<details><summary>Details</summary>\n"
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
-            else:
-                if result["score"] == 0:
-                    comment += "Failed...\n"
-                else:
-                    comment += "Passed!\n"  # FIXME: This is a temporary solution. The comment should be better generated directly in the json file.
             total_score += result["score"]
-            if not single_case:
-                comment += "</details>\n\n"
+            comment += "</details>\n\n"
         comment += "\n"
-    # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
 
