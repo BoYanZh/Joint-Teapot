@@ -82,9 +82,9 @@ def generate_scoreboard(
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    submitter_row[
-        columns.index("last_edit")
-    ] = now  # FIXME: Delete this in formal version
+    submitter_row[columns.index("last_edit")] = (
+        now  # FIXME: Delete this in formal version
+    )
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))
@@ -206,8 +206,8 @@ def generate_title_and_comment(
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
         comment += "\n"
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    title = f"JOJ3 Result {now} - Score: {total_score}"
+    # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    title = f"JOJ3 Result - Score: {total_score}"
     return title, comment
 
 
