@@ -355,6 +355,10 @@ def joj3_create_result_issue(
         "",
         help="gitea actions run number",
     ),
+    exercise_name: str = Argument(
+        "Unknown",
+        help="name of the exercise that appears on the issue title",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
@@ -367,7 +371,7 @@ def joj3_create_result_issue(
         + f"actions/runs/{run_number}"
     )
     title, comment = joj3.generate_title_and_comment(
-        score_file_path, actions_link, run_number
+        score_file_path, actions_link, run_number, exercise_name
     )
     tea.pot.gitea.create_issue(submitter_repo_name, title, comment, False)
 

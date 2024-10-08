@@ -179,7 +179,7 @@ def generate_failed_table(
 
 
 def generate_title_and_comment(
-    score_file_path: str, action_link: str, run_number: str
+    score_file_path: str, action_link: str, run_number: str, exercise_name: str
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -207,7 +207,7 @@ def generate_title_and_comment(
             total_score += result["score"]
         comment += "\n"
     # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    title = f"JOJ3 Result - Score: {total_score}"
+    title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
 
 
