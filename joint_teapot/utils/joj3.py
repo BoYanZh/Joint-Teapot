@@ -201,10 +201,14 @@ def generate_title_and_comment(
         comment += "\n"
         for i, result in enumerate(stage["results"]):
             if not single_case:
-                comment += f"### Case {i} - Score: {result['score']}\n"
+                comment += (
+                    f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
+                )
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
+            if not single_case:
+                comment += "</details>\n\n"
         comment += "\n"
     # now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
