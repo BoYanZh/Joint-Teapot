@@ -206,6 +206,11 @@ def generate_title_and_comment(
                 )
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
+            else:
+                if result["score"] == 0:
+                    comment += "Failed...\n"
+                else:
+                    comment += "Passed!\n"  # FIXME: This is a temporary solution. The comment should be better generated directly in the json file.
             total_score += result["score"]
             if not single_case:
                 comment += "</details>\n\n"
