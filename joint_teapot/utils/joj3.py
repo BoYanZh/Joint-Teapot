@@ -208,7 +208,6 @@ def generate_title_and_comment(
             if result["comment"].strip() != "":
                 comment += f"<details>\n\n{result['comment']}\n</details>\n\n"
             total_score += result["score"]
-            comment += "</details>\n\n"
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
