@@ -183,7 +183,12 @@ def generate_title_and_comment(
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
-
+    if exercise_name == "unknown":
+        for stage in stages:
+            if stage["name"] != "metadata":
+                continue
+            comment = stage["results"][0]["comment"]
+            exercise_name = comment.split("-")[0]
     total_score = 0
     comment = (
         f"Generated from [Gitea Actions #{run_number}]({action_link}). "
@@ -195,15 +200,16 @@ def generate_title_and_comment(
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
+        single_case = len(stage["results"]) == 1
+        if single_case:
+            comment += f" - Score: {stage['results'][0]['score']}"
         comment += "\n"
         for i, result in enumerate(stage["results"]):
-            comment += (
-                f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
-            )
+            if not single_case:
+                comment += f"### Case {i} - Score: {result['score']}\n"
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
-            comment += "</details>\n\n"
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
