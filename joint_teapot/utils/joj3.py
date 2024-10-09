@@ -203,11 +203,9 @@ def generate_title_and_comment(
         comment += "\n"
         for i, result in enumerate(stage["results"]):
             comment += f"<summary>Case {i} - Score: {result['score']}</summary>\n"
-            comment += "<details>\n\n"
             if result["comment"].strip() != "":
-                comment += f"{result['comment']}\n"
+                comment += f"<details>\n\n{result['comment']}\n</details>\n\n"
             total_score += result["score"]
-            comment += "</details>\n\n"
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
