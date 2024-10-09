@@ -9,7 +9,7 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(
-    score_file_path: str, submitter: str, scoreboard_file_path: str
+    score_file_path: str, submitter: str, scoreboard_file_path: str, exercise_name: str
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -50,12 +50,12 @@ def generate_scoreboard(
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
 
-    exercise_name = "unknown"
-    for stage in stages:
-        if stage["name"] != "metadata":
-            continue
-        comment = stage["results"][0]["comment"]
-        exercise_name = comment.split("-")[0]
+    if exercise_name == "unknown":
+        for stage in stages:
+            if stage["name"] != "metadata":
+                continue
+            comment = stage["results"][0]["comment"]
+            exercise_name = comment.split("-")[0]
     # Find if exercise in table:
     if exercise_name not in columns:
         column_tail = columns[3:]
@@ -82,9 +82,9 @@ def generate_scoreboard(
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    submitter_row[columns.index("last_edit")] = (
-        now  # FIXME: Delete this in formal version
-    )
+    submitter_row[
+        columns.index("last_edit")
+    ] = now  # FIXME: Delete this in formal version
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))

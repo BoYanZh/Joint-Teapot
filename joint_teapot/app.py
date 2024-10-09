@@ -260,6 +260,7 @@ def joj3_scoreboard(
         score_file_path,
         submitter,
         os.path.join(repo_path, scoreboard_file_name),
+        exercise_name,
     )
     actions_link = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
