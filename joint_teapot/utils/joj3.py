@@ -197,7 +197,7 @@ def generate_title_and_comment(
     )
     for stage in stages:
         force_quit = stage["force_quit"]
-        if stage["name"] == "healthcheck" and force_quit:
+        if stage["name"] == "healthcheck" and not force_quit:
             continue
         comment += f"## {stage['name']}"
         if force_quit:
