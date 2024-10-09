@@ -196,8 +196,10 @@ def generate_title_and_comment(
         + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
     for stage in stages:
-        comment += f"## {stage['name']}"
         force_quit = stage["force_quit"]
+        if stage["name"] == "healthcheck" and force_quit:
+            continue
+        comment += f"## {stage['name']}"
         if force_quit:
             comment += " - Failed"
         comment += "\n"
