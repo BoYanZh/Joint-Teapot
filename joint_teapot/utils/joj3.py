@@ -195,17 +195,11 @@ def generate_title_and_comment(
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
-        single_case = len(stage["results"]) == 1
-        if single_case:
-            comment += f" - Score: {stage['results'][0]['score']}"
         comment += "\n"
         for i, result in enumerate(stage["results"]):
-            if not single_case:
-                comment += (
-                    f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
-                )
-            else:
-                comment += "<details><summary>Details</summary>\n"
+            comment += (
+                f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
+            )
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
