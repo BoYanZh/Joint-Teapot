@@ -200,16 +200,14 @@ def generate_title_and_comment(
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
-        single_case = len(stage["results"]) == 1
-        if single_case:
-            comment += f" - Score: {stage['results'][0]['score']}"
         comment += "\n"
         for i, result in enumerate(stage["results"]):
-            if not single_case:
-                comment += f"### Case {i} - Score: {result['score']}\n"
+            comment += f"<summary>Case {i} - Score: {result['score']}</summary>\n"
+            comment += "<details>\n\n"
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
+            comment += "</details>\n\n"
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
