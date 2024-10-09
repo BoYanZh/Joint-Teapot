@@ -235,6 +235,10 @@ def joj3_scoreboard(
     scoreboard_file_name: str = Argument(
         "scoreboard.csv", help="name of scoreboard file in the gitea repo"
     ),
+    exercise_name: str = Argument(
+        "unknown",
+        help="name of the exercise that appears on the issue title",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
@@ -256,6 +260,7 @@ def joj3_scoreboard(
         score_file_path,
         submitter,
         os.path.join(repo_path, scoreboard_file_name),
+        exercise_name,
     )
     actions_link = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
@@ -293,6 +298,10 @@ def joj3_failed_table(
     ),
     failed_table_file_name: str = Argument(
         "failed-table.md", help="name of failed table file in the gitea repo"
+    ),
+    exercise_name: str = Argument(
+        "unknown",
+        help="name of the exercise that appears on the issue title",
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
@@ -355,6 +364,10 @@ def joj3_create_result_issue(
         "",
         help="gitea actions run number",
     ),
+    exercise_name: str = Argument(
+        "unknown",
+        help="name of the exercise that appears on the issue title",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
@@ -367,7 +380,7 @@ def joj3_create_result_issue(
         + f"actions/runs/{run_number}"
     )
     title, comment = joj3.generate_title_and_comment(
-        score_file_path, actions_link, run_number
+        score_file_path, actions_link, run_number, exercise_name
     )
     tea.pot.gitea.create_issue(submitter_repo_name, title, comment, False)
 

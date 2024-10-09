@@ -9,7 +9,7 @@ from joint_teapot.utils.logger import logger
 
 
 def generate_scoreboard(
-    score_file_path: str, submitter: str, scoreboard_file_path: str
+    score_file_path: str, submitter: str, scoreboard_file_path: str, exercise_name: str
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -50,12 +50,12 @@ def generate_scoreboard(
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
 
-    exercise_name = "unknown"
-    for stage in stages:
-        if stage["name"] != "metadata":
-            continue
-        comment = stage["results"][0]["comment"]
-        exercise_name = comment.split("-")[0]
+    if exercise_name == "unknown":
+        for stage in stages:
+            if stage["name"] != "metadata":
+                continue
+            comment = stage["results"][0]["comment"]
+            exercise_name = comment.split("-")[0]
     # Find if exercise in table:
     if exercise_name not in columns:
         column_tail = columns[3:]
@@ -179,7 +179,7 @@ def generate_failed_table(
 
 
 def generate_title_and_comment(
-    score_file_path: str, action_link: str, run_number: str
+    score_file_path: str, action_link: str, run_number: str, exercise_name: str
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -195,19 +195,17 @@ def generate_title_and_comment(
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
-        single_case = len(stage["results"]) == 1
-        if single_case:
-            comment += f" - Score: {stage['results'][0]['score']}"
         comment += "\n"
         for i, result in enumerate(stage["results"]):
-            if not single_case:
-                comment += f"### Case {i} - Score: {result['score']}\n"
+            comment += (
+                f"<details><summary>Case {i} - Score: {result['score']}</summary>\n"
+            )
             if result["comment"].strip() != "":
                 comment += f"{result['comment']}\n"
             total_score += result["score"]
+            comment += "</details>\n\n"
         comment += "\n"
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    title = f"JOJ3 Result {now} - Score: {total_score}"
+    title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
 
 
