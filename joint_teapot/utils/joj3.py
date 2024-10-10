@@ -197,6 +197,11 @@ def generate_title_and_comment(
     )
     for stage in stages:
         comment += f"## {stage['name']}"
+        if all(
+            result["score"] == 0 and result["comment"].strip() == ""
+            for result in stage["results"]
+        ):
+            continue
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
