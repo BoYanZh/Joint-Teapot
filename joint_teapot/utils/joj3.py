@@ -196,10 +196,13 @@ def generate_title_and_comment(
         + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
     for stage in stages:
-        force_quit = stage["force_quit"]
-        if stage["name"] == "healthcheck" and not force_quit:
+        stage_score = 0
+        for i, result in enumerate(stage["results"]):
+            stage_score += result["score"]
+        if stage_score == 0 and stage["results"][0]["comment"].strip() == "":
             continue
         comment += f"## {stage['name']}"
+        force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
         comment += "\n"
@@ -207,7 +210,7 @@ def generate_title_and_comment(
             comment += f"<summary>Case {i} - Score: {result['score']}</summary>\n"
             if result["comment"].strip() != "":
                 comment += f"<details>\n\n{result['comment']}\n</details>\n\n"
-            total_score += result["score"]
+        total_score += stage_score
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
