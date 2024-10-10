@@ -202,6 +202,11 @@ def generate_title_and_comment(
         if stage_score == 0 and stage["results"][0]["comment"].strip() == "":
             continue
         comment += f"## {stage['name']}"
+        if all(
+            result["score"] == 0 and result["comment"].strip() == ""
+            for result in stage["results"]
+        ):
+            continue
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
@@ -210,7 +215,7 @@ def generate_title_and_comment(
             comment += "<details>"
             comment += f"<summary>Case {i} - Score: {result['score']}</summary>\n"
             if result["comment"].strip() != "":
-                comment += f"{result['comment']}\n"
+                comment += f"\n{result['comment']}\n"
             comment += "</details>\n\n"
             total_score += result["score"]
         comment += "\n"
