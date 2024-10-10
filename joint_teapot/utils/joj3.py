@@ -210,7 +210,7 @@ def generate_title_and_comment(
             comment += "<details>"
             comment += f"<summary>Case {i} - Score: {result['score']}</summary>\n"
             if result["comment"].strip() != "":
-                comment += f"{result['comment']}\n"
+                comment += f"\n{result['comment']}\n"
             comment += "</details>\n\n"
             total_score += result["score"]
         comment += "\n"
