@@ -82,9 +82,9 @@ def generate_scoreboard(
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    submitter_row[
-        columns.index("last_edit")
-    ] = now  # FIXME: Delete this in formal version
+    submitter_row[columns.index("last_edit")] = (
+        now  # FIXME: Delete this in formal version
+    )
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))
@@ -201,7 +201,8 @@ def generate_title_and_comment(
             for result in stage["results"]
         ):
             continue
-        comment += f"## {stage['name']}"
+        stage_score = sum(result["score"] for result in stage["results"])
+        comment += f"## {stage['name']} - Score: {stage_score}"
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Fatal Error"
