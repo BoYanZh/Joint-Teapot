@@ -201,7 +201,7 @@ def generate_title_and_comment(
             for result in stage["results"]
         ):
             continue
-        comment += f"## {stage['name']}"
+        comment += f"## {stage['name']}\n"
         force_quit = stage["force_quit"]
         if force_quit:
             comment += " - Failed"
