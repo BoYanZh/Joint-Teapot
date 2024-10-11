@@ -196,7 +196,7 @@ def generate_title_and_comment(
         + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
     for stage in stages:
-        comment += f"## {stage['name']}"
+        comment += f"## {stage['name']}\n"
         if all(
             result["score"] == 0 and result["comment"].strip() == ""
             for result in stage["results"]
