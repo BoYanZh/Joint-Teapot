@@ -268,7 +268,7 @@ def joj3_scoreboard(
         + f"actions/runs/{run_number}"
     )
     commit_message = (
-        f"joj3: update scoreboard by {submitter} in {submitter_repo_name}\n\n"
+        f"joj3: update scoreboard by @{submitter} in {submitter_repo_name}\n\n"
         + f"gitea actions link: {actions_link}"
     )
     tea.pot.git.add_commit_and_push(repo_name, [scoreboard_file_name], commit_message)
@@ -337,7 +337,7 @@ def joj3_failed_table(
         actions_link,
     )
     commit_message = (
-        f"joj3: update failed table by {submitter} in {submitter_repo_name}\n\n"
+        f"joj3: update failed table by @{submitter} in {submitter_repo_name}\n\n"
         + f"gitea actions link: {actions_link}"
     )
     tea.pot.git.add_commit_and_push(
