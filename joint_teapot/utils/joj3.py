@@ -179,7 +179,11 @@ def generate_failed_table(
 
 
 def generate_title_and_comment(
-    score_file_path: str, action_link: str, run_number: str, exercise_name: str
+    score_file_path: str,
+    action_link: str,
+    run_number: str,
+    exercise_name: str,
+    submitter: str,
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -191,7 +195,8 @@ def generate_title_and_comment(
             exercise_name = comment.split("-")[0]
     total_score = 0
     comment = (
-        f"Generated from [Gitea Actions #{run_number}]({action_link}). "
+        f"Generated from [Gitea Actions #{run_number}]({action_link}), "
+        + f"triggered by @{submitter}.\n"
         + "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
