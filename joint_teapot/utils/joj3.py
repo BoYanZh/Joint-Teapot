@@ -82,9 +82,9 @@ def generate_scoreboard(
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    submitter_row[columns.index("last_edit")] = (
-        now  # FIXME: Delete this in formal version
-    )
+    submitter_row[
+        columns.index("last_edit")
+    ] = now  # FIXME: Delete this in formal version
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))
@@ -184,6 +184,7 @@ def generate_title_and_comment(
     run_number: str,
     exercise_name: str,
     submitter: str,
+    commit_hash: str,
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -196,6 +197,7 @@ def generate_title_and_comment(
     total_score = 0
     comment = (
         f"Generated from [Gitea Actions #{run_number}]({action_link}), "
+        + f"commit {commit_hash}, "
         + f"triggered by @{submitter}.\n"
         + "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
