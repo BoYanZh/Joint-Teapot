@@ -250,6 +250,7 @@ def joj3_scoreboard(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
+    tea.pot.git  # trigger lazy load
     lock_file_path = os.path.join(
         settings.repos_dir, repo_name, settings.joj3_lock_file_path
     )
@@ -330,6 +331,7 @@ def joj3_failed_table(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
+    tea.pot.git  # trigger lazy load
     lock_file_path = os.path.join(
         settings.repos_dir, repo_name, settings.joj3_lock_file_path
     )
