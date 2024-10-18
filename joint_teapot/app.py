@@ -250,9 +250,10 @@ def joj3_scoreboard(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
-    lock = FileLock(
-        settings.joj3_lock_file_path, timeout=settings.joj3_lock_file_timeout
+    lock_file_path = os.path.join(
+        settings.repos_dir, repo_name, settings.joj3_lock_file_path
     )
+    lock = FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout)
     with lock.acquire():
         repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
         repo: Repo = tea.pot.git.get_repo(repo_name)
@@ -325,9 +326,10 @@ def joj3_failed_table(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
-    lock = FileLock(
-        settings.joj3_lock_file_path, timeout=settings.joj3_lock_file_timeout
+    lock_file_path = os.path.join(
+        settings.repos_dir, repo_name, settings.joj3_lock_file_path
     )
+    lock = FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout)
     with lock.acquire():
         repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
         repo: Repo = tea.pot.git.get_repo(repo_name)
