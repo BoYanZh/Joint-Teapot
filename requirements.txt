@@ -1,5 +1,6 @@
 canvasapi>=2.2.0
 colorama>=0.4.6
+filelock>=3.14.0
 focs_gitea>=1.22.0
 GitPython>=3.1.18
 joj-submitter>=0.0.8

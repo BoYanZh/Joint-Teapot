@@ -35,8 +35,12 @@ class Settings(BaseSettings):
         "charlem",
     ]
 
-    # sid
+    # joj
     joj_sid: str = ""
+
+    # joj3
+    joj3_lock_file_path: str = ".git/teapot.lock"
+    joj3_lock_file_timeout: int = 30
 
     # log file
     log_file_path: str = "joint-teapot.log"

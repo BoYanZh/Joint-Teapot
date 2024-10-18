@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from filelock import FileLock
 from git import Repo
 from typer import Argument, Option, Typer, echo
 
@@ -249,34 +250,40 @@ def joj3_scoreboard(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
-    repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
-    repo: Repo = tea.pot.git.get_repo(repo_name)
-    if "grading" not in repo.remote().refs:
-        logger.error(
-            '"grading" branch not found in remote, create and push it to origin first.'
+    lock = FileLock(
+        settings.joj3_lock_file_path, timeout=settings.joj3_lock_file_timeout
+    )
+    with lock.acquire():
+        repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
+        repo: Repo = tea.pot.git.get_repo(repo_name)
+        if "grading" not in repo.remote().refs:
+            logger.error(
+                '"grading" branch not found in remote, create and push it to origin first.'
+            )
+            return
+        if "grading" not in repo.branches:
+            logger.error('"grading" branch not found in local, create it first.')
+            return
+        repo.git.reset("--hard", "origin/grading")
+        joj3.generate_scoreboard(
+            score_file_path,
+            submitter,
+            os.path.join(repo_path, scoreboard_file_name),
+            exercise_name,
         )
-        return
-    if "grading" not in repo.branches:
-        logger.error('"grading" branch not found in local, create it first.')
-        return
-    repo.git.reset("--hard", "origin/grading")
-    joj3.generate_scoreboard(
-        score_file_path,
-        submitter,
-        os.path.join(repo_path, scoreboard_file_name),
-        exercise_name,
-    )
-    actions_link = (
-        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
-        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
-        + f"actions/runs/{run_number}"
-    )
-    commit_message = (
-        f"joj3: update scoreboard by @{submitter} in "
-        + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-        + f"gitea actions link: {actions_link}"
-    )
-    tea.pot.git.add_commit_and_push(repo_name, [scoreboard_file_name], commit_message)
+        actions_link = (
+            f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+            + f"{settings.gitea_org_name}/{submitter_repo_name}/"
+            + f"actions/runs/{run_number}"
+        )
+        commit_message = (
+            f"joj3: update scoreboard by @{submitter} in "
+            + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+            + f"gitea actions link: {actions_link}"
+        )
+        tea.pot.git.add_commit_and_push(
+            repo_name, [scoreboard_file_name], commit_message
+        )
 
 
 @app.command(
@@ -318,43 +325,47 @@ def joj3_failed_table(
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
-    repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
-    repo: Repo = tea.pot.git.get_repo(repo_name)
-    if "grading" not in repo.remote().refs:
-        logger.error(
-            '"grading" branch not found in remote, create and push it to origin first.'
+    lock = FileLock(
+        settings.joj3_lock_file_path, timeout=settings.joj3_lock_file_timeout
+    )
+    with lock.acquire():
+        repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
+        repo: Repo = tea.pot.git.get_repo(repo_name)
+        if "grading" not in repo.remote().refs:
+            logger.error(
+                '"grading" branch not found in remote, create and push it to origin first.'
+            )
+            return
+        if "grading" not in repo.branches:
+            logger.error('"grading" branch not found in local, create it first.')
+            return
+        repo.git.reset("--hard", "origin/grading")
+        submitter_repo_link = (
+            f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+            + f"{settings.gitea_org_name}/{submitter_repo_name}"
         )
-        return
-    if "grading" not in repo.branches:
-        logger.error('"grading" branch not found in local, create it first.')
-        return
-    repo.git.reset("--hard", "origin/grading")
-    submitter_repo_link = (
-        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
-        + f"{settings.gitea_org_name}/{submitter_repo_name}"
-    )
-    actions_link = (
-        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
-        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
-        + f"actions/runs/{run_number}"
-    )
-    joj3.generate_failed_table(
-        score_file_path,
-        submitter_repo_name,
-        submitter_repo_link,
-        os.path.join(repo_path, failed_table_file_name),
-        actions_link,
-    )
-    commit_message = (
-        f"joj3: update failed table by @{submitter} in "
-        + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-        + f"gitea actions link: {actions_link}"
-    )
-    tea.pot.git.add_commit_and_push(
-        repo_name,
-        [failed_table_file_name],
-        commit_message,
-    )
+        actions_link = (
+            f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+            + f"{settings.gitea_org_name}/{submitter_repo_name}/"
+            + f"actions/runs/{run_number}"
+        )
+        joj3.generate_failed_table(
+            score_file_path,
+            submitter_repo_name,
+            submitter_repo_link,
+            os.path.join(repo_path, failed_table_file_name),
+            actions_link,
+        )
+        commit_message = (
+            f"joj3: update failed table by @{submitter} in "
+            + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+            + f"gitea actions link: {actions_link}"
+        )
+        tea.pot.git.add_commit_and_push(
+            repo_name,
+            [failed_table_file_name],
+            commit_message,
+        )
 
 
 @app.command(
