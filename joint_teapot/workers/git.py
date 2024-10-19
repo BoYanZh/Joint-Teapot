@@ -102,7 +102,7 @@ class Git:
                     raise
         return repo_dir
 
-    def add_commit_and_push(
+    def add_commit(
         self, repo_name: str, files_to_add: List[str], commit_message: str
     ) -> None:
         repo: Repo = self.get_repo(repo_name)
@@ -116,4 +116,7 @@ class Git:
                 continue
         if repo.is_dirty(untracked_files=True) or repo.index.diff(None):
             repo.index.commit(commit_message)
-            repo.remote(name="origin").push()
+
+    def push(self, repo_name: str) -> None:
+        repo: Repo = self.get_repo(repo_name)
+        repo.remote(name="origin").push()
