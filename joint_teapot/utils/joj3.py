@@ -16,7 +16,7 @@ def generate_scoreboard(
             f"Scoreboard file should be a .csv file, but now it is {scoreboard_file_path}"
         )
         return
-
+    os.makedirs(os.path.dirname(scoreboard_file_path), exist_ok=True)
     # Load the csv file if it already exists
     if os.path.exists(scoreboard_file_path):
         with open(scoreboard_file_path, newline="") as file:
@@ -150,6 +150,7 @@ def write_failed_table_into_file(data: List[List[str]], table_file_path: str) ->
     for row in data:
         text += f"|{row[0]}|{row[1]}|{row[2]}|\n"
 
+    os.makedirs(os.path.dirname(table_file_path), exist_ok=True)
     with open(table_file_path, "w") as table_file:
         table_file.write(text)
 
