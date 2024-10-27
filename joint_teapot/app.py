@@ -501,6 +501,7 @@ def joj3_all(
             body={"title": title, "body": comment},
         )
         gitea_issue_url = res["url"]
+        logger.info(f"gitea issue url: {gitea_issue_url}")
     if skip_scoreboard and skip_failed_table:
         return
     tea.pot.git  # trigger lazy load
