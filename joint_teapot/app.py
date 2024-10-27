@@ -476,25 +476,32 @@ def joj3_all(
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
     logger.info(f"debug log to file: {settings.log_file_path}")
-    actions_link = (
+    actions_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}/"
         + f"actions/runs/{run_number}"
     )
-    submitter_repo_link = (
+    submitter_repo_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}"
     )
+    gitea_issue_url = ""
     if not skip_result_issue:
         title, comment = joj3.generate_title_and_comment(
             score_file_path,
-            actions_link,
+            actions_url,
             run_number,
             exercise_name,
             submitter,
             commit_hash,
         )
-        tea.pot.gitea.create_issue(submitter_repo_name, title, comment, False)
+        res = tea.pot.gitea.issue_api.issue_create_issue(
+            tea.pot.gitea.org_name,
+            submitter_repo_name,
+            body={"title": title, "body": comment},
+        )
+        logger.info(f"create issue result: {res}")
+        gitea_issue_url = res["url"]
     if skip_scoreboard and skip_failed_table:
         return
     tea.pot.git  # trigger lazy load
@@ -530,25 +537,27 @@ def joj3_all(
                 [scoreboard_file_name],
                 (
                     f"joj3: update scoreboard by @{submitter} in "
-                    + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-                    + f"gitea actions link: {actions_link}"
+                    f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                    f"gitea actions link: {actions_url}\n"
+                    f"gitea issue link: {gitea_issue_url}"
                 ),
             )
         if not skip_failed_table:
             joj3.generate_failed_table(
                 score_file_path,
                 submitter_repo_name,
-                submitter_repo_link,
+                submitter_repo_url,
                 os.path.join(repo_path, failed_table_file_name),
-                actions_link,
+                actions_url,
             )
             tea.pot.git.add_commit(
                 repo_name,
                 [failed_table_file_name],
                 (
                     f"joj3: update failed table by @{submitter} in "
-                    + f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-                    + f"gitea actions link: {actions_link}"
+                    f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                    f"gitea actions link: {actions_url}"
+                    f"gitea issue link: {gitea_issue_url}"
                 ),
             )
         tea.pot.git.push(repo_name)
