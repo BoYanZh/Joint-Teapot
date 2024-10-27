@@ -498,13 +498,29 @@ def joj3_all(
             submitter,
             commit_hash,
         )
-        issue: focs_gitea.Issue = tea.pot.gitea.issue_api.issue_create_issue(
-            tea.pot.gitea.org_name,
-            submitter_repo_name,
-            body={"title": title, "body": comment},
-        )
+        title_prefix = joj3.get_title_prefix(title)
+        joj3_issue: focs_gitea.Issue
+        issue: focs_gitea.Issue
+        for issue in tea.pot.gitea.issue_api.issue_list_issues(
+            tea.pot.gitea.org_name, submitter_repo_name, state="all"
+        ):
+            if issue.title.startswith(title_prefix):
+                joj3_issue = issue
+                break
+        else:
+            joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
+                tea.pot.gitea.org_name,
+                submitter_repo_name,
+                body={"title": title, "body": ""},
+            )
         gitea_issue_url = issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
+        tea.pot.gitea.issue_api.issue_edit_issue(
+            tea.pot.gitea.org_name,
+            submitter_repo_name,
+            joj3_issue.number,
+            body={"body": comment},
+        )
     if skip_scoreboard and skip_failed_table:
         return
     tea.pot.git  # trigger lazy load

@@ -237,3 +237,10 @@ def check_skipped(score_file_path: str, keyword: str) -> bool:
         if keyword in comment or "skip-teapot" in comment:
             return True
     return False
+
+
+def get_title_prefix(title: str) -> str:
+    for i in range(len(title) - 1, -1, -1):
+        if not title[i].isdigit() and not title[i].isspace():
+            return title[: i + 1]
+    return ""
