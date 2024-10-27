@@ -503,7 +503,7 @@ def joj3_all(
             submitter_repo_name,
             body={"title": title, "body": comment},
         )
-        gitea_issue_url = issue.url
+        gitea_issue_url = issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
     if skip_scoreboard and skip_failed_table:
         return
