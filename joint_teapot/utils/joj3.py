@@ -196,12 +196,13 @@ def generate_title_and_comment(
             comment = stage["results"][0]["comment"]
             exercise_name = comment.split("-")[0]
     total_score = 0
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     comment = (
-        f"Generated from [Gitea Actions #{run_number}]({action_link}), "
-        + f"commit {commit_hash}, "
-        + f"triggered by @{submitter}.\n"
-        + "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
-        + "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
+        f"Generated at {now} from [Gitea Actions #{run_number}]({action_link}), "
+        f"commit {commit_hash}, "
+        f"triggered by @{submitter}.\n"
+        "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
+        "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
     for stage in stages:
         if all(
