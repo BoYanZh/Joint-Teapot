@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from filelock import FileLock
 from git import Repo
@@ -11,6 +11,9 @@ from joint_teapot.config import Settings, set_settings, settings
 from joint_teapot.teapot import Teapot
 from joint_teapot.utils import joj3
 from joint_teapot.utils.logger import logger, set_logger
+
+if TYPE_CHECKING:
+    import focs_gitea
 
 app = Typer(add_completion=False)
 
@@ -495,12 +498,12 @@ def joj3_all(
             submitter,
             commit_hash,
         )
-        res = tea.pot.gitea.issue_api.issue_create_issue(
+        issue: focs_gitea.Issue = tea.pot.gitea.issue_api.issue_create_issue(
             tea.pot.gitea.org_name,
             submitter_repo_name,
             body={"title": title, "body": comment},
         )
-        gitea_issue_url = res["url"]
+        gitea_issue_url = issue.url
         logger.info(f"gitea issue url: {gitea_issue_url}")
     if skip_scoreboard and skip_failed_table:
         return
