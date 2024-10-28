@@ -515,7 +515,7 @@ def joj3_all(
                 body={"title": title_prefix, "body": ""},
             )
             logger.info(f"created joj3 issue: #{joj3_issue.number}")
-        gitea_issue_url = issue.html_url
+        gitea_issue_url = joj3_issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
         tea.pot.gitea.issue_api.issue_edit_issue(
             tea.pot.gitea.org_name,
