@@ -506,6 +506,7 @@ def joj3_all(
         ):
             if issue.title.startswith(title_prefix):
                 joj3_issue = issue
+                logger.info(f"found joj3 issue: #{joj3_issue.number}")
                 break
         else:
             joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
@@ -513,6 +514,7 @@ def joj3_all(
                 submitter_repo_name,
                 body={"title": title_prefix, "body": ""},
             )
+            logger.info(f"created joj3 issue: #{joj3_issue.number}")
         gitea_issue_url = issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
         tea.pot.gitea.issue_api.issue_edit_issue(
