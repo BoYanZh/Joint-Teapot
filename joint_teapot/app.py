@@ -511,7 +511,7 @@ def joj3_all(
             joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
                 tea.pot.gitea.org_name,
                 submitter_repo_name,
-                body={"title": title, "body": ""},
+                body={"title": title_prefix, "body": ""},
             )
         gitea_issue_url = issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
@@ -519,7 +519,7 @@ def joj3_all(
             tea.pot.gitea.org_name,
             submitter_repo_name,
             joj3_issue.number,
-            body={"body": comment},
+            body={"title": title, "body": comment},
         )
     if skip_scoreboard and skip_failed_table:
         return
