@@ -479,7 +479,7 @@ def joj3_all(
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
     logger.info(f"debug log to file: {settings.log_file_path}")
-    actions_url = (
+    gitea_actions_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}/"
         + f"actions/runs/{run_number}"
@@ -492,7 +492,7 @@ def joj3_all(
     if not skip_result_issue:
         title, comment = joj3.generate_title_and_comment(
             score_file_path,
-            actions_url,
+            gitea_actions_url,
             run_number,
             exercise_name,
             submitter,
@@ -557,9 +557,9 @@ def joj3_all(
                 repo_name,
                 [scoreboard_file_name],
                 (
-                    f"joj3: update scoreboard by @{submitter} in "
+                    f"joj3: update scoreboard for {exercise_name} by @{submitter} in "
                     f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-                    f"gitea actions link: {actions_url}\n"
+                    f"gitea actions link: {gitea_actions_url}\n"
                     f"gitea issue link: {gitea_issue_url}"
                 ),
             )
@@ -569,15 +569,15 @@ def joj3_all(
                 submitter_repo_name,
                 submitter_repo_url,
                 os.path.join(repo_path, failed_table_file_name),
-                actions_url,
+                gitea_actions_url,
             )
             tea.pot.git.add_commit(
                 repo_name,
                 [failed_table_file_name],
                 (
-                    f"joj3: update failed table by @{submitter} in "
+                    f"joj3: update failed table for {exercise_name} by @{submitter} in "
                     f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-                    f"gitea actions link: {actions_url}"
+                    f"gitea actions link: {gitea_actions_url}"
                     f"gitea issue link: {gitea_issue_url}"
                 ),
             )
