@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, List
 
 from filelock import FileLock
 from git import Repo
-from typer import Argument, Option, Typer, echo
+from typer import Argument, Exit, Option, Typer, echo
 
 from joint_teapot.config import Settings, set_settings, settings
 from joint_teapot.teapot import Teapot
@@ -539,20 +539,20 @@ def joj3_all(
         + f"timeout: {settings.joj3_lock_file_timeout}"
     )
     with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
+        logger.info("file lock acquired")
         retry_interval = 1
         git_push_ok = False
         while not git_push_ok:
-            logger.info("file lock acquired")
             repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
             repo: Repo = tea.pot.git.get_repo(repo_name)
             if "grading" not in repo.remote().refs:
                 logger.error(
                     '"grading" branch not found in remote, create and push it to origin first.'
                 )
-                return
+                raise Exit(code=1)
             if "grading" not in repo.branches:
                 logger.error('"grading" branch not found in local, create it first.')
-                return
+                raise Exit(code=1)
             repo.git.reset("--hard", "origin/grading")
             if not skip_scoreboard:
                 joj3.generate_scoreboard(
@@ -598,7 +598,7 @@ def joj3_all(
                 )
                 if retry_interval > 64:
                     logger.error(f"git push failed too many times")
-                    return
+                    raise Exit(code=1)
                 sleep(retry_interval)
 
 
