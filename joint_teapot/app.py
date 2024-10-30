@@ -512,7 +512,7 @@ def joj3_all(
             joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
                 tea.pot.gitea.org_name,
                 submitter_repo_name,
-                body={"title": title_prefix, "body": ""},
+                body={"title": title_prefix + "0", "body": ""},
             )
             logger.info(f"created joj3 issue: #{joj3_issue.number}")
         gitea_issue_url = joj3_issue.html_url
