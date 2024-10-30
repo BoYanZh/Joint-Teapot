@@ -464,7 +464,7 @@ def joj3_all(
         "",
         help="commit hash that triggers gitea actions",
     ),
-    run_ID: str = Argument(
+    run_id: str = Argument(
         "unknown",
         help="JOJ3 run ID",
     ),
@@ -507,7 +507,7 @@ def joj3_all(
             submitter,
             commit_hash,
             submitter_in_issue_title,
-            run_ID,
+            run_id,
         )
         title_prefix = joj3.get_title_prefix(title)
         joj3_issue: focs_gitea.Issue

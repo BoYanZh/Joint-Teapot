@@ -187,7 +187,7 @@ def generate_title_and_comment(
     submitter: str,
     commit_hash: str,
     submitter_in_title: bool = True,
-    run_ID: str = "unknown",
+    run_id: str = "unknown",
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -203,7 +203,7 @@ def generate_title_and_comment(
         f"Generated at {now} from [Gitea Actions #{run_number}]({action_link}), "
         f"commit {commit_hash}, "
         f"triggered by @{submitter}, "
-        f"run ID {run_ID}.\n"
+        f"run ID `{run_id}`.\n"
         "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
