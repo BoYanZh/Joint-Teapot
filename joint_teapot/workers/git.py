@@ -9,6 +9,7 @@ current_path = sys.path[0]
 sys.path.remove(current_path)
 from git import Repo
 from git.exc import GitCommandError
+from git.remote import PushInfoList
 
 sys.path.insert(0, current_path)
 
@@ -117,6 +118,6 @@ class Git:
         if repo.is_dirty(untracked_files=True) or repo.index.diff(None):
             repo.index.commit(commit_message)
 
-    def push(self, repo_name: str) -> None:
+    def push(self, repo_name: str) -> PushInfoList:
         repo: Repo = self.get_repo(repo_name)
-        repo.remote(name="origin").push()
+        return repo.remote(name="origin").push()
