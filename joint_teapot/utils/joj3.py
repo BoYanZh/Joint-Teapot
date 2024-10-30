@@ -186,6 +186,7 @@ def generate_title_and_comment(
     exercise_name: str,
     submitter: str,
     commit_hash: str,
+    submitter_in_title: bool = True,
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -225,6 +226,8 @@ def generate_title_and_comment(
             total_score += result["score"]
         comment += "\n"
     title = f"JOJ3 Result for {exercise_name} by @{submitter} - Score: {total_score}"
+    if not submitter_in_title:
+        title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
     return title, comment
 
 

@@ -475,6 +475,10 @@ def joj3_all(
         False,
         help="skip creating failed table on gitea",
     ),
+    submitter_in_issue_title: bool = Option(
+        True,
+        help="whether to include submitter in issue title",
+    ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
@@ -497,6 +501,7 @@ def joj3_all(
             exercise_name,
             submitter,
             commit_hash,
+            submitter_in_issue_title,
         )
         title_prefix = joj3.get_title_prefix(title)
         joj3_issue: focs_gitea.Issue
