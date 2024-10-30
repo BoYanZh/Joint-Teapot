@@ -224,7 +224,7 @@ def generate_title_and_comment(
             comment += "</details>\n\n"
             total_score += result["score"]
         comment += "\n"
-    title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
+    title = f"JOJ3 Result for {exercise_name} by @{submitter} - Score: {total_score}"
     return title, comment
 
 
