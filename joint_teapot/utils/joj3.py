@@ -246,7 +246,11 @@ def check_skipped(score_file_path: str, keyword: str) -> bool:
 
 
 def get_title_prefix(title: str) -> str:
+    meet_negative = False
     for i in range(len(title) - 1, -1, -1):
         if not title[i].isdigit() and not title[i].isspace():
+            if not meet_negative and title[i] == "-":
+                meet_negative = True
+                continue
             return title[: i + 1]
     return ""
