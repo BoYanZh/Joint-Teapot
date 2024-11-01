@@ -513,7 +513,7 @@ def joj3_all(
         joj3_issue: focs_gitea.Issue
         issue: focs_gitea.Issue
         for issue in tea.pot.gitea.issue_api.issue_list_issues(
-            tea.pot.gitea.org_name, submitter_repo_name, state="all"
+            tea.pot.gitea.org_name, submitter_repo_name, state="open"
         ):
             if issue.title.startswith(title_prefix):
                 joj3_issue = issue
