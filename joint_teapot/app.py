@@ -572,6 +572,7 @@ def joj3_all(
                     submitter,
                     os.path.join(repo_path, scoreboard_file_name),
                     exercise_name,
+                    max_total_score,
                 )
                 tea.pot.git.add_commit(
                     repo_name,
