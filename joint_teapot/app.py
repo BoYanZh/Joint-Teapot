@@ -468,7 +468,7 @@ def joj3_all(
         "unknown",
         help="JOJ3 run ID",
     ),
-    max_total_score: int = Argument(
+    max_total_score: int = Option(
         -1,
         help="max total score",
     ),
