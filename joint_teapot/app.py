@@ -468,6 +468,10 @@ def joj3_all(
         "unknown",
         help="JOJ3 run ID",
     ),
+    max_total_score: int = Argument(
+        -1,
+        help="max total score",
+    ),
     skip_result_issue: bool = Option(
         False,
         help="skip creating result issue on gitea",
@@ -508,8 +512,11 @@ def joj3_all(
             commit_hash,
             submitter_in_issue_title,
             run_id,
+            max_total_score,
         )
-        title_prefix = joj3.get_title_prefix(title)
+        title_prefix = joj3.get_title_prefix(
+            exercise_name, submitter, submitter_in_issue_title
+        )
         joj3_issue: focs_gitea.Issue
         issue: focs_gitea.Issue
         for issue in tea.pot.gitea.issue_api.issue_list_issues(

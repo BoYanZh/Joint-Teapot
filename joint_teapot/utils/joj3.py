@@ -188,6 +188,7 @@ def generate_title_and_comment(
     commit_hash: str,
     submitter_in_title: bool = True,
     run_id: str = "unknown",
+    max_total_score: int = -1,
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -227,9 +228,12 @@ def generate_title_and_comment(
             comment += "</details>\n\n"
             total_score += result["score"]
         comment += "\n"
-    title = f"JOJ3 Result for {exercise_name} by @{submitter} - Score: {total_score}"
-    if not submitter_in_title:
-        title = f"JOJ3 Result for {exercise_name} - Score: {total_score}"
+    title = get_title_prefix(exercise_name, submitter, submitter_in_title)
+    if max_total_score >= 0:
+        total_score = min(total_score, max_total_score)
+        title += f"{total_score} / {max_total_score}"
+    else:
+        title += f"{total_score}"
     return title, comment
 
 
@@ -245,12 +249,10 @@ def check_skipped(score_file_path: str, keyword: str) -> bool:
     return False
 
 
-def get_title_prefix(title: str) -> str:
-    meet_negative = False
-    for i in range(len(title) - 1, -1, -1):
-        if not title[i].isdigit() and not title[i].isspace():
-            if not meet_negative and title[i] == "-":
-                meet_negative = True
-                continue
-            return title[: i + 1]
-    return ""
+def get_title_prefix(
+    exercise_name: str, submitter: str, submitter_in_title: bool
+) -> str:
+    title = f"JOJ3 Result for {exercise_name} by @{submitter} - "
+    if not submitter_in_title:
+        title = f"JOJ3 Result for {exercise_name} - "
+    return title
