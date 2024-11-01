@@ -257,7 +257,7 @@ def check_skipped(score_file_path: str, keyword: str) -> bool:
 def get_title_prefix(
     exercise_name: str, submitter: str, submitter_in_title: bool
 ) -> str:
-    title = f"JOJ3 Result for {exercise_name} by @{submitter} - "
+    title = f"JOJ3 Result for {exercise_name} by @{submitter} - Score: "
     if not submitter_in_title:
-        title = f"JOJ3 Result for {exercise_name} - "
+        title = f"JOJ3 Result for {exercise_name} - Score: "
     return title
