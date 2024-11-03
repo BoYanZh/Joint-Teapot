@@ -72,7 +72,11 @@ class Git:
         return self.clone_repo(repo_name)
 
     def repo_clean_and_checkout(
-        self, repo_name: str, checkout_dest: str, auto_retry: bool = True
+        self,
+        repo_name: str,
+        checkout_dest: str,
+        auto_retry: bool = True,
+        clean_git_lock: bool = False,
     ) -> str:
         repo_dir = os.path.join(self.repos_dir, repo_name)
         repo = self.get_repo(repo_name)
@@ -81,6 +85,10 @@ class Git:
         retry_interval = 2
         while retry_interval and auto_retry:
             try:
+                if clean_git_lock and os.path.exists(
+                    os.path.join(repo_dir, ".git/index.lock")
+                ):
+                    os.remove(os.path.join(repo_dir, ".git/index.lock"))
                 repo.git.fetch("--tags", "--all", "-f")
                 repo.git.reset("--hard", "origin/master")
                 repo.git.clean("-d", "-f", "-x")

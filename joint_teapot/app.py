@@ -264,7 +264,9 @@ def joj3_scoreboard(
     )
     with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
         logger.info("file lock acquired")
-        repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
+        repo_path = tea.pot.git.repo_clean_and_checkout(
+            repo_name, "grading", clean_git_lock=True
+        )
         repo: Repo = tea.pot.git.get_repo(repo_name)
         if "grading" not in repo.remote().refs:
             logger.error(
@@ -344,7 +346,9 @@ def joj3_failed_table(
     )
     with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
         logger.info("file lock acquired")
-        repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
+        repo_path = tea.pot.git.repo_clean_and_checkout(
+            repo_name, "grading", clean_git_lock=True
+        )
         repo: Repo = tea.pot.git.get_repo(repo_name)
         if "grading" not in repo.remote().refs:
             logger.error(
@@ -555,7 +559,9 @@ def joj3_all(
         retry_interval = 1
         git_push_ok = False
         while not git_push_ok:
-            repo_path = tea.pot.git.repo_clean_and_checkout(repo_name, "grading")
+            repo_path = tea.pot.git.repo_clean_and_checkout(
+                repo_name, "grading", clean_git_lock=True
+            )
             repo: Repo = tea.pot.git.get_repo(repo_name)
             if "grading" not in repo.remote().refs:
                 logger.error(
