@@ -604,7 +604,7 @@ def joj3_all(
                     (
                         f"joj3: update failed table for {exercise_name} by @{submitter} in "
                         f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
-                        f"gitea actions link: {gitea_actions_url}"
+                        f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}"
                     ),
                 )
