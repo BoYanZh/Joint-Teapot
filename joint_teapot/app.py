@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 from pathlib import Path
@@ -495,6 +496,11 @@ def joj3_all(
 ) -> None:
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    res = {
+        "issue": 0,
+        "action": int(run_number) if run_number != "" else 0,
+        "sha": commit_hash,
+    }
     logger.info(f"debug log to file: {settings.log_file_path}")
     gitea_actions_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
@@ -545,6 +551,8 @@ def joj3_all(
             joj3_issue.number,
             body={"title": title, "body": comment},
         )
+        res["issue"] = joj3_issue.number
+    print(json.dumps(res))
     if skip_scoreboard and skip_failed_table:
         return
     lock_file_path = os.path.join(
