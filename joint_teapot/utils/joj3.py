@@ -13,7 +13,6 @@ def generate_scoreboard(
     submitter: str,
     scoreboard_file_path: str,
     exercise_name: str,
-    max_total_score: int = -1,
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -73,8 +72,7 @@ def generate_scoreboard(
     for stage in stages:
         for result in stage["results"]:
             exercise_total_score += result["score"]
-    if max_total_score >= 0:
-        exercise_total_score = min(exercise_total_score, max_total_score)
+    exercise_total_score = exercise_total_score
     submitter_row[columns.index(exercise_name)] = str(exercise_total_score)
 
     total = 0
@@ -235,7 +233,6 @@ def generate_title_and_comment(
         comment += "\n"
     title = get_title_prefix(exercise_name, submitter, submitter_in_title)
     if max_total_score >= 0:
-        total_score = min(total_score, max_total_score)
         title += f"{total_score} / {max_total_score}"
     else:
         title += f"{total_score}"
