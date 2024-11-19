@@ -568,7 +568,10 @@ def joj3_all(
         git_push_ok = False
         while not git_push_ok:
             repo_path = tea.pot.git.repo_clean_and_checkout(
-                repo_name, "grading", clean_git_lock=True
+                repo_name,
+                "grading",
+                clean_git_lock=True,
+                reset_target="origin/grading",
             )
             repo: Repo = tea.pot.git.get_repo(repo_name)
             if "grading" not in repo.remote().refs:

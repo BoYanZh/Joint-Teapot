@@ -75,8 +75,10 @@ class Git:
         self,
         repo_name: str,
         checkout_dest: str,
+        *,
         auto_retry: bool = True,
         clean_git_lock: bool = False,
+        reset_target: str = "origin/master",
     ) -> str:
         repo_dir = os.path.join(self.repos_dir, repo_name)
         repo = self.get_repo(repo_name)
@@ -92,7 +94,7 @@ class Git:
                         if os.path.exists(lock_path):
                             os.remove(lock_path)
                 repo.git.fetch("--tags", "--all", "-f")
-                repo.git.reset("--hard", "origin/master")
+                repo.git.reset("--hard", reset_target)
                 repo.git.clean("-d", "-f", "-x")
                 repo.git.checkout(checkout_dest)
                 retry_interval = 0
