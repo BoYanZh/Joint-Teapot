@@ -85,10 +85,12 @@ class Git:
         retry_interval = 2
         while retry_interval and auto_retry:
             try:
-                if clean_git_lock and os.path.exists(
-                    os.path.join(repo_dir, ".git/index.lock")
-                ):
-                    os.remove(os.path.join(repo_dir, ".git/index.lock"))
+                if clean_git_lock:
+                    lock_files = ["index.lock", "HEAD.lock", "fetch-pack.lock"]
+                    for lock_file in lock_files:
+                        lock_path = os.path.join(repo_dir, ".git", lock_file)
+                        if os.path.exists(lock_path):
+                            os.remove(lock_path)
                 repo.git.fetch("--tags", "--all", "-f")
                 repo.git.reset("--hard", "origin/master")
                 repo.git.clean("-d", "-f", "-x")
