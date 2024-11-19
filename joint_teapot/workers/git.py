@@ -88,7 +88,14 @@ class Git:
         while retry_interval and auto_retry:
             try:
                 if clean_git_lock:
-                    lock_files = ["index.lock", "HEAD.lock", "fetch-pack.lock"]
+                    lock_files = [
+                        "index.lock",
+                        "HEAD.lock",
+                        "fetch-pack.lock",
+                        "logs/HEAD.lock",
+                        "packed-refs.lock",
+                        "config.lock",
+                    ]
                     for lock_file in lock_files:
                         lock_path = os.path.join(repo_dir, ".git", lock_file)
                         if os.path.exists(lock_path):
