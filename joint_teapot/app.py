@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING, List
@@ -556,6 +556,7 @@ def joj3_all(
             body={"title": title, "body": comment},
         )
         res["issue"] = joj3_issue.number
+    print(json.dumps(res))  # print result to stdout for joj3
     if skip_scoreboard and skip_failed_table:
         return
     lock_file_path = os.path.join(
