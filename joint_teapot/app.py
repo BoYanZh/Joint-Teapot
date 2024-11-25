@@ -473,6 +473,10 @@ def joj3_all(
         "unknown",
         help="JOJ3 run ID",
     ),
+    triggering_actor: str = Argument(
+        "unknown",
+        help="actor that triggers the gitea actions run",
+    ),
     max_total_score: int = Option(
         -1,
         help="max total score",
@@ -552,7 +556,6 @@ def joj3_all(
             body={"title": title, "body": comment},
         )
         res["issue"] = joj3_issue.number
-    print(json.dumps(res))
     if skip_scoreboard and skip_failed_table:
         return
     lock_file_path = os.path.join(
@@ -594,7 +597,7 @@ def joj3_all(
                     repo_name,
                     [scoreboard_file_name],
                     (
-                        f"joj3: update scoreboard for {exercise_name} by @{submitter} in "
+                        f"joj3: update scoreboard for {exercise_name} by @{triggering_actor} in "
                         f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}"
@@ -612,7 +615,7 @@ def joj3_all(
                     repo_name,
                     [failed_table_file_name],
                     (
-                        f"joj3: update failed table for {exercise_name} by @{submitter} in "
+                        f"joj3: update failed table for {exercise_name} by @{triggering_actor} in "
                         f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}"
