@@ -711,7 +711,7 @@ def joj3_check(
                     if group not in groups:
                         continue
             submit_count += 1
-            if submit_count > max_count:
+            if submit_count + 1 > max_count:  # + 1 as we will submit later
                 logger.error(
                     f"submitter {submitter} has submitted too many times, "
                     f"group={group}, "
