@@ -473,6 +473,10 @@ def joj3_all(
         "unknown",
         help="JOJ3 run ID",
     ),
+    groups: str = Argument(
+        "",
+        help="groups used in this run",
+    ),
     max_total_score: int = Option(
         -1,
         help="max total score",
@@ -596,7 +600,8 @@ def joj3_all(
                         f"joj3: update scoreboard for {exercise_name} by @{submitter} in "
                         f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
-                        f"gitea issue link: {gitea_issue_url}"
+                        f"gitea issue link: {gitea_issue_url}\n"
+                        f"groups: {groups}\n"
                     ),
                 )
             if not skip_failed_table:
@@ -614,7 +619,8 @@ def joj3_all(
                         f"joj3: update failed table for {exercise_name} by @{submitter} in "
                         f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
-                        f"gitea issue link: {gitea_issue_url}"
+                        f"gitea issue link: {gitea_issue_url}\n"
+                        f"groups: {groups}\n"
                     ),
                 )
             push_info_list = tea.pot.git.push(repo_name)
