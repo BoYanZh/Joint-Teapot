@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from time import sleep
@@ -13,6 +14,7 @@ from joint_teapot.config import Settings, set_settings, settings
 from joint_teapot.teapot import Teapot
 from joint_teapot.utils import joj3
 from joint_teapot.utils.logger import logger, set_logger
+from joint_teapot.utils.main import first
 
 if TYPE_CHECKING:
     import focs_gitea
@@ -635,6 +637,88 @@ def joj3_all(
                     logger.error(f"git push failed too many times")
                     raise Exit(code=1)
                 sleep(retry_interval)
+
+
+@app.command(
+    "joj3-check",
+    help="check joj3 restrictions",
+)
+def joj3_check(
+    env_path: str = Argument("", help="path to .env file"),
+    submitter: str = Argument("", help="submitter ID"),
+    repo_name: str = Argument(
+        "",
+        help="name of grading repo to push scoreboard file",
+    ),
+    submitter_repo_name: str = Argument(
+        "",
+        help="repository's name of the submitter",
+    ),
+    scoreboard_file_name: str = Argument(
+        "scoreboard.csv", help="name of scoreboard file in the gitea repo"
+    ),
+    exercise_name: str = Argument(
+        "unknown",
+        help="name of the exercise that appears on the issue title",
+    ),
+    group_config: str = Option(
+        ...,
+        help=(
+            "Configuration for groups in the format "
+            "'group_name=max_count:time_period(in hours)'. "
+            "Empty group name for all groups. "
+            "Negative max_count or time_period for no limit. "
+            "Example: --group-config joj=10:24,run=20:48"
+        ),
+    ),
+) -> None:
+    set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    repo: Repo = tea.pot.git.get_repo(repo_name)
+    now = datetime.now()
+    items = group_config.split(",")
+    for item in items:
+        group, values = item.split("=")
+        max_count, time_period = map(int, values.split(":"))
+        if max_count < 0 or time_period < 0:
+            continue
+        since = now - timedelta(hours=time_period)
+        since_git_format = since.strftime("%Y-%m-%dT%H:%M:%S")
+        submit_count = 0
+        commits = repo.iter_commits(paths=scoreboard_file_name, since=since_git_format)
+        for commit in commits:
+            msg = commit.message.strip()
+            lines = msg.splitlines()
+            pattern = (
+                r"joj3: update scoreboard for (?P<exercise_name>.+?) "
+                r"by @(?P<submitter>.+) in "
+                r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"  # 捕获 gitea_org_name, submitter_repo_name 和 commit_hash
+            )
+            match = re.match(pattern, lines[0])
+            if not match:
+                continue
+            d = match.groupdict()
+            if (
+                exercise_name != d["exercise_name"]
+                or submitter != d["submitter"]
+                or submitter_repo_name != d["submitter_repo_name"]
+            ):
+                continue
+            if group != "":
+                line = first(lines, lambda l: l.startswith("groups: "))
+                if line is not None:
+                    groups = line[len("groups: ") :].split(",")
+                    if group not in groups:
+                        continue
+            submit_count += 1
+            if submit_count > max_count:
+                logger.error(
+                    f"submitter {submitter} has submitted too many times, "
+                    f"group={group}, "
+                    f"time period={time_period} hour(s), "
+                    f"max count={max_count}, submit count={submit_count}"
+                )
+                raise Exit(code=1)
 
 
 if __name__ == "__main__":
