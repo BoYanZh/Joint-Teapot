@@ -719,6 +719,12 @@ def joj3_check(
                     f"max count={max_count}, submit count={submit_count}"
                 )
                 raise Exit(code=1)
+        logger.info(
+            f"submitter {submitter} has submitted {submit_count} time(s), "
+            f"group={group}, "
+            f"time period={time_period} hour(s), "
+            f"max count={max_count}, submit count={submit_count}"
+        )
 
 
 if __name__ == "__main__":
