@@ -677,6 +677,7 @@ def joj3_check(
     repo: Repo = tea.pot.git.get_repo(repo_name)
     now = datetime.now()
     items = group_config.split(",")
+    res = []
     for item in items:
         group, values = item.split("=")
         max_count, time_period = map(int, values.split(":"))
@@ -711,14 +712,6 @@ def joj3_check(
                     if group not in groups:
                         continue
             submit_count += 1
-            if submit_count + 1 > max_count:  # + 1 as we will submit later
-                logger.error(
-                    f"submitter {submitter} has submitted too many times, "
-                    f"group={group}, "
-                    f"time period={time_period} hour(s), "
-                    f"max count={max_count}, submit count={submit_count}"
-                )
-                raise Exit(code=1)
         logger.info(
             f"submitter {submitter} is submitting for the {submit_count + 1} time, "
             f"{max_count - submit_count - 1} time(s) remaining, "
@@ -726,6 +719,15 @@ def joj3_check(
             f"time period={time_period} hour(s), "
             f"max count={max_count}, submit count={submit_count}"
         )
+        res.append(
+            {
+                "name": group,
+                "max_count": max_count,
+                "submit_count": submit_count,
+                "time_period": time_period,
+            }
+        )
+    print(json.dumps(res))  # print result to stdout for joj3
 
 
 if __name__ == "__main__":
