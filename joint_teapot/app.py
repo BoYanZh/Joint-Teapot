@@ -720,7 +720,8 @@ def joj3_check(
                 )
                 raise Exit(code=1)
         logger.info(
-            f"submitter {submitter} has submitted {submit_count} time(s), "
+            f"submitter {submitter} is submitting for the {submit_count + 1} time, "
+            f"{max_count - submit_count - 1} time(s) remaining, "
             f"group={group}, "
             f"time period={time_period} hour(s), "
             f"max count={max_count}, submit count={submit_count}"
