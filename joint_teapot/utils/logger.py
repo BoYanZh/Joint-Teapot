@@ -11,10 +11,8 @@ from joint_teapot.config import settings
 
 # recipe from https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
 class InterceptHandler(logging.Handler):
-    def __init__(self, diagnose: bool = True, backtrace: bool = True):
+    def __init__(self) -> None:
         super().__init__()
-        self.diagnose = diagnose
-        self.backtrace = backtrace
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
@@ -30,25 +28,19 @@ class InterceptHandler(logging.Handler):
             depth += 1
 
         logger.opt(depth=depth, exception=record.exc_info).log(
-            level, record.getMessage(), diagnose=self.diagnose, backtrace=self.backtrace
+            level,
+            record.getMessage(),
         )
 
 
 def set_logger(
     stderr_log_level: str = settings.stderr_log_level,
-    *,
-    diagnose: bool = True,
-    backtrace: bool = True,
 ) -> None:
-    logging.basicConfig(
-        handlers=[InterceptHandler(diagnose, backtrace)], level=0, force=True
-    )
+    logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     logger.remove()
     logger.add(
         stderr,
         level=stderr_log_level,
-        diagnose=diagnose,
-        backtrace=backtrace,
     )
     logger.add(settings.log_file_path, level="DEBUG")
 
