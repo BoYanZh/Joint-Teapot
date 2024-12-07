@@ -4,6 +4,7 @@ from typing import cast
 
 from canvasapi import Canvas as PyCanvas
 from canvasapi.assignment import Assignment
+from canvasapi.user import User
 from patoolib import extract_archive
 from patoolib.util import PatoolError
 
@@ -30,7 +31,15 @@ class Canvas:
         logger.info(f"Canvas course loaded. {self.course}")
         # types = ["student", "observer"]
         types = ["student"]
-        self.students = self.course.get_users(enrollment_type=types, include=["email"])
+
+        def patch_student(student: User) -> User:
+            student.login_id = student.email.split("@")[0]
+            return student
+
+        self.students = [
+            patch_student(student)
+            for student in self.course.get_users(enrollment_type=types)
+        ]
         for attr in ["login_id", "sortable_name", "name"]:
             if not hasattr(self.students[0], attr):
                 raise Exception(
