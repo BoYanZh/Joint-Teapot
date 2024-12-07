@@ -260,7 +260,7 @@ class Gitea:
                         "require_signed_commits": False,
                         "required_approvals": max(student_count - 1, 0),
                         "enable_status_check": True,
-                        "status_check_contexts": ["continuous-integration/drone/pr"],
+                        "status_check_contexts": ["Run JOJ3 on Push / run (push)"],
                     },
                 )
             except ApiException as e:
