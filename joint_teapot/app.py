@@ -253,7 +253,7 @@ def joj3_scoreboard(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-scoreboard"):
         return
@@ -335,7 +335,7 @@ def joj3_failed_table(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-failed-table"):
         return
@@ -415,7 +415,7 @@ def joj3_create_result_issue(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
     if joj3.check_skipped(score_file_path, "skip-result-issue"):
         return
@@ -501,7 +501,7 @@ def joj3_all(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    set_logger(settings.stderr_log_level)
     res = {
         "issue": 0,
         "action": int(run_number) if run_number != "" else 0,
@@ -673,7 +673,7 @@ def joj3_check(
     ),
 ) -> None:
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level, diagnose=False, backtrace=False)
+    set_logger(settings.stderr_log_level)
     repo: Repo = tea.pot.git.get_repo(repo_name)
     now = datetime.now()
     items = group_config.split(",")
