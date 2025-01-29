@@ -252,6 +252,7 @@ def joj3_scoreboard(
         help="commit hash that triggers gitea actions",
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
@@ -334,6 +335,7 @@ def joj3_failed_table(
         help="commit hash that triggers gitea actions",
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
@@ -414,6 +416,7 @@ def joj3_create_result_issue(
         help="commit hash that triggers gitea actions",
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
@@ -500,6 +503,7 @@ def joj3_all(
         help="whether to include submitter in issue title",
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     res = {
@@ -683,6 +687,7 @@ def joj3_env(
         help="whether to include submitter in issue title",
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     submitter = os.getenv("GITHUB_ACTOR")
     run_number = os.getenv("GITHUB_RUN_NUMBER")
     exercise_name = os.getenv("CONF_NAME")
@@ -746,6 +751,7 @@ def joj3_check(
         ),
     ),
 ) -> None:
+    app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     repo: Repo = tea.pot.git.get_repo(repo_name)
