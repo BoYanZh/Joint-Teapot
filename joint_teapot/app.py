@@ -731,7 +731,7 @@ def joj3_all_env(
 def joj3_check(
     env_path: str = Argument("", help="path to .env file"),
     submitter: str = Argument("", help="submitter ID"),
-    repo_name: str = Argument(
+    grading_repo_name: str = Argument(
         "",
         help="name of grading repo to push scoreboard file",
     ),
@@ -760,7 +760,7 @@ def joj3_check(
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
-    repo: Repo = tea.pot.git.get_repo(repo_name)
+    repo: Repo = tea.pot.git.get_repo(grading_repo_name)
     now = datetime.now()
     items = group_config.split(",")
     res = []
@@ -814,6 +814,57 @@ def joj3_check(
             }
         )
     print(json.dumps(res))  # print result to stdout for joj3
+
+
+@app.command(
+    "joj3-check-env",
+    help="check joj3 restrictions from env var and cli args",
+)
+def joj3_check_env(
+    env_path: str = Argument("", help="path to .env file"),
+    grading_repo_name: str = Argument(
+        "",
+        help="name of grading repo to push scoreboard file",
+    ),
+    scoreboard_file_name: str = Argument(
+        "scoreboard.csv", help="name of scoreboard file in the gitea repo"
+    ),
+    group_config: str = Option(
+        ...,
+        help=(
+            "Configuration for groups in the format "
+            "'group_name=max_count:time_period(in hours)'. "
+            "Empty group name for all groups. "
+            "Negative max_count or time_period for no limit. "
+            "Example: --group-config joj=10:24,run=20:48"
+        ),
+    ),
+) -> None:
+    app.pretty_exceptions_enable = False
+    submitter = os.getenv("GITHUB_ACTOR")
+    exercise_name = os.getenv("CONF_NAME")
+    run_id = os.getenv("RUN_ID")
+    groups = os.getenv("GROUPS")
+    repository = os.getenv("GITHUB_REPOSITORY")
+    if None in (
+        submitter,
+        exercise_name,
+        run_id,
+        groups,
+        repository,
+    ):
+        logger.error("missing required env var")
+        raise Exit(code=1)
+    submitter_repo_name = (repository or "").split("/")[-1]
+    joj3_check(
+        env_path,
+        submitter,
+        grading_repo_name,
+        submitter_repo_name,
+        scoreboard_file_name,
+        exercise_name,
+        group_config,
+    )
 
 
 if __name__ == "__main__":
