@@ -689,22 +689,19 @@ def joj3_all_env(
     logger.info(f"debug log to file: {settings.log_file_path}")
     submitter = os.getenv("GITHUB_ACTOR", "")
     run_number = os.getenv("GITHUB_RUN_NUMBER", "")
-    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
     commit_hash = os.getenv("GITHUB_SHA", "")
-    run_id = os.getenv("JOJ3_RUN_ID", "")
-    groups = os.getenv("JOJ3_GROUPS", "")
     repository = os.getenv("GITHUB_REPOSITORY", "")
     if "" in (
         submitter,
         run_number,
-        exercise_name,
         commit_hash,
-        run_id,
-        groups,
         repository,
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
+    run_id = os.getenv("JOJ3_RUN_ID", "")
+    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
+    groups = os.getenv("JOJ3_GROUPS", "")
     commit_msg = os.getenv("JOJ3_COMMIT_MSG", "")
     force_quit_stage_name = os.getenv("JOJ3_FORCE_QUIT_STAGE_NAME") or ""
     submitter_repo_name = (repository or "").split("/")[-1]
@@ -971,21 +968,17 @@ def joj3_check_env(
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
-    submitter = os.getenv("GITHUB_ACTOR")
-    exercise_name = os.getenv("JOJ3_CONF_NAME")
-    run_id = os.getenv("JOJ3_RUN_ID")
-    groups = os.getenv("JOJ3_GROUPS")
-    repository = os.getenv("GITHUB_REPOSITORY")
-    if None in (
+    submitter = os.getenv("GITHUB_ACTOR", "")
+    repository = os.getenv("GITHUB_REPOSITORY", "")
+    if "" in (
         submitter,
-        exercise_name,
-        run_id,
-        groups,
         repository,
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
-    submitter_repo_name = (repository or "").split("/")[-1]
+    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
+    groups = os.getenv("JOJ3_GROUPS", "")
+    submitter_repo_name = repository.split("/")[-1]
     repo: Repo = tea.pot.git.get_repo(grading_repo_name)
     now = datetime.now()
     items = group_config.split(",")
