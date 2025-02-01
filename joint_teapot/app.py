@@ -686,10 +686,10 @@ def joj3_all_env(
     app.pretty_exceptions_enable = False
     submitter = os.getenv("GITHUB_ACTOR")
     run_number = os.getenv("GITHUB_RUN_NUMBER")
-    exercise_name = os.getenv("CONF_NAME")
+    exercise_name = os.getenv("JOJ3_CONF_NAME")
     commit_hash = os.getenv("GITHUB_SHA")
-    run_id = os.getenv("RUN_ID")
-    groups = os.getenv("GROUPS")
+    run_id = os.getenv("JOJ3_RUN_ID")
+    groups = os.getenv("JOJ3_GROUPS")
     repository = os.getenv("GITHUB_REPOSITORY")
     if None in (
         submitter,
@@ -842,9 +842,9 @@ def joj3_check_env(
 ) -> None:
     app.pretty_exceptions_enable = False
     submitter = os.getenv("GITHUB_ACTOR")
-    exercise_name = os.getenv("CONF_NAME")
-    run_id = os.getenv("RUN_ID")
-    groups = os.getenv("GROUPS")
+    exercise_name = os.getenv("JOJ3_CONF_NAME")
+    run_id = os.getenv("JOJ3_RUN_ID")
+    groups = os.getenv("JOJ3_GROUPS")
     repository = os.getenv("GITHUB_REPOSITORY")
     if None in (
         submitter,
