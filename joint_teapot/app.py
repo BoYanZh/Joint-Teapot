@@ -875,8 +875,7 @@ def joj3_check_env(
         submit_count = 0
         commits = repo.iter_commits(paths=scoreboard_file_name, since=since_git_format)
         for commit in commits:
-            comment = commit.message.strip()
-            lines = comment.splitlines()
+            lines = commit.message.strip().splitlines()
             pattern = (
                 r"joj3: update scoreboard for (?P<exercise_name>.+?) "
                 r"by @(?P<submitter>.+) in "
@@ -907,12 +906,12 @@ def joj3_check_env(
         use_group = False
         if name:
             comment += f"keyword `{name}` "
+            for group in groups or "":
+                if group.lower() == name.lower():
+                    use_group = True
+                    break
         else:
             use_group = True
-        for group in groups or "":
-            if group.lower() == name.lower():
-                use_group = True
-                break
         comment += (
             f"in last {time_period} hour(s): "
             f"submit count {submit_count}, "
