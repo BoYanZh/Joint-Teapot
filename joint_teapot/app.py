@@ -684,6 +684,8 @@ def joj3_all_env(
     ),
 ) -> None:
     app.pretty_exceptions_enable = False
+    set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level)
     submitter = os.getenv("GITHUB_ACTOR")
     run_number = os.getenv("GITHUB_RUN_NUMBER")
     exercise_name = os.getenv("JOJ3_CONF_NAME")
@@ -841,6 +843,8 @@ def joj3_check_env(
     ),
 ) -> None:
     app.pretty_exceptions_enable = False
+    set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level)
     submitter = os.getenv("GITHUB_ACTOR")
     exercise_name = os.getenv("JOJ3_CONF_NAME")
     run_id = os.getenv("JOJ3_RUN_ID")
@@ -856,15 +860,69 @@ def joj3_check_env(
         logger.error("missing required env var")
         raise Exit(code=1)
     submitter_repo_name = (repository or "").split("/")[-1]
-    joj3_check(
-        env_path,
-        submitter,
-        grading_repo_name,
-        submitter_repo_name,
-        scoreboard_file_name,
-        exercise_name,
-        group_config,
-    )
+    repo: Repo = tea.pot.git.get_repo(grading_repo_name)
+    now = datetime.now()
+    items = group_config.split(",")
+    msg = ""
+    failed = False
+    for item in items:
+        name, values = item.split("=")
+        max_count, time_period = map(int, values.split(":"))
+        if max_count < 0 or time_period < 0:
+            continue
+        since = now - timedelta(hours=time_period)
+        since_git_format = since.strftime("%Y-%m-%dT%H:%M:%S")
+        submit_count = 0
+        commits = repo.iter_commits(paths=scoreboard_file_name, since=since_git_format)
+        for commit in commits:
+            msg = commit.message.strip()
+            lines = msg.splitlines()
+            pattern = (
+                r"joj3: update scoreboard for (?P<exercise_name>.+?) "
+                r"by @(?P<submitter>.+) in "
+                r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"  # 捕获 gitea_org_name, submitter_repo_name 和 commit_hash
+            )
+            match = re.match(pattern, lines[0])
+            if not match:
+                continue
+            d = match.groupdict()
+            if (
+                exercise_name != d["exercise_name"]
+                or submitter != d["submitter"]
+                or submitter_repo_name != d["submitter_repo_name"]
+            ):
+                continue
+            if name != "":
+                line = first(lines, lambda l: l.startswith("groups: "))
+                if line and name not in line[len("groups: ") :].split(","):
+                    continue
+            submit_count += 1
+        logger.info(
+            f"submitter {submitter} is submitting for the {submit_count + 1} time, "
+            f"{max_count - submit_count - 1} time(s) remaining, "
+            f"group={name}, "
+            f"time period={time_period} hour(s), "
+            f"max count={max_count}, submit count={submit_count}"
+        )
+        use_group = False
+        if name:
+            msg += f"keyword `{name}` "
+        else:
+            use_group = True
+        for group in groups or "":
+            if group.lower() == name.lower():
+                use_group = True
+                break
+        msg += (
+            f"in last {time_period} hour(s): "
+            f"submit count {submit_count}, "
+            f"max count {max_count}"
+        )
+        if use_group and submit_count + 1 > max_count:
+            failed = True
+            msg += ", exceeded"
+        msg += "\n"
+    print(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
 
 
 if __name__ == "__main__":
