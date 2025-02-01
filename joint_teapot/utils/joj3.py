@@ -8,6 +8,16 @@ from typing import Any, Dict, List, Tuple
 from joint_teapot.utils.logger import logger
 
 
+def get_total_score(score_file_path: str) -> int:
+    with open(score_file_path) as json_file:
+        stages: List[Dict[str, Any]] = json.load(json_file)
+    total_score = 0
+    for stage in stages:
+        for result in stage["results"]:
+            total_score += result["score"]
+    return total_score
+
+
 def generate_scoreboard(
     score_file_path: str,
     submitter: str,

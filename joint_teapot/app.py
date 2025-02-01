@@ -686,14 +686,15 @@ def joj3_all_env(
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
-    submitter = os.getenv("GITHUB_ACTOR")
-    run_number = os.getenv("GITHUB_RUN_NUMBER")
-    exercise_name = os.getenv("JOJ3_CONF_NAME")
-    commit_hash = os.getenv("GITHUB_SHA")
-    run_id = os.getenv("JOJ3_RUN_ID")
-    groups = os.getenv("JOJ3_GROUPS")
-    repository = os.getenv("GITHUB_REPOSITORY")
-    if None in (
+    logger.info(f"debug log to file: {settings.log_file_path}")
+    submitter = os.getenv("GITHUB_ACTOR", "")
+    run_number = os.getenv("GITHUB_RUN_NUMBER", "")
+    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
+    commit_hash = os.getenv("GITHUB_SHA", "")
+    run_id = os.getenv("JOJ3_RUN_ID", "")
+    groups = os.getenv("JOJ3_GROUPS", "")
+    repository = os.getenv("GITHUB_REPOSITORY", "")
+    if "" in (
         submitter,
         run_number,
         exercise_name,
@@ -704,26 +705,151 @@ def joj3_all_env(
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
+    commit_msg = os.getenv("JOJ3_COMMIT_MSG", "")
+    force_quit_stage_name = os.getenv("JOJ3_FORCE_QUIT_STAGE_NAME") or ""
     submitter_repo_name = (repository or "").split("/")[-1]
-    joj3_all(
-        env_path,
-        score_file_path,
-        submitter,
-        grading_repo_name,
-        submitter_repo_name,
-        run_number,
-        scoreboard_file_name,
-        failed_table_file_name,
-        exercise_name,
-        commit_hash,
-        run_id,
-        groups,
-        max_total_score,
-        skip_result_issue,
-        skip_scoreboard,
-        skip_failed_table,
-        submitter_in_issue_title,
+    total_score = joj3.get_total_score(score_file_path)
+    res = {
+        "totalScore": total_score,
+        "cappedTotalScore": (
+            total_score if max_total_score < 0 else min(total_score, max_total_score)
+        ),
+        "forceQuit": force_quit_stage_name != "",
+        "forceQuitStageName": force_quit_stage_name,
+        "issue": 0,
+        "action": int(run_number) if run_number != "" else 0,
+        "sha": commit_hash,
+        "commitMsg": commit_msg,
+    }
+    gitea_actions_url = (
+        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
+        + f"actions/runs/{run_number}"
     )
+    submitter_repo_url = (
+        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
+        + f"{settings.gitea_org_name}/{submitter_repo_name}"
+    )
+    gitea_issue_url = ""
+    if not skip_result_issue:
+        title, comment = joj3.generate_title_and_comment(
+            score_file_path,
+            gitea_actions_url,
+            run_number,
+            exercise_name,
+            submitter,
+            commit_hash,
+            submitter_in_issue_title,
+            run_id,
+            max_total_score,
+        )
+        title_prefix = joj3.get_title_prefix(
+            exercise_name, submitter, submitter_in_issue_title
+        )
+        joj3_issue: focs_gitea.Issue
+        issue: focs_gitea.Issue
+        for issue in tea.pot.gitea.issue_api.issue_list_issues(
+            tea.pot.gitea.org_name, submitter_repo_name, state="open"
+        ):
+            if issue.title.startswith(title_prefix):
+                joj3_issue = issue
+                logger.info(f"found joj3 issue: #{joj3_issue.number}")
+                break
+        else:
+            joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
+                tea.pot.gitea.org_name,
+                submitter_repo_name,
+                body={"title": title_prefix + "0", "body": ""},
+            )
+            logger.info(f"created joj3 issue: #{joj3_issue.number}")
+        gitea_issue_url = joj3_issue.html_url
+        logger.info(f"gitea issue url: {gitea_issue_url}")
+        tea.pot.gitea.issue_api.issue_edit_issue(
+            tea.pot.gitea.org_name,
+            submitter_repo_name,
+            joj3_issue.number,
+            body={"title": title, "body": comment},
+        )
+        res["issue"] = joj3_issue.number
+    print(json.dumps(res))  # print result to stdout for joj3 log parser
+    if skip_scoreboard and skip_failed_table:
+        return
+    lock_file_path = os.path.join(
+        settings.repos_dir, submitter_repo_name, settings.joj3_lock_file_path
+    )
+    logger.info(
+        f"try to acquire lock, file path: {lock_file_path}, "
+        + f"timeout: {settings.joj3_lock_file_timeout}"
+    )
+    with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
+        logger.info("file lock acquired")
+        retry_interval = 1
+        git_push_ok = False
+        while not git_push_ok:
+            repo_path = tea.pot.git.repo_clean_and_checkout(
+                submitter_repo_name,
+                "grading",
+                clean_git_lock=True,
+                reset_target="origin/grading",
+            )
+            repo: Repo = tea.pot.git.get_repo(submitter_repo_name)
+            if "grading" not in repo.remote().refs:
+                logger.error(
+                    '"grading" branch not found in remote, create and push it to origin first.'
+                )
+                raise Exit(code=1)
+            if "grading" not in repo.branches:
+                logger.error('"grading" branch not found in local, create it first.')
+                raise Exit(code=1)
+            repo.git.reset("--hard", "origin/grading")
+            if not skip_scoreboard:
+                joj3.generate_scoreboard(
+                    score_file_path,
+                    submitter,
+                    os.path.join(repo_path, scoreboard_file_name),
+                    exercise_name,
+                )
+                tea.pot.git.add_commit(
+                    submitter_repo_name,
+                    [scoreboard_file_name],
+                    (
+                        f"joj3: update scoreboard for {exercise_name} by @{submitter} in "
+                        f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                        f"gitea actions link: {gitea_actions_url}\n"
+                        f"gitea issue link: {gitea_issue_url}\n"
+                        f"groups: {groups}\n"
+                    ),
+                )
+            if not skip_failed_table:
+                joj3.generate_failed_table(
+                    score_file_path,
+                    submitter_repo_name,
+                    submitter_repo_url,
+                    os.path.join(repo_path, failed_table_file_name),
+                    gitea_actions_url,
+                )
+                tea.pot.git.add_commit(
+                    submitter_repo_name,
+                    [failed_table_file_name],
+                    (
+                        f"joj3: update failed table for {exercise_name} by @{submitter} in "
+                        f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                        f"gitea actions link: {gitea_actions_url}\n"
+                        f"gitea issue link: {gitea_issue_url}\n"
+                        f"groups: {groups}\n"
+                    ),
+                )
+            push_info_list = tea.pot.git.push(submitter_repo_name)
+            git_push_ok = push_info_list.error is None
+            if not git_push_ok:
+                retry_interval *= 2
+                logger.info(
+                    f"git push failed, retry in {retry_interval} seconds: {push_info_list}"
+                )
+                if retry_interval > 64:
+                    logger.error(f"git push failed too many times")
+                    raise Exit(code=1)
+                sleep(retry_interval)
 
 
 @app.command(
