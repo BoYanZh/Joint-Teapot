@@ -863,7 +863,7 @@ def joj3_check_env(
     repo: Repo = tea.pot.git.get_repo(grading_repo_name)
     now = datetime.now()
     items = group_config.split(",")
-    msg = ""
+    comment = ""
     failed = False
     for item in items:
         name, values = item.split("=")
@@ -875,8 +875,8 @@ def joj3_check_env(
         submit_count = 0
         commits = repo.iter_commits(paths=scoreboard_file_name, since=since_git_format)
         for commit in commits:
-            msg = commit.message.strip()
-            lines = msg.splitlines()
+            comment = commit.message.strip()
+            lines = comment.splitlines()
             pattern = (
                 r"joj3: update scoreboard for (?P<exercise_name>.+?) "
                 r"by @(?P<submitter>.+) in "
@@ -906,22 +906,27 @@ def joj3_check_env(
         )
         use_group = False
         if name:
-            msg += f"keyword `{name}` "
+            comment += f"keyword `{name}` "
         else:
             use_group = True
         for group in groups or "":
             if group.lower() == name.lower():
                 use_group = True
                 break
-        msg += (
+        comment += (
             f"in last {time_period} hour(s): "
             f"submit count {submit_count}, "
             f"max count {max_count}"
         )
         if use_group and submit_count + 1 > max_count:
             failed = True
-            msg += ", exceeded"
-        msg += "\n"
+            comment += ", exceeded"
+        comment += "\n"
+    if failed:
+        title = "### Submission Count Check Failed:"
+    else:
+        title = "### Submission Count Check Result:"
+    msg = f"{title}\n{comment}\n"
     print(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
 
 
