@@ -40,7 +40,7 @@ class Canvas:
             patch_student(student)
             for student in self.course.get_users(enrollment_type=types)
         ]
-        for attr in ["login_id", "sortable_name", "name"]:
+        for attr in ["login_id", "name"]:
             if not hasattr(self.students[0], attr):
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"
