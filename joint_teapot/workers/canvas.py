@@ -33,6 +33,7 @@ class Canvas:
         types = ["student"]
 
         def patch_student(student: User) -> User:
+            student.sis_id = student.login_id
             student.login_id = student.email.split("@")[0]
             return student
 
