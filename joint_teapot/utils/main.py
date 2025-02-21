@@ -30,8 +30,8 @@ def percentile(
 
 
 def default_repo_name_convertor(user: User) -> str:
-    sis_user_id, name = user.sis_user_id, user.name
+    user_id, name = user.user_id, user.name
     eng = re.sub("[\u4e00-\u9fa5]", "", name)
     eng = eng.replace(",", "")
     eng = eng.title().replace(" ", "").replace("\xa0", "")
-    return f"{eng}{sis_user_id}"
+    return f"{eng}{user_id}"
