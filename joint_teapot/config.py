@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     """
 
     # canvas
-    canvas_domain_name: str = "jicanvas.com"
+    canvas_domain_name: str = "oc.sjtu.edu.cn"
     canvas_suffix: str = "/"
     canvas_access_token: str = ""
     canvas_course_id: int = 0
