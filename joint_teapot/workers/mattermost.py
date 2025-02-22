@@ -1,6 +1,8 @@
+import re
 from typing import Dict, List
 
 import focs_gitea
+from canvasapi.paginated_list import PaginatedList
 from mattermostdriver import Driver
 
 from joint_teapot.config import settings
@@ -47,7 +49,7 @@ class Mattermost:
         self,
         groups: Dict[str, List[str]],
         suffix: str = "",
-        invite_teaching_team: bool = False,
+        invite_teaching_team: bool = True,
     ) -> None:
         for group_name, members in groups.items():
             channel_name = group_name + suffix
@@ -66,6 +68,65 @@ class Mattermost:
                     f"Error when creating channel {channel_name}: {e} Perhaps channel already exists?"
                 )
                 continue
+            if invite_teaching_team:
+                members.extend(settings.mattermost_teaching_team)
+            for member in members:
+                try:
+                    mmuser = self.endpoint.users.get_user_by_username(member)
+                except Exception:
+                    logger.warning(
+                        f"User {member} is not found on the Mattermost server"
+                    )
+                    continue
+                # code for adding student to mm, disabled since there is no need to do that
+                # try:
+                #     mmuser = self.endpoint.users.create_user({'email':f"{member}@sjtu.edu.cn", 'username':member, auth_service:"gitlab"})
+                # except e:
+                #     logger.error(f"Error creating user {member}")
+                #     continue
+                try:
+                    self.endpoint.channels.add_user(
+                        channel["id"], {"user_id": mmuser["id"]}
+                    )
+                except Exception:
+                    logger.warning(f"User {member} is not in the team")
+                logger.info(f"Added member {member} to channel {channel_name}")
+
+    def create_channels_for_individuals(
+        self,
+        students: PaginatedList,
+        invite_teaching_team: bool = True,
+    ) -> None:
+        for student in students:
+            try:
+                self.endpoint.users.get_user_by_username(student.login_id)
+            except Exception:
+                logger.warning(
+                    f"User {student.login_id} ({student.name}) is not found on the Mattermost server"
+                )
+                continue
+            display_name = re.sub(
+                r"[^\x00-\x7F]+", "", student.name
+            ).strip()  # only ASCII
+            channel_name = student.sis_id
+            try:
+                channel = self.endpoint.channels.create_channel(
+                    {
+                        "team_id": self.team["id"],
+                        "name": channel_name,
+                        "display_name": display_name,
+                        "type": "P",  # create private channels
+                    }
+                )
+                logger.info(
+                    f"Added channel {display_name} ({channel_name}) to Mattermost"
+                )
+            except Exception as e:
+                logger.warning(
+                    f"Error when creating channel {channel_name}: {e} Perhaps channel already exists?"
+                )
+                continue
+            members = [student.login_id]
             if invite_teaching_team:
                 members.extend(settings.mattermost_teaching_team)
             for member in members:

@@ -172,14 +172,14 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
 
 
 @app.command(
-    "create-channels-on-mm",
+    "create-group-channels-on-mm",
     help="create channels for student groups according to group information on"
     " gitea",
 )
-def create_channels_on_mm(
+def create_group_channels_on_mm(
     prefix: str = Option(""),
     suffix: str = Option(""),
-    invite_teaching_team: bool = Option(False),
+    invite_teaching_team: bool = Option(True),
 ) -> None:
     groups = {
         group_name: members
@@ -193,6 +193,16 @@ def create_channels_on_mm(
         + f": {','.join(groups.keys())}"
     )
     tea.pot.mattermost.create_channels_for_groups(groups, suffix, invite_teaching_team)
+
+
+@app.command(
+    "create-personal-channels-on-mm",
+    help="create channels for every student",
+)
+def create_personal_channels_on_mm(
+    invite_teaching_team: bool = Option(True),
+) -> None:
+    tea.pot.create_channels_for_individuals(invite_teaching_team)
 
 
 @app.command(
