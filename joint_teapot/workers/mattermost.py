@@ -1,4 +1,3 @@
-import re
 from typing import Dict, List
 
 import focs_gitea
