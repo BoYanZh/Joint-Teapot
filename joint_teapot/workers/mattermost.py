@@ -77,6 +77,12 @@ class Mattermost:
                     logger.warning(
                         f"User {member} is not found on the Mattermost server"
                     )
+                    self.endpoint.posts.create_post(
+                        {
+                            "channel_id": channel["id"],
+                            "message": f"User {member} is not found on the Mattermost server",
+                        }
+                    )
                     continue
                 # code for adding student to mm, disabled since there is no need to do that
                 # try:
@@ -90,6 +96,12 @@ class Mattermost:
                     )
                 except Exception:
                     logger.warning(f"User {member} is not in the team")
+                    self.endpoint.posts.create_post(
+                        {
+                            "channel_id": channel["id"],
+                            "message": f"User {member} is not in the team",
+                        }
+                    )
                 logger.info(f"Added member {member} to channel {channel_name}")
 
     def create_channels_for_individuals(
