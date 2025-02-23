@@ -1,6 +1,8 @@
+import csv
 import os
 import re
 from glob import glob
+from pathlib import Path
 from typing import cast
 
 from canvasapi import Canvas as PyCanvas
@@ -57,6 +59,13 @@ class Canvas:
         logger.debug("Canvas groups loaded")
         self.grade_filename = grade_filename
         logger.debug("Canvas initialized")
+
+    def export_students_to_csv(self, filename: Path) -> None:
+        with open(filename, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            for student in self.students:
+                writer.writerow([student.name, student.sis_id, student.login_id])
+        logger.info(f"Students exported to {filename}")
 
     def prepare_assignment_dir(
         self, dir_or_zip_file: str, create_grade_file: bool = True
