@@ -36,9 +36,9 @@ class Canvas:
         types = ["student"]
 
         def patch_student(student: User) -> User:
-            student.name = re.sub(
-                r"[^\x00-\x7F]+", "", student.name
-            ).strip()  # We only care english name
+            student.name = (
+                re.sub(r"[^\x00-\x7F]+", "", student.name).strip().title()
+            )  # We only care english name
             student.sis_id = student.login_id
             student.login_id = student.email.split("@")[0]
             return student
