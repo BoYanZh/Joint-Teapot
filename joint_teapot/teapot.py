@@ -13,7 +13,7 @@ _T = TypeVar("_T")
 
 
 def for_all_methods(
-    decorator: Callable[[Callable[[_T], _T]], Any]
+    decorator: Callable[[Callable[[_T], _T]], Any],
 ) -> Callable[[_T], _T]:
     @functools.wraps(decorator)
     def decorate(cls: Any) -> Any:
@@ -203,6 +203,13 @@ class Teapot:
                     f"{self.gitea.org_name}/{repo_name} has "
                     f"{commit_count} commit(s), {issue_count} issue(s)"
                 )
+
+    def create_channels_for_individuals(
+        self, invite_teaching_teams: bool = True
+    ) -> None:
+        return self.mattermost.create_channels_for_individuals(
+            self.canvas.students, invite_teaching_teams
+        )
 
 
 if __name__ == "__main__":
