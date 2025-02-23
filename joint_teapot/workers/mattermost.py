@@ -110,9 +110,7 @@ class Mattermost:
         invite_teaching_team: bool = True,
     ) -> None:
         for student in students:
-            display_name = re.sub(
-                r"[^\x00-\x7F]+", "", student.name
-            ).strip()  # only ASCII
+            display_name = student.name
             channel_name = student.sis_id
             try:
                 channel = self.endpoint.channels.create_channel(
