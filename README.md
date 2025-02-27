@@ -93,7 +93,7 @@ create teams on gitea by canvas groups
 
 Create a pair of webhooks on gitea and mm for all student groups on gitea, and configure them so that updates on gitea will be pushed to the mm channel. Optionally specify a prefix to ignore all repos whose names do not start with it.
 
-Example: `python3 -m joint_teapot create-webhooks-for-mm p1` will fetch all repos whose names start with `"p1"` and create two-way webhooks for these repos. All repos should already have same-name mm channels. If not, use `create-channels-on-mm` to create them.
+Example: `python3 -m joint_teapot create-webhooks-for-mm p1 -git-suffix` will fetch all repos whose names start with `"p1"` and create two-way webhooks for these repos and channels of the same name but with a "-git" suffix. All repos should already have mm channels following the requirement. If not, use `create-channels-on-mm` to create them.
 
 ### `get-no-collaborator-repos`
 

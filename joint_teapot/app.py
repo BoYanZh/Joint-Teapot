@@ -215,14 +215,16 @@ def create_personal_channels_on_mm(
     help="create a pair of webhooks on gitea and mm for all student groups on gitea, "
     "and configure them so that updates on gitea will be pushed to the mm channel",
 )
-def create_webhooks_for_mm(prefix: str = Argument("")) -> None:
+def create_webhooks_for_mm(
+    regex: str = Argument(""), git_suffix: bool = Option(False)
+) -> None:
     repo_names = [
         group_name
         for group_name in tea.pot.gitea.get_all_teams()
-        if group_name.startswith(prefix)
+        if re.match(regex, group_name)
     ]
     logger.info(f"{len(repo_names)} pair(s) of webhooks to be created: {repo_names}")
-    tea.pot.mattermost.create_webhooks_for_repos(repo_names, tea.pot.gitea)
+    tea.pot.mattermost.create_webhooks_for_repos(repo_names, tea.pot.gitea, git_suffix)
 
 
 @app.command(

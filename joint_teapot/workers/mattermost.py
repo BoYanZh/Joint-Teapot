@@ -166,17 +166,20 @@ class Mattermost:
 
                 logger.info(f"Added member {member} to channel {channel_name}")
 
-    def create_webhooks_for_repos(self, repos: List[str], gitea: Gitea) -> None:
+    def create_webhooks_for_repos(
+        self, repos: List[str], gitea: Gitea, git_suffix: bool
+    ) -> None:
         # one group corresponds to one repo so these concepts can be used interchangeably
         for repo in repos:
             logger.info(f"Creating webhooks for repo {gitea.org_name}/{repo}")
+            channel_name = f"{repo}-git" if git_suffix else repo
             try:
                 mm_channel = self.endpoint.channels.get_channel_by_name(
-                    self.team["id"], repo
+                    self.team["id"], channel_name
                 )
             except Exception as e:
                 logger.warning(
-                    f"Error when getting channel {repo} from Mattermost team {self.team['name']}: {e}"
+                    f"Error when getting channel {channel_name} from Mattermost team {self.team['name']}: {e}"
                 )
                 continue
             try:
@@ -209,7 +212,7 @@ class Mattermost:
                             "username": "FOCS Gitea",
                             "icon_url": f"https://{self.url}{self.url_suffix}/api/v4/brand/image",
                             "content_type": "json",
-                            "channel": repo,
+                            "channel": channel_name,
                         },
                     ),
                 )
