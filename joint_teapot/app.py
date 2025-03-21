@@ -1002,6 +1002,11 @@ def joj3_check_env(
     items = group_config.split(",")
     comment = ""
     failed = False
+    pattern = re.compile(
+        r"joj3: update scoreboard for (?P<exercise_name>.+?) "
+        r"by @(?P<submitter>.+) in "
+        r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"
+    )
     for item in items:
         name, values = item.split("=")
         max_count, time_period = map(int, values.split(":"))
@@ -1013,12 +1018,7 @@ def joj3_check_env(
         commits = repo.iter_commits(paths=scoreboard_filename, since=since_git_format)
         for commit in commits:
             lines = commit.message.strip().splitlines()
-            pattern = (
-                r"joj3: update scoreboard for (?P<exercise_name>.+?) "
-                r"by @(?P<submitter>.+) in "
-                r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"  # 捕获 gitea_org_name, submitter_repo_name 和 commit_hash
-            )
-            match = re.match(pattern, lines[0])
+            match = pattern.match(lines[0])
             if not match:
                 continue
             d = match.groupdict()
