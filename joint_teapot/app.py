@@ -1007,17 +1007,24 @@ def joj3_check_env(
         r"by @(?P<submitter>.+) in "
         r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"
     )
+    time_windows = []
+    valid_items = []
     for item in items:
         name, values = item.split("=")
         max_count, time_period = map(int, values.split(":"))
         if max_count < 0 or time_period < 0:
             continue
         since = now - timedelta(hours=time_period)
-        since_git_format = since.strftime("%Y-%m-%dT%H:%M:%S")
-        submit_count = 0
-        commits = repo.iter_commits(paths=scoreboard_filename, since=since_git_format)
+        time_windows.append(since)
+        valid_items.append((name, max_count, time_period, since))
+    all_commits = []
+    if time_windows:
+        earliest_since = min(time_windows).strftime("%Y-%m-%dT%H:%M:%S")
+        commits = repo.iter_commits(paths=scoreboard_filename, since=earliest_since)
         for commit in commits:
             lines = commit.message.strip().splitlines()
+            if not lines:
+                continue
             match = pattern.match(lines[0])
             if not match:
                 continue
@@ -1028,14 +1035,31 @@ def joj3_check_env(
                 or submitter_repo_name != d["submitter_repo_name"]
             ):
                 continue
-            if name != "":
-                line = first(lines, lambda l: l.startswith("groups: "))
-                if line and name not in line[len("groups: ") :].split(","):
+            groups_line = next((l for l in lines if l.startswith("groups: ")), None)
+            commit_groups = (
+                groups_line[len("groups: ") :].split(",") if groups_line else []
+            )
+            all_commits.append(
+                {
+                    "time": commit.committed_datetime,
+                    "groups": [g.strip() for g in commit_groups],
+                }
+            )
+    for name, max_count, time_period, since in valid_items:
+        submit_count = 0
+        time_limit = now - timedelta(hours=time_period)
+        for commit in all_commits:
+            if commit["time"] < time_limit:
+                continue
+            if name:
+                target_group = name.lower()
+                commit_groups_lower = [g.lower() for g in commit["groups"]]
+                if target_group not in commit_groups_lower:
                     continue
             submit_count += 1
         logger.info(
             f"submitter {submitter} is submitting for the {submit_count + 1} time, "
-            f"{max_count - submit_count - 1} time(s) remaining, "
+            f"{min(0, max_count - submit_count - 1)} time(s) remaining, "
             f"group={name}, "
             f"time period={time_period} hour(s), "
             f"max count={max_count}, submit count={submit_count}"
