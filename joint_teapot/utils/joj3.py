@@ -5,7 +5,24 @@ import os
 from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
+from pydantic_settings import BaseSettings
+
 from joint_teapot.utils.logger import logger
+
+
+class Env(BaseSettings):
+    github_actor: str = ""
+    github_repository: str = ""
+    github_sha: str = ""
+    github_ref: str = ""
+    github_workflow: str = ""
+    github_run_number: str = "0"
+    joj3_conf_name: str = ""
+    joj3_groups: str = ""
+    joj3_run_id: str = ""
+    joj3_commit_msg: str = ""
+    joj3_force_quit_stage_name: str = ""
+    joj3_output_path: str = ""
 
 
 def get_total_score(score_file_path: str) -> int:

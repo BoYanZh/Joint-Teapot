@@ -15,6 +15,7 @@ from joint_teapot.teapot import Teapot
 from joint_teapot.utils import joj3
 from joint_teapot.utils.logger import logger, set_logger
 from joint_teapot.utils.main import first
+from joint_teapot.workers.joj import JOJ
 
 if TYPE_CHECKING:
     import focs_gitea
@@ -276,42 +277,33 @@ def joj3_all_env(
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     logger.info(f"debug log to file: {settings.log_file_path}")
-    submitter = os.getenv("GITHUB_ACTOR", "")
-    run_number = os.getenv("GITHUB_RUN_NUMBER", "")
-    commit_hash = os.getenv("GITHUB_SHA", "")
-    repository = os.getenv("GITHUB_REPOSITORY", "")
+    env = joj3.Env()
     if "" in (
-        submitter,
-        run_number,
-        commit_hash,
-        repository,
+        env.github_actor,
+        env.github_run_number,
+        env.github_sha,
+        env.github_repository,
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
-    run_id = os.getenv("JOJ3_RUN_ID", "")
-    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
-    groups = os.getenv("JOJ3_GROUPS", "")
-    commit_msg = os.getenv("JOJ3_COMMIT_MSG", "")
-    force_quit_stage_name = os.getenv("JOJ3_FORCE_QUIT_STAGE_NAME") or ""
-    score_file_path = os.getenv("JOJ3_OUTPUT_PATH", "")
-    submitter_repo_name = (repository or "").split("/")[-1]
-    total_score = joj3.get_total_score(score_file_path)
+    submitter_repo_name = env.github_repository.split("/")[-1]
+    total_score = joj3.get_total_score(env.joj3_output_path)
     res = {
         "totalScore": total_score,
         "cappedTotalScore": (
             total_score if max_total_score < 0 else min(total_score, max_total_score)
         ),
-        "forceQuit": force_quit_stage_name != "",
-        "forceQuitStageName": force_quit_stage_name,
+        "forceQuit": env.joj3_force_quit_stage_name != "",
+        "forceQuitStageName": env.joj3_force_quit_stage_name,
         "issue": 0,
-        "action": int(run_number) if run_number != "" else 0,
-        "sha": commit_hash,
-        "commitMsg": commit_msg,
+        "action": int(env.github_run_number),
+        "sha": env.github_sha,
+        "commitMsg": env.joj3_commit_msg,
     }
     gitea_actions_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}/"
-        + f"actions/runs/{run_number}"
+        + f"actions/runs/{env.github_run_number}"
     )
     submitter_repo_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
@@ -320,18 +312,18 @@ def joj3_all_env(
     gitea_issue_url = ""
     if not skip_result_issue:
         title, comment = joj3.generate_title_and_comment(
-            score_file_path,
+            env.joj3_output_path,
             gitea_actions_url,
-            run_number,
-            exercise_name,
-            submitter,
-            commit_hash,
+            env.github_run_number,
+            env.joj3_conf_name,
+            env.github_actor,
+            env.github_sha,
             submitter_in_issue_title,
-            run_id,
+            env.joj3_run_id,
             max_total_score,
         )
         title_prefix = joj3.get_title_prefix(
-            exercise_name, submitter, submitter_in_issue_title
+            env.joj3_conf_name, env.github_actor, submitter_in_issue_title
         )
         joj3_issue: focs_gitea.Issue
         issue: focs_gitea.Issue
@@ -391,25 +383,25 @@ def joj3_all_env(
             repo.git.reset("--hard", "origin/grading")
             if not skip_scoreboard:
                 joj3.generate_scoreboard(
-                    score_file_path,
-                    submitter,
+                    env.joj3_output_path,
+                    env.github_actor,
                     os.path.join(repo_path, scoreboard_filename),
-                    exercise_name,
+                    env.joj3_conf_name,
                 )
                 tea.pot.git.add_commit(
                     grading_repo_name,
                     [scoreboard_filename],
                     (
-                        f"joj3: update scoreboard for {exercise_name} by @{submitter} in "
-                        f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                        f"joj3: update scoreboard for {env.joj3_conf_name} by @{env.github_actor} in "
+                        f"{settings.gitea_org_name}/{submitter_repo_name}@{env.github_sha}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}\n"
-                        f"groups: {groups}\n"
+                        f"groups: {env.joj3_groups}\n"
                     ),
                 )
             if not skip_failed_table:
                 joj3.generate_failed_table(
-                    score_file_path,
+                    env.joj3_output_path,
                     submitter_repo_name,
                     submitter_repo_url,
                     os.path.join(repo_path, failed_table_filename),
@@ -419,11 +411,11 @@ def joj3_all_env(
                     grading_repo_name,
                     [failed_table_filename],
                     (
-                        f"joj3: update failed table for {exercise_name} by @{submitter} in "
-                        f"{settings.gitea_org_name}/{submitter_repo_name}@{commit_hash}\n\n"
+                        f"joj3: update failed table for {env.joj3_conf_name} by @{env.github_actor} in "
+                        f"{settings.gitea_org_name}/{submitter_repo_name}@{env.github_sha}\n\n"
                         f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}\n"
-                        f"groups: {groups}\n"
+                        f"groups: {env.joj3_groups}\n"
                     ),
                 )
             push_info_list = tea.pot.git.push(grading_repo_name)
@@ -467,17 +459,14 @@ def joj3_check_env(
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
-    submitter = os.getenv("GITHUB_ACTOR", "")
-    repository = os.getenv("GITHUB_REPOSITORY", "")
+    env = joj3.Env()
     if "" in (
-        submitter,
-        repository,
+        env.github_actor,
+        env.github_repository,
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
-    exercise_name = os.getenv("JOJ3_CONF_NAME", "")
-    groups = os.getenv("JOJ3_GROUPS", "")
-    submitter_repo_name = repository.split("/")[-1]
+    submitter_repo_name = env.github_repository.split("/")[-1]
     repo: Repo = tea.pot.git.get_repo(grading_repo_name)
     now = datetime.now(timezone.utc)
     items = group_config.split(",")
@@ -511,8 +500,8 @@ def joj3_check_env(
                 continue
             d = match.groupdict()
             if (
-                exercise_name != d["exercise_name"]
-                or submitter != d["submitter"]
+                env.joj3_conf_name != d["exercise_name"]
+                or env.github_actor != d["submitter"]
                 or submitter_repo_name != d["submitter_repo_name"]
             ):
                 continue
@@ -539,7 +528,7 @@ def joj3_check_env(
                     continue
             submit_count += 1
         logger.info(
-            f"submitter {submitter} is submitting for the {submit_count + 1} time, "
+            f"submitter {env.github_actor} is submitting for the {submit_count + 1} time, "
             f"{min(0, max_count - submit_count - 1)} time(s) remaining, "
             f"group={name}, "
             f"time period={time_period} hour(s), "
@@ -548,7 +537,7 @@ def joj3_check_env(
         use_group = False
         if name:
             comment += f"keyword `{name}` "
-            for group in groups or "":
+            for group in env.joj3_groups or "":
                 if group.lower() == name.lower():
                     use_group = True
                     break
