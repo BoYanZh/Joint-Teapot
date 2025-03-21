@@ -658,6 +658,7 @@ def joj3_all(
                     logger.error(f"git push failed too many times")
                     raise Exit(code=1)
                 sleep(retry_interval)
+    logger.info("joj3-all done")
 
 
 @app.command(
@@ -862,6 +863,7 @@ def joj3_all_env(
                     logger.error(f"git push failed too many times")
                     raise Exit(code=1)
                 sleep(retry_interval)
+    logger.info("joj3-all-env done")
 
 
 @app.command(
@@ -954,6 +956,7 @@ def joj3_check(
             }
         )
     print(json.dumps(res))  # print result to stdout for joj3
+    logger.info("joj3-check done")
 
 
 @app.command(
@@ -1061,6 +1064,7 @@ def joj3_check_env(
         title = "### Submission Count Check Result:"
     msg = f"{title}\n{comment}\n"
     print(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
+    logger.info("joj3-check-env done")
 
 
 if __name__ == "__main__":
