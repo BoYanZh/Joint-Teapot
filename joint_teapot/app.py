@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING, List
@@ -998,7 +998,7 @@ def joj3_check_env(
     groups = os.getenv("JOJ3_GROUPS", "")
     submitter_repo_name = repository.split("/")[-1]
     repo: Repo = tea.pot.git.get_repo(grading_repo_name)
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     items = group_config.split(",")
     comment = ""
     failed = False
