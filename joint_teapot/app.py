@@ -555,7 +555,7 @@ def joj3_check_env(
     if failed:
         title = "### Submission Count Check Failed:"
     else:
-        title = "### Submission Count Check Result:"
+        title = "### Submission Count Check Passed:"
     msg = f"{title}\n{comment}\n"
     print(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
     logger.info("joj3-check-env done")
