@@ -57,9 +57,7 @@ def generate_scoreboard(
     else:
         columns = [
             "",
-            "last_edit",  # FIXME:
-            # This is just to make changes in the file so that it can be pushed.
-            # Only used in development stage. Will be removed in the future.
+            "last_edit",
             "total",
         ]
         data = []
@@ -71,9 +69,8 @@ def generate_scoreboard(
             submitter_found = True
             break
     if not submitter_found:
-        submitter_row = [submitter, "", "0"] + [""] * (
-            len(columns) - 3
-        )  # FIXME: In formal version should be -2
+        fixed_columns = [submitter, "", "0"]
+        submitter_row = fixed_columns + [""] * (len(columns) - len(fixed_columns))
         data.append(submitter_row)
 
     # Update data
@@ -113,7 +110,6 @@ def generate_scoreboard(
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # FIXME: Delete this in formal version
     submitter_row[columns.index("last_edit")] = now
 
     # Sort data by total, from low to high
