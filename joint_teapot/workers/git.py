@@ -35,7 +35,10 @@ class Git:
         logger.info(f"repos dir: {self.repos_dir}")
 
     def clone_repo(
-        self, repo_name: str, branch: str = "master", auto_retry: bool = True
+        self,
+        repo_name: str,
+        branch: str = settings.default_branch,
+        auto_retry: bool = True,
     ) -> Optional[Repo]:
         repo = None
         repo_dir = os.path.join(self.repos_dir, repo_name)
@@ -78,7 +81,7 @@ class Git:
         *,
         auto_retry: bool = True,
         clean_git_lock: bool = False,
-        reset_target: str = "origin/master",
+        reset_target: str = f"origin/{settings.default_branch}",
     ) -> str:
         repo_dir = os.path.join(self.repos_dir, repo_name)
         repo = self.get_repo(repo_name)
@@ -115,11 +118,17 @@ class Git:
                     sleep(retry_interval)
                     if retry_interval < 64:
                         retry_interval *= 2
-                elif "Remote branch master not found in upstream origin" in e.stderr:
+                elif (
+                    f"Remote branch {settings.default_branch} not found in upstream origin"
+                    in e.stderr
+                ):
                     retry_interval = 0
-                    logger.error(f"{repo_name} origin/master not found")
+                    logger.error(
+                        f"{repo_name} origin/{settings.default_branch} not found"
+                    )
                 else:
-                    raise
+                    retry_interval = 0
+                    logger.exception(e)
         return repo_dir
 
     def add_commit(

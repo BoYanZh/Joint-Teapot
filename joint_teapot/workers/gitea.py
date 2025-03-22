@@ -126,7 +126,7 @@ class Gitea:
             repo_names.append(repo_name)
             body = {
                 "auto_init": False,
-                "default_branch": "master",
+                "default_branch": settings.default_branch,
                 "name": repo_name,
                 "private": True,
                 "template": False,
@@ -198,7 +198,7 @@ class Gitea:
                     self.org_name,
                     body={
                         "auto_init": False,
-                        "default_branch": "master",
+                        "default_branch": settings.default_branch,
                         "name": repo_name,
                         "private": True,
                         "template": False,
@@ -236,7 +236,7 @@ class Gitea:
                     continue
             try:
                 self.repository_api.repo_delete_branch_protection(
-                    self.org_name, repo_name, "master"
+                    self.org_name, repo_name, settings.default_branch
                 )
             except ApiException as e:
                 if e.status != 404:
@@ -249,7 +249,7 @@ class Gitea:
                         "block_on_official_review_requests": True,
                         "block_on_outdated_branch": True,
                         "block_on_rejected_reviews": True,
-                        "branch_name": "master",
+                        "branch_name": settings.default_branch,
                         "dismiss_stale_approvals": True,
                         "enable_approvals_whitelist": False,
                         "enable_merge_whitelist": False,

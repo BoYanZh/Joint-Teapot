@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # git
     git_host: str = "ssh://git@focs.ji.sjtu.edu.cn:2222"
     repos_dir: str = "./repos"
+    default_branch: str = "master"
 
     # mattermost
     mattermost_domain_name: str = "focs.ji.sjtu.edu.cn"

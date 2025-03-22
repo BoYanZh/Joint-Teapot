@@ -114,7 +114,7 @@ class Teapot:
     def clone_all_repos(self) -> None:
         for i, repo_name in enumerate(self.gitea.get_all_repo_names()):
             logger.info(f"{i}, {self.gitea.org_name}/{repo_name} cloning...")
-            self.git.repo_clean_and_checkout(repo_name, "master")
+            self.git.repo_clean_and_checkout(repo_name, settings.default_branch)
 
     def create_issue_for_repos(
         self,
