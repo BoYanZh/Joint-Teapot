@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     joj3_lock_file_path: str = ".git/teapot.lock"
     joj3_lock_file_timeout: int = 30
 
+    # moss
+    moss_user_id: int
+
     # log file
     log_file_path: str = "joint-teapot.log"
     stderr_log_level: str = "INFO"

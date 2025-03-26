@@ -1,3 +1,4 @@
+import glob
 import json
 import os
 import re
@@ -6,6 +7,7 @@ from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING, List
 
+import mosspy
 from filelock import FileLock
 from git import Repo
 from typer import Argument, Exit, Option, Typer, echo
@@ -14,8 +16,6 @@ from joint_teapot.config import Settings, set_settings, settings
 from joint_teapot.teapot import Teapot
 from joint_teapot.utils import joj3
 from joint_teapot.utils.logger import logger, set_logger
-from joint_teapot.utils.main import first
-from joint_teapot.workers.joj import JOJ
 
 if TYPE_CHECKING:
     import focs_gitea
@@ -73,6 +73,23 @@ def get_public_key_of_all_canvas_students() -> None:
 @app.command("clone-all-repos", help="clone all gitea repos to local")
 def clone_all_repos() -> None:
     tea.pot.clone_all_repos()
+
+
+@app.command("moss-all-repos", help="moss all gitea repos")
+def moss_all_repos(language: str = "cc", wildcards: List[str] = ["*.*"]) -> None:
+    m = mosspy.Moss(settings.moss_user_id, language)
+    for repo_name in tea.pot.gitea.get_all_repo_names():
+        base_dir = os.path.join(settings.repos_dir, repo_name)
+        for wildcard in wildcards:
+            full_wildcard = os.path.join(base_dir, wildcard)
+            for file in glob.glob(full_wildcard, recursive=True):
+                if not os.path.isfile(file):
+                    continue
+                logger.info(f"Adding file {file}")
+                m.files.append((file, os.path.relpath(file, settings.repos_dir)))
+    logger.info("Sending files")
+    url = m.send()
+    echo("Report Url: " + url)
 
 
 @app.command("create-issues", help="create issues on gitea")
