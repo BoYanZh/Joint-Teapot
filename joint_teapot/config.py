@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     joj3_lock_file_timeout: int = 30
 
     # moss
-    moss_user_id: int
+    moss_user_id: int = 9876543210
 
     # log file
     log_file_path: str = "joint-teapot.log"
