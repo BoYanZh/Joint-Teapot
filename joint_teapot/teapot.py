@@ -1,7 +1,11 @@
 import functools
+import glob
+import os
 import re
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, TypeVar
+
+import mosspy
 
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
@@ -115,6 +119,20 @@ class Teapot:
         for i, repo_name in enumerate(self.gitea.get_all_repo_names()):
             logger.info(f"{i}, {self.gitea.org_name}/{repo_name} cloning...")
             self.git.repo_clean_and_checkout(repo_name, settings.default_branch)
+
+    def moss_all_repos(self, language: str, wildcards: List[str]) -> str:
+        m = mosspy.Moss(settings.moss_user_id, language)
+        for repo_name in self.gitea.get_all_repo_names():
+            base_dir = os.path.join(settings.repos_dir, repo_name)
+            for wildcard in wildcards:
+                full_wildcard = os.path.join(base_dir, wildcard)
+                for file in glob.glob(full_wildcard, recursive=True):
+                    if not os.path.isfile(file):
+                        continue
+                    logger.info(f"Adding file {file}")
+                    m.files.append((file, os.path.relpath(file, settings.repos_dir)))
+        logger.info("Sending files")
+        return m.send()
 
     def create_issue_for_repos(
         self,
