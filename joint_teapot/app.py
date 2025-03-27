@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING, List
@@ -16,7 +16,7 @@ from joint_teapot.utils import joj3
 from joint_teapot.utils.logger import logger, set_logger
 
 if TYPE_CHECKING:
-    import focs_gitea
+    pass
 
 app = Typer(add_completion=False)
 
@@ -315,46 +315,15 @@ def joj3_all_env(
     )
     gitea_issue_url = ""
     if not skip_result_issue:
-        title, comment = joj3.generate_title_and_comment(
-            env.joj3_output_path,
-            gitea_actions_url,
-            env.github_run_number,
-            env.joj3_conf_name,
-            env.github_actor,
-            env.github_sha,
-            submitter_in_issue_title,
-            env.joj3_run_id,
+        issue_number = tea.pot.joj3_post_issue(
+            env,
             max_total_score,
-        )
-        title_prefix = joj3.get_title_prefix(
-            env.joj3_conf_name, env.github_actor, submitter_in_issue_title
-        )
-        joj3_issue: focs_gitea.Issue
-        issue: focs_gitea.Issue
-        for issue in tea.pot.gitea.issue_api.issue_list_issues(
-            tea.pot.gitea.org_name, submitter_repo_name, state="open"
-        ):
-            if issue.title.startswith(title_prefix):
-                joj3_issue = issue
-                logger.info(f"found joj3 issue: #{joj3_issue.number}")
-                break
-        else:
-            joj3_issue = tea.pot.gitea.issue_api.issue_create_issue(
-                tea.pot.gitea.org_name,
-                submitter_repo_name,
-                body={"title": title_prefix + "0", "body": ""},
-            )
-            logger.info(f"created joj3 issue: #{joj3_issue.number}")
-        gitea_issue_url = joj3_issue.html_url
-        logger.info(f"gitea issue url: {gitea_issue_url}")
-        tea.pot.gitea.issue_api.issue_edit_issue(
-            tea.pot.gitea.org_name,
+            gitea_actions_url,
+            submitter_in_issue_title,
             submitter_repo_name,
-            joj3_issue.number,
-            body={"title": title, "body": comment},
         )
-        res["issue"] = joj3_issue.number
-    print(json.dumps(res))  # print result to stdout for joj3 log parser
+        res["issue"] = issue_number
+    echo(json.dumps(res))  # print result to stdout for joj3 log parser
     if skip_scoreboard and skip_failed_table:
         return
     lock_file_path = os.path.join(
@@ -463,6 +432,7 @@ def joj3_check_env(
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
+    logger.info(f"debug log to file: {settings.log_file_path}")
     env = joj3.Env()
     if "" in (
         env.github_actor,
@@ -470,98 +440,10 @@ def joj3_check_env(
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
-    submitter_repo_name = env.github_repository.split("/")[-1]
-    repo: Repo = tea.pot.git.get_repo(grading_repo_name)
-    now = datetime.now(timezone.utc)
-    items = group_config.split(",")
-    comment = ""
-    failed = False
-    pattern = re.compile(
-        r"joj3: update scoreboard for (?P<exercise_name>.+?) "
-        r"by @(?P<submitter>.+) in "
-        r"(?P<gitea_org_name>.+)/(?P<submitter_repo_name>.+)@(?P<commit_hash>.+)"
+    msg, failed = tea.pot.joj3_check_submission_count(
+        env, grading_repo_name, group_config, scoreboard_filename
     )
-    time_windows = []
-    valid_items = []
-    for item in items:
-        name, values = item.split("=")
-        max_count, time_period = map(int, values.split(":"))
-        if max_count < 0 or time_period < 0:
-            continue
-        since = now - timedelta(hours=time_period)
-        time_windows.append(since)
-        valid_items.append((name, max_count, time_period, since))
-    all_commits = []
-    if time_windows:
-        earliest_since = min(time_windows).strftime("%Y-%m-%dT%H:%M:%S")
-        commits = repo.iter_commits(paths=scoreboard_filename, since=earliest_since)
-        for commit in commits:
-            lines = commit.message.strip().splitlines()
-            if not lines:
-                continue
-            match = pattern.match(lines[0])
-            if not match:
-                continue
-            d = match.groupdict()
-            if (
-                env.joj3_conf_name != d["exercise_name"]
-                or env.github_actor != d["submitter"]
-                or submitter_repo_name != d["submitter_repo_name"]
-            ):
-                continue
-            groups_line = next((l for l in lines if l.startswith("groups: ")), None)
-            commit_groups = (
-                groups_line[len("groups: ") :].split(",") if groups_line else []
-            )
-            all_commits.append(
-                {
-                    "time": commit.committed_datetime,
-                    "groups": [g.strip() for g in commit_groups],
-                }
-            )
-    for name, max_count, time_period, since in valid_items:
-        submit_count = 0
-        time_limit = now - timedelta(hours=time_period)
-        for commit in all_commits:
-            if commit["time"] < time_limit:
-                continue
-            if name:
-                target_group = name.lower()
-                commit_groups_lower = [g.lower() for g in commit["groups"]]
-                if target_group not in commit_groups_lower:
-                    continue
-            submit_count += 1
-        logger.info(
-            f"submitter {env.github_actor} is submitting for the {submit_count + 1} time, "
-            f"{min(0, max_count - submit_count - 1)} time(s) remaining, "
-            f"group={name}, "
-            f"time period={time_period} hour(s), "
-            f"max count={max_count}, submit count={submit_count}"
-        )
-        use_group = False
-        if name:
-            comment += f"keyword `{name}` "
-            for group in env.joj3_groups or "":
-                if group.lower() == name.lower():
-                    use_group = True
-                    break
-        else:
-            use_group = True
-        comment += (
-            f"in last {time_period} hour(s): "
-            f"submit count {submit_count}, "
-            f"max count {max_count}"
-        )
-        if use_group and submit_count + 1 > max_count:
-            failed = True
-            comment += ", exceeded"
-        comment += "\n"
-    if failed:
-        title = "### Submission Count Check Failed:"
-    else:
-        title = "### Submission Count Check Passed:"
-    msg = f"{title}\n{comment}\n"
-    print(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
+    echo(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
     logger.info("joj3-check-env done")
 
 
