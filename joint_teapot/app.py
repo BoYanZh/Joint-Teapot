@@ -144,7 +144,7 @@ def close_all_issues() -> None:
 @app.command(
     "archive-repos", help="archive repos in gitea organization according to regex"
 )
-def archive_repos(regex: str = Argument(""), dry_run: bool = Option(True)) -> None:
+def archive_repos(regex: str = Argument(".+"), dry_run: bool = Option(True)) -> None:
     tea.pot.gitea.archive_repos(regex, dry_run)
 
 

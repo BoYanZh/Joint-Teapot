@@ -413,7 +413,7 @@ class Gitea:
                         self.org_name, repo_name, issue.number, body={"state": "closed"}
                     )
 
-    def archive_repos(self, regex: str, dry_run: bool = True) -> None:
+    def archive_repos(self, regex: str = ".+", dry_run: bool = True) -> None:
         if dry_run:
             logger.info("Dry run enabled. No changes will be made to the repositories.")
         logger.info(f"Archiving repos with name matching {regex}")
