@@ -111,7 +111,7 @@ class Teapot:
                 return None
             team_name, number_str = name.split(" ")
             number = int(number_str)
-            return f"{team_name}-{number:02}"
+            return f"{team_name}{number:02}"
 
         return self.gitea.create_teams_and_repos_by_canvas_groups(
             self.canvas.students, self.canvas.groups, convertor, convertor
