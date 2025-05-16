@@ -87,7 +87,7 @@ Example: `python3 -m joint_teapot create-personal-repos --suffix "-p1"` will cre
 
 ### `create-teams`
 
-create teams on gitea by canvas groups
+create teams on gitea by canvas groups. To integrate with webhooks, it's recommended to set suffix to `-gitea`.
 
 ### `create-webhooks-for-mm`
 

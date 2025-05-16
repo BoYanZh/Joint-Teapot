@@ -167,12 +167,14 @@ class Mattermost:
                 logger.info(f"Added member {member} to channel {channel_name}")
 
     def create_webhooks_for_repos(
-        self, repos: List[str], gitea: Gitea, git_suffix: bool
+        self, repos: List[str], gitea: Gitea, gitea_suffix: bool
     ) -> None:
         # one group corresponds to one repo so these concepts can be used interchangeably
         for repo in repos:
-            logger.info(f"Creating webhooks for repo {gitea.org_name}/{repo}")
-            channel_name = f"{repo}-git" if git_suffix else repo
+            channel_name = f"{repo}-gitea" if gitea_suffix else repo
+            logger.info(
+                f"Creating webhooks for repo {gitea.org_name}/{repo} and channel {channel_name}"
+            )
             try:
                 mm_channel = self.endpoint.channels.get_channel_by_name(
                     self.team["id"], channel_name

@@ -184,7 +184,7 @@ def upload_assignment_grades(assignments_dir: Path, assignment_name: str) -> Non
 @app.command(
     "create-group-channels-on-mm",
     help="create channels for student groups according to group information on"
-    " gitea",
+    " gitea; to integrate with webhooks, it's recommended to set suffix to '-gitea'",
 )
 def create_group_channels_on_mm(
     prefix: str = Option(""),
@@ -221,7 +221,7 @@ def create_personal_channels_on_mm(
     "and configure them so that updates on gitea will be pushed to the mm channel",
 )
 def create_webhooks_for_mm(
-    regex: str = Argument(""), git_suffix: bool = Option(False)
+    regex: str = Argument(""), gitea_suffix: bool = Option(True)
 ) -> None:
     repo_names = [
         group_name
@@ -229,7 +229,9 @@ def create_webhooks_for_mm(
         if re.match(regex, group_name)
     ]
     logger.info(f"{len(repo_names)} pair(s) of webhooks to be created: {repo_names}")
-    tea.pot.mattermost.create_webhooks_for_repos(repo_names, tea.pot.gitea, git_suffix)
+    tea.pot.mattermost.create_webhooks_for_repos(
+        repo_names, tea.pot.gitea, gitea_suffix
+    )
 
 
 @app.command(
