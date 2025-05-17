@@ -103,11 +103,17 @@ def create_comment(
     tea.pot.create_comment(repo_name, index, body)
 
 
-@app.command("create-milestones", help="create milestones on gitea")
-def create_milestone_for_repos(
-    repo_names: List[str], title: str, description: str, due_on: datetime
+@app.command(
+    "create-milestones",
+    help="create milestones on gitea",
+)
+def create_milestones(
+    title: str,
+    regex: str = Argument(".+"),
+    due_on: str = Argument("", help="milestone due-on date [%YYYY-%MM-%DD]"),
+    description: str = Argument(""),
 ) -> None:
-    tea.pot.create_milestone_for_repos(repo_names, title, description, due_on)
+    tea.pot.gitea.create_milestones(title, regex, due_on, description)
 
 
 @app.command("check-issues", help="check the existence of issue by title on gitea")

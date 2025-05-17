@@ -183,12 +183,6 @@ class Teapot:
     ) -> None:
         self.gitea.create_comment(repo_name, index, body)
 
-    def create_milestone_for_repos(
-        self, repo_names: List[str], title: str, description: str, due_on: datetime
-    ) -> None:
-        for repo_name in repo_names:
-            self.gitea.create_milestone(repo_name, title, description, due_on)
-
     def check_exist_issue_by_title(
         self, repo_names: List[str], title: str
     ) -> List[str]:

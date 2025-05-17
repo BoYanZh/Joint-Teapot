@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from enum import Enum
 from functools import lru_cache
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar
@@ -382,15 +381,22 @@ class Gitea:
         repo_name: str,
         title: str,
         description: str,
-        due_on: datetime,
+        due_on: str,
     ) -> None:
+        if due_on == "":
+            self.issue_api.issue_create_milestone(
+                self.org_name,
+                repo_name,
+                body={"title": title, "description": description},
+            )
+            return
         self.issue_api.issue_create_milestone(
             self.org_name,
             repo_name,
             body={
                 "title": title,
                 "description": description,
-                "due_on": due_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                "due_on": due_on + "T23:59:59.999Z",
             },
         )
 
@@ -468,6 +474,21 @@ class Gitea:
                 self.org_name, sub.name
             )
             logger.info(f"Unsubscribed from {sub.name}")
+
+    def create_milestones(
+        self, milestone: str, regex: str, due_date: str, description: str
+    ) -> None:
+        for repo_name in self.get_all_repo_names():
+            if not re.match(regex, repo_name):
+                continue
+            milestone_list = self.issue_api.issue_get_milestones_list(
+                self.org_name, repo_name
+            )
+            if milestone in [m.title for m in milestone_list]:
+                logger.warning(f"Milestone {milestone} already exists in {repo_name}")
+                continue
+            self.create_milestone(repo_name, milestone, description, due_date)
+            logger.info(f"Created milestone {milestone} in {repo_name}")
 
 
 if __name__ == "__main__":
