@@ -36,9 +36,9 @@ pytest -svv
 
 ## Commands & Features
 
-### `archive-all-repos`
+### `archive-repos`
 
-archive all repos in gitea organization
+archive repos in gitea organization according to regex (dry-run enabled by default)
 
 ### `unwatch-all-repos`
 

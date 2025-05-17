@@ -413,11 +413,17 @@ class Gitea:
                         self.org_name, repo_name, issue.number, body={"state": "closed"}
                     )
 
-    def archive_all_repos(self) -> None:
-        for repo in list_all(self.organization_api.org_list_repos, self.org_name):
-            self.repository_api.repo_edit(
-                self.org_name, repo.name, body={"archived": True}
-            )
+    def archive_repos(self, regex: str = ".+", dry_run: bool = True) -> None:
+        if dry_run:
+            logger.info("Dry run enabled. No changes will be made to the repositories.")
+        logger.info(f"Archiving repos with name matching {regex}")
+        for repo_name in self.get_all_repo_names():
+            if re.match(regex, repo_name):
+                logger.info(f"Archived {repo_name}")
+                if not dry_run:
+                    self.repository_api.repo_edit(
+                        self.org_name, repo_name, body={"archived": True}
+                    )
 
     def unwatch_all_repos(self) -> None:
         for repo in list_all(self.organization_api.org_list_repos, self.org_name):

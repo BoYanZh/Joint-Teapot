@@ -141,9 +141,11 @@ def close_all_issues() -> None:
     tea.pot.gitea.close_all_issues()
 
 
-@app.command("archive-all-repos", help="archive all repos in gitea organization")
-def archive_all_repos() -> None:
-    tea.pot.gitea.archive_all_repos()
+@app.command(
+    "archive-repos", help="archive repos in gitea organization according to regex"
+)
+def archive_repos(regex: str = Argument(".+"), dry_run: bool = Option(True)) -> None:
+    tea.pot.gitea.archive_repos(regex, dry_run)
 
 
 @app.command("unwatch-all-repos", help="unwatch all repos in gitea organization")
