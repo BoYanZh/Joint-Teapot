@@ -146,6 +146,8 @@ class Teapot:
         body: str,
         from_file: bool = False,
         use_regex: bool = False,
+        milestone: str = "",
+        labels: List[str] = [],
     ) -> None:
         if from_file:
             try:
@@ -173,7 +175,7 @@ class Teapot:
             affected_repos = repo_names
 
         for repo_name in affected_repos:
-            self.gitea.create_issue(repo_name, title, content)
+            self.gitea.create_issue(repo_name, title, content, True, milestone, labels)
 
     def create_comment(
         self,
@@ -182,12 +184,6 @@ class Teapot:
         body: str,
     ) -> None:
         self.gitea.create_comment(repo_name, index, body)
-
-    def create_milestone_for_repos(
-        self, repo_names: List[str], title: str, description: str, due_on: datetime
-    ) -> None:
-        for repo_name in repo_names:
-            self.gitea.create_milestone(repo_name, title, description, due_on)
 
     def check_exist_issue_by_title(
         self, repo_names: List[str], title: str
