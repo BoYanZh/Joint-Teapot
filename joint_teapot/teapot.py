@@ -146,6 +146,8 @@ class Teapot:
         body: str,
         from_file: bool = False,
         use_regex: bool = False,
+        milestone: str = "",
+        labels: List[str] = [],
     ) -> None:
         if from_file:
             try:
@@ -173,7 +175,7 @@ class Teapot:
             affected_repos = repo_names
 
         for repo_name in affected_repos:
-            self.gitea.create_issue(repo_name, title, content)
+            self.gitea.create_issue(repo_name, title, content, True, milestone, labels)
 
     def create_comment(
         self,

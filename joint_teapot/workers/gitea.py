@@ -344,6 +344,8 @@ class Gitea:
         title: str,
         body: str,
         assign_every_collaborators: bool = True,
+        milestone: str = "",
+        labels: list[str] = [],
     ) -> None:
         assignees = []
         if assign_every_collaborators:
@@ -355,10 +357,33 @@ class Gitea:
                     repo_name,
                 )
             ]
+        milestone_id = None
+        if milestone:
+            milestone_list = self.issue_api.issue_get_milestones_list(
+                self.org_name, repo_name
+            )
+            if milestone not in [m.title for m in milestone_list]:
+                logger.warning(f"Milestone {milestone} does not exist in {repo_name}")
+            else:
+                milestone_id = first(
+                    [m.id for m in milestone_list if m.title == milestone]
+                )
+        labels_id = []
+        if labels:
+            labels_list = self.issue_api.issue_list_labels(self.org_name, repo_name)
+            labels_id = [l.id for l in labels_list if l.name in labels]
+            if not labels_id:
+                logger.warning(f"no label matches {labels}")
         self.issue_api.issue_create_issue(
             self.org_name,
             repo_name,
-            body={"title": title, "body": body, "assignees": assignees},
+            body={
+                "title": title,
+                "body": body,
+                "assignees": assignees,
+                "milestone": milestone_id,
+                "labels": labels_id,
+            },
         )
         logger.info(f'Created issue "{title}" in {repo_name}')
 

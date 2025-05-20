@@ -90,8 +90,16 @@ def create_issue_for_repos(
     use_regex: bool = Option(
         False, "--regex", help="repo_names takes list of regexes if set"
     ),
+    milesetone: str = Option("", "--milestone", help="milestone title"),
+    labels: List[str] = Option(
+        [],
+        "--label",
+        help="labels to add to the issue (use --label A --label B to add multiple)",
+    ),
 ) -> None:
-    tea.pot.create_issue_for_repos(repo_names, title, body, from_file, use_regex)
+    tea.pot.create_issue_for_repos(
+        repo_names, title, body, from_file, use_regex, milesetone, labels
+    )
 
 
 @app.command("create-comment", help="create a comment for an issue on gitea")
