@@ -421,7 +421,7 @@ class Gitea:
             body={
                 "title": title,
                 "description": description,
-                "due_on": due_on + "T23:59:59.999Z",
+                "due_on": due_on + "T23:59:59.999+08:00",
             },
         )
 
