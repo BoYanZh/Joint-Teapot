@@ -254,6 +254,7 @@ class Teapot:
         )
         joj3_issue: focs_gitea.Issue
         issue: focs_gitea.Issue
+        new_issue = False
         for issue in self.gitea.issue_api.issue_list_issues(
             self.gitea.org_name, submitter_repo_name, state="open"
         ):
@@ -262,20 +263,22 @@ class Teapot:
                 logger.info(f"found joj3 issue: #{joj3_issue.number}")
                 break
         else:
+            new_issue = True
             joj3_issue = self.gitea.issue_api.issue_create_issue(
                 self.gitea.org_name,
                 submitter_repo_name,
-                body={"title": title_prefix + "0", "body": ""},
+                body={"title": title, "body": comment},
             )
             logger.info(f"created joj3 issue: #{joj3_issue.number}")
         gitea_issue_url = joj3_issue.html_url
         logger.info(f"gitea issue url: {gitea_issue_url}")
-        self.gitea.issue_api.issue_edit_issue(
-            self.gitea.org_name,
-            submitter_repo_name,
-            joj3_issue.number,
-            body={"title": title, "body": comment},
-        )
+        if not new_issue:
+            self.gitea.issue_api.issue_edit_issue(
+                self.gitea.org_name,
+                submitter_repo_name,
+                joj3_issue.number,
+                body={"title": title, "body": comment},
+            )
         return joj3_issue.number
 
     def joj3_check_submission_count(
