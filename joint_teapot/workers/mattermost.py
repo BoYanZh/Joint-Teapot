@@ -202,22 +202,20 @@ class Mattermost:
                     body=focs_gitea.CreateHookOption(
                         active=True,
                         type="slack",
-                        events=(
-                            [
-                                "issues_only",
-                                "issue_comment",
-                                "issue_assign",
-                                "pull_request_only",
-                                "pull_request_comment",
-                                "pull_request_review",
-                                "pull_request_review_request",
-                                "push",
-                                "create",
-                                "delete",
-                                "release",
-                                "wiki",
-                            ]
-                        ),
+                        events=[
+                            "issues_only",
+                            "issue_comment",
+                            "issue_assign",
+                            "pull_request_only",
+                            "pull_request_comment",
+                            "pull_request_review",
+                            "pull_request_review_request",
+                            "push",
+                            "create",
+                            "delete",
+                            "release",
+                            "wiki",
+                        ],
                         config={
                             "url": f"https://{self.url}{self.url_suffix}/hooks/{mm_webhook['id']}",
                             "username": "FOCS Gitea",
