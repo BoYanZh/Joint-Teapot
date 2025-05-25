@@ -322,15 +322,11 @@ def joj3_all_env(
         "sha": env.github_sha,
         "commitMsg": env.joj3_commit_msg,
     }
-    gitea_actions_url = (
-        f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
-        + f"{settings.gitea_org_name}/{submitter_repo_name}/"
-        + f"actions/runs/{env.github_run_number}"
-    )
     submitter_repo_url = (
         f"https://{settings.gitea_domain_name}{settings.gitea_suffix}/"
         + f"{settings.gitea_org_name}/{submitter_repo_name}"
     )
+    gitea_actions_url = f"{submitter_repo_url}/actions/runs/{env.github_run_number}"
     gitea_issue_url = ""
     if not skip_result_issue:
         issue_number = tea.pot.joj3_post_issue(
@@ -341,6 +337,8 @@ def joj3_all_env(
             submitter_repo_name,
         )
         res["issue"] = issue_number
+        gitea_issue_url = f"{submitter_repo_url}/issues/{issue_number}"
+        logger.info(f"gitea issue url: {gitea_issue_url}")
     echo(json.dumps(res))  # print result to stdout for joj3 log parser
     if skip_scoreboard and skip_failed_table:
         return
