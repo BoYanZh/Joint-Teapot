@@ -237,7 +237,8 @@ def create_personal_channels_on_mm(
     "and configure them so that updates on gitea will be pushed to the mm channel",
 )
 def create_webhooks_for_mm(
-    regex: str = Argument(""), gitea_suffix: bool = Option(True)
+    regex: str = Argument(""),
+    gitea_suffix: bool = Option(True, help="append gitea suffix to mm channel names"),
 ) -> None:
     repo_names = [
         group_name

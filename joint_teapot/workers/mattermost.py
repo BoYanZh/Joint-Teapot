@@ -36,7 +36,7 @@ class Mattermost:
         except Exception:
             logger.error("Cannot login to Mattermost")
             return
-        if "admin" not in operator["roles"]:
+        if "admin" not in operator["roles"] and "system_user" not in operator["roles"]:
             logger.error("Please make sure you have enough permission")
         try:
             self.team = self.endpoint.teams.get_team_by_name(team_name)
@@ -202,13 +202,22 @@ class Mattermost:
                     body=focs_gitea.CreateHookOption(
                         active=True,
                         type="slack",
-                        events=[
-                            "issues_only",
-                            "issue_comment",
-                            "pull_request_only",
-                            "pull_request_comment",
-                            "pull_request_review",
-                        ],
+                        events=(
+                            [
+                                "issues_only",
+                                "issue_comment",
+                                "issue_assign",
+                                "pull_request_only",
+                                "pull_request_comment",
+                                "pull_request_review",
+                                "pull_request_review_request",
+                                "push",
+                                "create",
+                                "delete",
+                                "release",
+                                "wiki",
+                            ]
+                        ),
                         config={
                             "url": f"https://{self.url}{self.url_suffix}/hooks/{mm_webhook['id']}",
                             "username": "FOCS Gitea",
