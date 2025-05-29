@@ -356,15 +356,10 @@ class Teapot:
                 f"time period={time_period} hour(s), "
                 f"max count={max_count}, submit count={submit_count}"
             )
-            use_group = False
+            use_group = True
             if name:
                 comment += f"keyword `{name}` "
-                for group in env.joj3_groups or "":
-                    if group.lower() == name.lower():
-                        use_group = True
-                        break
-            else:
-                use_group = True
+                use_group = name.lower() in env.joj3_groups.lower()
             comment += (
                 f"in last {time_period} hour(s): "
                 f"submit count {submit_count}, "
