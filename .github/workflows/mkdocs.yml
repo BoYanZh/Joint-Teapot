@@ -5,7 +5,7 @@ on:
       - master
 jobs:
   deploy:
-    if: ${{ !env.GITEA_ACTIONS || env.GITEA_ACTIONS != 'true' }}
+    if: ${{ vars.RUN_ON_GITEA != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
