@@ -10,7 +10,7 @@ on:
 
 jobs:
   analyze:
-    if: ${{ env.GITEA_ACTIONS != 'true' }}
+    if: env.GITEA_ACTIONS != 'true'
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
