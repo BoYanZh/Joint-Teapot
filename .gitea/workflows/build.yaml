@@ -1,0 +1,34 @@
+name: build
+on:
+  - push
+jobs:
+  trigger-build-image:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519.pub
+          chmod 600 ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519.pub
+          ssh-keyscan -p 2222 focs.ji.sjtu.edu.cn >> ~/.ssh/known_hosts
+          ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+      - name: Set up Git
+        run: |
+          git config --global user.name "bot-joj"
+          git config --global user.email "bot-joj@focs.ji.sjtu.edu.cn"
+      - name: Clone, Commit and Push
+        shell: bash
+        run: |
+          git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
+          cd runner-images
+          git submodule update --init --remote --force
+          git add -A
+          if echo "${{ github.event.head_commit.message }}" | grep -q "force build"; then
+            git commit --allow-empty -m "chore: ${{ github.repository }}@${{ github.sha }} trigger force build gitea actions"
+          else
+            git commit --allow-empty -m "chore: ${{ github.repository }}@${{ github.sha }} trigger build gitea actions"
+          fi
+          git push
