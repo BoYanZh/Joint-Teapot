@@ -4,7 +4,7 @@ on:
 jobs:
   trigger-build-image:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: gitea.ref == 'refs/heads/master'
     steps:
       - name: Set up SSH
         run: |
@@ -26,5 +26,5 @@ jobs:
           cd runner-images
           git submodule update --init --remote --force
           git add -A
-          git commit --allow-empty -m "chore: ${{ github.repository }}@${{ github.sha }} trigger force build gitea actions"
+          git commit --allow-empty -m "chore: ${{ gitea.repository }}@${{ gitea.sha }} trigger force build gitea actions"
           git push
