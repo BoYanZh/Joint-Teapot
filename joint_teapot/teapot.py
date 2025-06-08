@@ -309,6 +309,7 @@ class Teapot:
             since = now - timedelta(hours=time_period)
             time_windows.append(since)
             valid_items.append((name, max_count, time_period, since))
+        logger.info(f"valid items: {valid_items}, time windows: {time_windows}")
         all_commits = []
         if time_windows:
             earliest_since = min(time_windows).strftime("%Y-%m-%dT%H:%M:%S")
@@ -337,6 +338,7 @@ class Teapot:
                         "groups": [g.strip() for g in commit_groups],
                     }
                 )
+        logger.info(f"all commits length: {len(all_commits)}")
         for name, max_count, time_period, since in valid_items:
             submit_count = 0
             time_limit = now - timedelta(hours=time_period)
