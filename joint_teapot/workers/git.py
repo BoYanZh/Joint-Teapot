@@ -90,6 +90,11 @@ class Git:
         retry_interval = 2
         while retry_interval and auto_retry:
             try:
+                current_branch = ""
+                if repo.head.is_detached:
+                    current_branch = repo.head.commit.hexsha
+                else:
+                    current_branch = repo.active_branch.name
                 if clean_git_lock:
                     lock_files = [
                         "index.lock",
@@ -98,7 +103,7 @@ class Git:
                         "logs/HEAD.lock",
                         "packed-refs.lock",
                         "config.lock",
-                        f"{checkout_dest}.lock",
+                        f"refs/remotes/origin/{current_branch}.lock",
                     ]
                     for lock_file in lock_files:
                         lock_path = os.path.join(repo_dir, ".git", lock_file)
