@@ -6,7 +6,7 @@ from pathlib import Path
 from time import sleep
 from typing import TYPE_CHECKING, List
 
-from filelock import FileLock
+# from filelock import FileLock
 from git import Repo
 from typer import Argument, Exit, Option, Typer, echo
 
@@ -350,7 +350,8 @@ def joj3_all_env(
         f"try to acquire lock, file path: {lock_file_path}, "
         + f"timeout: {settings.joj3_lock_file_timeout}"
     )
-    with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
+    if True:  # disable the file lock temporarily
+        # with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
         logger.info("file lock acquired")
         retry_interval = 1
         git_push_ok = False
