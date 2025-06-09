@@ -98,6 +98,7 @@ class Git:
                         "logs/HEAD.lock",
                         "packed-refs.lock",
                         "config.lock",
+                        f"{checkout_dest}.lock",
                     ]
                     for lock_file in lock_files:
                         lock_path = os.path.join(repo_dir, ".git", lock_file)
