@@ -116,6 +116,7 @@ class Gitea:
         repo_name_convertor: Callable[
             [User], Optional[str]
         ] = default_repo_name_convertor,
+        template: str = "",
     ) -> List[str]:
         repo_names = []
         for student in students:
@@ -123,17 +124,32 @@ class Gitea:
             if repo_name is None:
                 continue
             repo_names.append(repo_name)
-            body = {
-                "auto_init": False,
-                "default_branch": settings.default_branch,
-                "name": repo_name,
-                "private": True,
-                "template": False,
-                "trust_model": "default",
-            }
             try:
                 try:
-                    self.organization_api.create_org_repo(self.org_name, body=body)
+                    if template == "":
+                        body = {
+                            "auto_init": False,
+                            "default_branch": settings.default_branch,
+                            "name": repo_name,
+                            "private": True,
+                            "template": False,
+                            "trust_model": "default",
+                        }
+                        self.organization_api.create_org_repo(self.org_name, body=body)
+                    else:
+                        body = {
+                            "default_branch": settings.default_branch,
+                            "git_content": True,
+                            "git_hooks": True,
+                            "labels": True,
+                            "name": repo_name,
+                            "owner": self.org_name,
+                            "private": True,
+                            "protected_branch": True,
+                        }
+                        self.repository_api.generate_repo(
+                            self.org_name, template, body=body
+                        )
                     logger.info(
                         f"Personal repo {self.org_name}/{repo_name} for {student} created"
                     )
@@ -158,6 +174,7 @@ class Gitea:
         groups: PaginatedList,
         team_name_convertor: Callable[[str], Optional[str]] = lambda name: name,
         repo_name_convertor: Callable[[str], Optional[str]] = lambda name: name,
+        template: str = "",
         permission: PermissionEnum = PermissionEnum.write,
     ) -> List[str]:
         repo_names = []
@@ -190,21 +207,37 @@ class Gitea:
                         ],
                     },
                 )
-                logger.info(f"{self.org_name}/{team_name} created")
+                logger.info(f"Team {team_name} created")
             if first(repos, lambda repo: repo.name == repo_name) is None:
                 repo_names.append(repo_name)
-                self.organization_api.create_org_repo(
-                    self.org_name,
-                    body={
-                        "auto_init": False,
-                        "default_branch": settings.default_branch,
-                        "name": repo_name,
-                        "private": True,
-                        "template": False,
-                        "trust_model": "default",
-                    },
-                )
-                logger.info(f"Team {team_name} created")
+                if template == "":
+                    self.organization_api.create_org_repo(
+                        self.org_name,
+                        body={
+                            "auto_init": False,
+                            "default_branch": settings.default_branch,
+                            "name": repo_name,
+                            "private": True,
+                            "template": False,
+                            "trust_model": "default",
+                        },
+                    )
+                else:
+                    self.repository_api.generate_repo(
+                        self.org_name,
+                        template,
+                        body={
+                            "default_branch": settings.default_branch,
+                            "git_content": True,
+                            "git_hooks": True,
+                            "labels": True,
+                            "name": repo_name,
+                            "owner": self.org_name,
+                            "private": True,
+                            "protected_branch": True,
+                        },
+                    )
+                logger.info(f"{self.org_name}/{team_name} created")
             try:
                 self.organization_api.org_add_team_repository(
                     team.id, self.org_name, repo_name
