@@ -290,14 +290,14 @@ class Teapot:
         if (valid_after and now < valid_after) or (valid_before and now > valid_before):
             return (
                 "### Submission Time Check Failed:\n"
-                f"Current time {now} is not in the valid range.\n"
-                f"After: {valid_after}, Before: {valid_before}\n",
+                f"Current time {now} is not in the valid range "
+                f"[{valid_after}, {valid_before}].\n",
                 True,
             )
         return (
             "### Submission Time Check Passed:\n"
-            f"Current time {now} is in the valid range.\n"
-            f"After: {valid_after}, Before: {valid_before}\n",
+            f"Current time {now} is in the valid range "
+            f"[{valid_after}, {valid_before}].\n",
             False,
         )
 
@@ -383,13 +383,15 @@ class Teapot:
                 comment += f"keyword `{name}` "
                 use_group = name.lower() in env.joj3_groups.lower()
             comment += (
-                f"in last {time_period} hour(s): "
+                f"In last {time_period} hour(s): "
                 f"submit count {submit_count}, "
                 f"max count {max_count}"
             )
             if use_group and submit_count + 1 > max_count:
                 failed = True
-                comment += ", exceeded"
+                comment += ", exceeded."
+            else:
+                comment += "."
             comment += "\n"
         if failed:
             title = "### Submission Count Check Failed:"
