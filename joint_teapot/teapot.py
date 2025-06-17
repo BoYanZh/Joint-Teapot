@@ -281,6 +281,26 @@ class Teapot:
             )
         return joj3_issue.number
 
+    def joj3_check_submission_time(
+        self,
+        valid_after: Optional[datetime] = None,
+        valid_before: Optional[datetime] = None,
+    ) -> Tuple[str, bool]:
+        now = datetime.now()
+        if (valid_after and now < valid_after) or (valid_before and now > valid_before):
+            return (
+                "### Submission Time Check Failed:\n"
+                f"Current time {now} is not in the valid range.\n"
+                f"After: {valid_after}, Before: {valid_before}\n",
+                True,
+            )
+        return (
+            "### Submission Time Check Passed:\n"
+            f"Current time {now} is in the valid range.\n"
+            f"After: {valid_after}, Before: {valid_before}\n",
+            False,
+        )
+
     def joj3_check_submission_count(
         self,
         env: joj3.Env,

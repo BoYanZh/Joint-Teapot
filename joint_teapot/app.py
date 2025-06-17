@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from time import sleep
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 # from filelock import FileLock
 from git import Repo
@@ -446,6 +446,8 @@ def joj3_check_env(
             "Example: --group-config joj=10:24,run=20:48"
         ),
     ),
+    valid_after: Optional[datetime] = Option(None),
+    valid_before: Optional[datetime] = Option(None),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -458,10 +460,21 @@ def joj3_check_env(
     ):
         logger.error("missing required env var")
         raise Exit(code=1)
-    msg, failed = tea.pot.joj3_check_submission_count(
+    time_msg, time_failed = tea.pot.joj3_check_submission_time(
+        valid_after,
+        valid_before,
+    )
+    count_msg, count_failed = tea.pot.joj3_check_submission_count(
         env, grading_repo_name, group_config, scoreboard_filename
     )
-    echo(json.dumps({"msg": msg, "failed": failed}))  # print result to stdout for joj3
+    echo(
+        json.dumps(
+            {
+                "msg": time_msg + count_msg,
+                "failed": time_failed or count_failed,
+            }
+        )
+    )  # print result to stdout for joj3
     logger.info("joj3-check-env done")
 
 
