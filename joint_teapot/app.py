@@ -450,8 +450,8 @@ def joj3_check_env(
             "Example: --group-config joj=10:24,run=20:48"
         ),
     ),
-    valid_after: Optional[datetime] = Option(None),
-    valid_before: Optional[datetime] = Option(None),
+    begin_time: Optional[datetime] = Option(None),
+    end_time: Optional[datetime] = Option(None),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -465,8 +465,8 @@ def joj3_check_env(
         logger.error("missing required env var")
         raise Exit(code=1)
     time_msg, time_failed = tea.pot.joj3_check_submission_time(
-        valid_after,
-        valid_before,
+        begin_time,
+        end_time,
     )
     count_msg, count_failed = tea.pot.joj3_check_submission_count(
         env, grading_repo_name, group_config, scoreboard_filename

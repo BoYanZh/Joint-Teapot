@@ -284,21 +284,21 @@ class Teapot:
 
     def joj3_check_submission_time(
         self,
-        valid_after: Optional[datetime] = None,
-        valid_before: Optional[datetime] = None,
+        begin_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
     ) -> Tuple[str, bool]:
         now = datetime.now()
-        if (valid_after and now < valid_after) or (valid_before and now > valid_before):
+        if (begin_time and now < begin_time) or (end_time and now > end_time):
             return (
                 "### Submission Time Check Failed:\n"
                 f"Current time {now} is not in the valid range "
-                f"[{valid_after}, {valid_before}].\n",
+                f"[{begin_time}, {end_time}].\n",
                 True,
             )
         return (
             "### Submission Time Check Passed:\n"
             f"Current time {now} is in the valid range "
-            f"[{valid_after}, {valid_before}].\n",
+            f"[{begin_time}, {end_time}].\n",
             False,
         )
 
