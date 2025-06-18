@@ -96,15 +96,16 @@ class Teapot:
         return self.gitea.add_canvas_students_to_teams(self.canvas.students, team_names)
 
     def create_personal_repos_for_all_canvas_students(
-        self, suffix: str = ""
+        self, suffix: str = "", template: str = ""
     ) -> List[str]:
         return self.gitea.create_personal_repos_for_canvas_students(
             self.canvas.students,
             lambda user: default_repo_name_convertor(user) + suffix,
+            template,
         )
 
     def create_teams_and_repos_by_canvas_groups(
-        self, group_prefix: str = ""
+        self, group_prefix: str = "", template: str = ""
     ) -> List[str]:
         def convertor(name: str) -> Optional[str]:
             if group_prefix and not name.startswith(group_prefix):
@@ -114,7 +115,7 @@ class Teapot:
             return f"{team_name}{number:02}"
 
         return self.gitea.create_teams_and_repos_by_canvas_groups(
-            self.canvas.students, self.canvas.groups, convertor, convertor
+            self.canvas.students, self.canvas.groups, convertor, convertor, template
         )
 
     def get_public_key_of_all_canvas_students(self) -> Dict[str, List[str]]:
