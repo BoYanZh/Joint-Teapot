@@ -290,13 +290,13 @@ class Teapot:
         now = datetime.now()
         if (begin_time and now < begin_time) or (end_time and now > end_time):
             return (
-                "### Submission Time Check Failed:\n"
+                "### Submission Time Check Failed\n"
                 f"Current time {now} is not in the valid range "
                 f"[{begin_time}, {end_time}].\n",
                 True,
             )
         return (
-            "### Submission Time Check Passed:\n"
+            "### Submission Time Check Passed\n"
             f"Current time {now} is in the valid range "
             f"[{begin_time}, {end_time}].\n",
             False,
@@ -395,9 +395,9 @@ class Teapot:
                 comment += "."
             comment += "\n"
         if failed:
-            title = "### Submission Count Check Failed:"
+            title = "### Submission Count Check Failed"
         else:
-            title = "### Submission Count Check Passed:"
+            title = "### Submission Count Check Passed"
         msg = f"{title}\n{comment}\n"
         return msg, failed
 
