@@ -240,6 +240,7 @@ class Teapot:
         submitter_repo_name: str,
         issue_label_name: str,
         issue_label_color: str,
+        penalty_factor: float,
     ) -> int:
         title, comment = joj3.generate_title_and_comment(
             env.joj3_output_path,
@@ -251,6 +252,7 @@ class Teapot:
             submitter_in_issue_title,
             env.joj3_run_id,
             max_total_score,
+            penalty_factor,
         )
         title_prefix = joj3.get_title_prefix(
             env.joj3_conf_name, env.github_actor, submitter_in_issue_title
@@ -299,15 +301,43 @@ class Teapot:
         self,
         begin_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
+        penalty_config: str = "",
     ) -> Tuple[str, bool]:
         now = datetime.now()
-        if (begin_time and now < begin_time) or (end_time and now > end_time):
-            return (
-                "### Submission Time Check Failed\n"
-                f"Current time {now} is not in the valid range "
-                f"[{begin_time}, {end_time}].\n",
-                True,
-            )
+        penalties = joj3.parse_penalty_config(penalty_config)
+        if penalties and end_time:
+            penalty_end_time = end_time + timedelta(hours=penalties[-1][0])
+            if begin_time and now < begin_time:
+                return (
+                    "### Submission Time Check Failed\n"
+                    f"Current time {now} is not in the valid range "
+                    f"[{begin_time}, {end_time}].\n",
+                    True,
+                )
+            elif now > penalty_end_time:
+                return (
+                    "### Submission Time Check Failed\n"
+                    f"Current time {now} is not in the valid range "
+                    f"[{begin_time}, {end_time}], and the penalty range "
+                    f"[{end_time}, {penalty_end_time}].\n",
+                    True,
+                )
+            else:
+                return (
+                    "### Submission Time Check Passed\n"
+                    f"Current time {now} is not in the valid range "
+                    f"[{begin_time}, {end_time}], but in the penalty range "
+                    f"[{end_time}, {penalty_end_time}].\n",
+                    False,
+                )
+        else:
+            if (begin_time and now < begin_time) or (end_time and now > end_time):
+                return (
+                    "### Submission Time Check Failed\n"
+                    f"Current time {now} is not in the valid range "
+                    f"[{begin_time}, {end_time}].\n",
+                    True,
+                )
         return (
             "### Submission Time Check Passed\n"
             f"Current time {now} is in the valid range "

@@ -307,6 +307,15 @@ def joj3_all_env(
         "#795548",
         help="label color for the issue created by this command",
     ),
+    end_time: Optional[datetime] = Option(None),
+    penalty_config: str = Option(
+        "",
+        help=(
+            "Configuration for penalties in the format "
+            "'hours=factor'. "
+            "Example: --penalty-config 24=0.75,48=0.5"
+        ),
+    ),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -322,6 +331,7 @@ def joj3_all_env(
         logger.error("missing required env var")
         raise Exit(code=1)
     submitter_repo_name = env.github_repository.split("/")[-1]
+    penalty_factor = joj3.get_penalty_factor(end_time, penalty_config)
     total_score = joj3.get_total_score(env.joj3_output_path)
     res = {
         "totalScore": total_score,
@@ -350,6 +360,7 @@ def joj3_all_env(
             submitter_repo_name,
             issue_label_name,
             issue_label_color,
+            penalty_factor,
         )
         res["issue"] = issue_number
         gitea_issue_url = f"{submitter_repo_url}/issues/{issue_number}"
@@ -462,6 +473,14 @@ def joj3_check_env(
     ),
     begin_time: Optional[datetime] = Option(None),
     end_time: Optional[datetime] = Option(None),
+    penalty_config: str = Option(
+        "",
+        help=(
+            "Configuration for penalties in the format "
+            "'hours=factor'. "
+            "Example: --penalty-config 24=0.75,48=0.5"
+        ),
+    ),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -477,6 +496,7 @@ def joj3_check_env(
     time_msg, time_failed = tea.pot.joj3_check_submission_time(
         begin_time,
         end_time,
+        penalty_config,
     )
     count_msg, count_failed = tea.pot.joj3_check_submission_count(
         env, grading_repo_name, group_config, scoreboard_filename

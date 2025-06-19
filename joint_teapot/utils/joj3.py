@@ -2,8 +2,8 @@ import bisect
 import csv
 import json
 import os
-from datetime import datetime
-from typing import Any, Dict, List, Tuple
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic_settings import BaseSettings
 
@@ -215,6 +215,7 @@ def generate_title_and_comment(
     submitter_in_title: bool = True,
     run_id: str = "unknown",
     max_total_score: int = -1,
+    penalty_factor: float = 1.0,
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -234,6 +235,8 @@ def generate_title_and_comment(
         "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
+    if penalty_factor != 1.0:
+        comment += f"Note: The total score is multiplied by a penalty factor of {penalty_factor}.\n"
     for stage in stages:
         if all(
             result["score"] == 0 and result["comment"].strip() == ""
@@ -254,6 +257,8 @@ def generate_title_and_comment(
             comment += "</details>\n\n"
             total_score += result["score"]
         comment += "\n"
+    if penalty_factor != 1.0:
+        total_score = round(total_score * penalty_factor)
     title = get_title_prefix(exercise_name, submitter, submitter_in_title)
     if max_total_score >= 0:
         title += f"{total_score} / {max_total_score}"
@@ -281,3 +286,29 @@ def get_title_prefix(
     if not submitter_in_title:
         title = f"JOJ3 Result for {exercise_name} - Score: "
     return title
+
+
+def parse_penalty_config(penalty_config: str) -> List[Tuple[float, float]]:
+    res = []
+    for penalty in penalty_config.split(","):
+        hour, factor = map(float, penalty.split("="))
+        res.append((hour, factor))
+    res.sort(key=lambda x: x[0])
+    return res
+
+
+def get_penalty_factor(
+    end_time: Optional[datetime],
+    penalty_config: str,
+) -> float:
+    if not end_time or not penalty_config:
+        return 1.0
+    penalties = parse_penalty_config(penalty_config)
+    now = datetime.now()
+    res = 0.0
+    for hour, factor in penalties[::-1]:
+        if now < end_time + timedelta(hours=hour):
+            res = factor
+        else:
+            break
+    return res
