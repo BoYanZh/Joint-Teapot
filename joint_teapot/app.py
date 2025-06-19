@@ -299,6 +299,14 @@ def joj3_all_env(
         True,
         help="whether to include submitter in issue title",
     ),
+    issue_label_name: str = Option(
+        "Kind/Testing",
+        help="label name for the issue created by this command",
+    ),
+    issue_label_color: str = Option(
+        "#795548",
+        help="label color for the issue created by this command",
+    ),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -340,6 +348,8 @@ def joj3_all_env(
             gitea_actions_url,
             submitter_in_issue_title,
             submitter_repo_name,
+            issue_label_name,
+            issue_label_color,
         )
         res["issue"] = issue_number
         gitea_issue_url = f"{submitter_repo_url}/issues/{issue_number}"

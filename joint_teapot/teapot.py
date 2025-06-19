@@ -238,6 +238,8 @@ class Teapot:
         gitea_actions_url: str,
         submitter_in_issue_title: bool,
         submitter_repo_name: str,
+        issue_label_name: str,
+        issue_label_color: str,
     ) -> int:
         title, comment = joj3.generate_title_and_comment(
             env.joj3_output_path,
@@ -265,10 +267,25 @@ class Teapot:
                 break
         else:
             new_issue = True
+            labels = self.gitea.issue_api.issue_list_labels(
+                self.gitea.org_name, submitter_repo_name
+            )
+            label_id = 0
+            for label in labels:
+                if label.name == issue_label_name:
+                    label_id = label.id
+                    break
+            else:
+                label = self.gitea.issue_api.issue_create_label(
+                    self.gitea.org_name,
+                    submitter_repo_name,
+                    body={"name": issue_label_name, "color": issue_label_color},
+                )
+                label_id = label.id
             joj3_issue = self.gitea.issue_api.issue_create_issue(
                 self.gitea.org_name,
                 submitter_repo_name,
-                body={"title": title, "body": comment},
+                body={"title": title, "body": comment, "labels": [label_id]},
             )
             logger.info(f"created joj3 issue: #{joj3_issue.number}")
         gitea_issue_url = joj3_issue.html_url
