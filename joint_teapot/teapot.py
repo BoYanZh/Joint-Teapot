@@ -327,7 +327,7 @@ class Teapot:
                     "### Submission Time Check Passed\n"
                     f"Current time {now} is not in the valid range "
                     f"[{begin_time}, {end_time}], but in the penalty range "
-                    f"[{end_time}, {penalty_end_time}].\n",
+                    f"[{end_time + timedelta(seconds=1)}, {penalty_end_time}].\n",
                     False,
                 )
         else:
