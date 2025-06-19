@@ -291,6 +291,8 @@ def get_title_prefix(
 def parse_penalty_config(penalty_config: str) -> List[Tuple[float, float]]:
     res = []
     for penalty in penalty_config.split(","):
+        if not penalty.strip():
+            continue
         hour, factor = map(float, penalty.split("="))
         res.append((hour, factor))
     res.sort(key=lambda x: x[0])
