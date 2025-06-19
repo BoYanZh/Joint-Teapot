@@ -366,7 +366,11 @@ class Teapot:
         time_windows = []
         valid_items = []
         for item in items:
+            if "=" not in item:
+                continue
             name, values = item.split("=")
+            if ":" not in values:
+                continue
             max_count, time_period = map(int, values.split(":"))
             if max_count < 0 or time_period < 0:
                 continue
