@@ -272,8 +272,11 @@ class Teapot:
             labels = self.gitea.issue_api.issue_list_labels(
                 self.gitea.org_name, submitter_repo_name
             )
-            label_id = first(labels, lambda label: label.name == issue_label_name)
-            if not label_id:
+            label_id = 0
+            label = first(labels, lambda label: label.name == issue_label_name)
+            if label:
+                label_id = label.id
+            else:
                 label = self.gitea.issue_api.issue_create_label(
                     self.gitea.org_name,
                     submitter_repo_name,
