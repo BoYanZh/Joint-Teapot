@@ -482,7 +482,7 @@ class Gitea:
             logger.info("Dry run enabled. No changes will be made to the repositories.")
         logger.info(f"Archiving repos with name matching {regex}")
         for repo_name in self.get_all_repo_names():
-            if re.match(regex, repo_name):
+            if re.fullmatch(regex, repo_name):
                 logger.info(f"Archived {repo_name}")
                 if not dry_run:
                     self.repository_api.repo_edit(
@@ -537,7 +537,7 @@ class Gitea:
         self, milestone: str, regex: str, due_date: str, description: str
     ) -> None:
         for repo_name in self.get_all_repo_names():
-            if not re.match(regex, repo_name):
+            if not re.fullmatch(regex, repo_name):
                 continue
             milestone_list = self.issue_api.issue_get_milestones_list(
                 self.org_name, repo_name
