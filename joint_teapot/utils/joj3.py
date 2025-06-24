@@ -236,9 +236,7 @@ def generate_title_and_comment(
         "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
     if penalty_factor != 1.0:
-        comment += (
-            f"## Total Score Penalty Warning\nThe total score is multiplied by 0.75.\n"
-        )
+        comment += f"## ⚠️Total Score Penalty Warning⚠️\n**The total score is multiplied by {penalty_factor}.**\n"
     for stage in stages:
         if all(
             result["score"] == 0 and result["comment"].strip() == ""
