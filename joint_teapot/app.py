@@ -307,6 +307,10 @@ def joj3_all_env(
         "#795548",
         help="label color for the issue created by this command",
     ),
+    issue_label_exclusive: bool = Option(
+        False,
+        help="label set as exclusive for the issue created by this command",
+    ),
     end_time: Optional[datetime] = Option(None),
     penalty_config: str = Option(
         "",
@@ -360,6 +364,7 @@ def joj3_all_env(
             submitter_repo_name,
             issue_label_name,
             issue_label_color,
+            issue_label_exclusive,
             penalty_factor,
         )
         res["issue"] = issue_number

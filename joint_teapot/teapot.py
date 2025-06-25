@@ -240,6 +240,7 @@ class Teapot:
         submitter_repo_name: str,
         issue_label_name: str,
         issue_label_color: str,
+        issue_label_exclusive: bool,
         penalty_factor: float,
     ) -> int:
         title, comment = joj3.generate_title_and_comment(
@@ -280,7 +281,11 @@ class Teapot:
                 label = self.gitea.issue_api.issue_create_label(
                     self.gitea.org_name,
                     submitter_repo_name,
-                    body={"name": issue_label_name, "color": issue_label_color},
+                    body={
+                        "name": issue_label_name,
+                        "color": issue_label_color,
+                        "exclusive": issue_label_exclusive,
+                    },
                 )
                 label_id = label.id
             joj3_issue = self.gitea.issue_api.issue_create_issue(
