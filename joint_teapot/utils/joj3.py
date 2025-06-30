@@ -258,7 +258,7 @@ def generate_title_and_comment(
             total_score += result["score"]
         comment += "\n"
     if penalty_factor != 1.0:
-        total_score = round(total_score * penalty_factor)
+        total_score = round(total_score - abs(total_score) * (1 - penalty_factor))
     title = get_title_prefix(exercise_name, submitter, submitter_in_title)
     if max_total_score >= 0:
         title += f"{total_score} / {max_total_score}"
