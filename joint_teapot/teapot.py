@@ -330,7 +330,7 @@ class Teapot:
                     f"[{end_time + timedelta(seconds=1)}, {penalty_end_time}].\n",
                     True,
                 )
-            else:
+            elif now > end_time:
                 return (
                     "### Submission Time Check Passed\n"
                     f"Current time {now} is not in the valid range "

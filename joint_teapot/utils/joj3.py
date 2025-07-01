@@ -305,8 +305,10 @@ def get_penalty_factor(
 ) -> float:
     if not end_time or not penalty_config:
         return 1.0
-    penalties = parse_penalty_config(penalty_config)
     now = datetime.now()
+    if now < end_time:
+        return 1.0
+    penalties = parse_penalty_config(penalty_config)
     res = 0.0
     for hour, factor in penalties[::-1]:
         if now < end_time + timedelta(hours=hour):
