@@ -35,7 +35,7 @@ class Canvas:
         # types = ["student", "observer"]
         types = ["student"]
 
-        def patch_student(student: User) -> User:
+        def patch_user(student: User) -> User:
             student.name = (
                 re.sub(r"[^\x00-\x7F]+", "", student.name).strip().title()
             )  # We only care english name
@@ -44,7 +44,7 @@ class Canvas:
             return student
 
         self.students = [
-            patch_student(student)
+            patch_user(student)
             for student in self.course.get_users(enrollment_type=types)
         ]
         for attr in ["login_id", "name"]:
@@ -52,6 +52,7 @@ class Canvas:
                 raise Exception(
                     f"Unable to gather students' {attr}, please contact the Canvas site admin"
                 )
+        self.users = [patch_user(student) for student in self.course.get_users()]
         logger.debug("Canvas students loaded")
         self.assignments = self.course.get_assignments()
         logger.debug("Canvas assignments loaded")
@@ -60,12 +61,12 @@ class Canvas:
         self.grade_filename = grade_filename
         logger.debug("Canvas initialized")
 
-    def export_students_to_csv(self, filename: Path) -> None:
+    def export_users_to_csv(self, filename: Path) -> None:
         with open(filename, mode="w", newline="") as file:
             writer = csv.writer(file)
-            for student in self.students:
-                writer.writerow([student.name, student.sis_id, student.login_id])
-        logger.info(f"Students exported to {filename}")
+            for user in self.users:
+                writer.writerow([user.name, user.sis_id, user.login_id])
+        logger.info(f"Users exported to {filename}")
 
     def prepare_assignment_dir(
         self, dir_or_zip_file: str, create_grade_file: bool = True

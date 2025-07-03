@@ -34,9 +34,9 @@ class Tea:
 tea = Tea()  # lazy loader
 
 
-@app.command("export-students", help="export students from canvas to csv file")
-def export_students_to_csv(output_file: Path) -> None:
-    tea.pot.canvas.export_students_to_csv(output_file)
+@app.command("export-users", help="export users from canvas to csv file")
+def export_users_to_csv(output_file: Path = Argument("students.csv")) -> None:
+    tea.pot.canvas.export_users_to_csv(output_file)
 
 
 @app.command(
