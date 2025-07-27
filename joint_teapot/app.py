@@ -408,6 +408,7 @@ def joj3_all_env(
                     env.github_actor,
                     os.path.join(repo_path, scoreboard_filename),
                     env.joj3_conf_name,
+                    submitter_repo_name,
                 )
                 tea.pot.git.add_commit(
                     grading_repo_name,

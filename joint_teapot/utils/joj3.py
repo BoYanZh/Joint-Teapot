@@ -40,6 +40,7 @@ def generate_scoreboard(
     submitter: str,
     scoreboard_file_path: str,
     exercise_name: str,
+    submitter_repo_name: str,
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -48,18 +49,25 @@ def generate_scoreboard(
         return
     os.makedirs(os.path.dirname(scoreboard_file_path), exist_ok=True)
     # Load the csv file if it already exists
+    fixed_headers = ["", "repo_name", "last_edit", "total"]
+    fixed_defaults = [submitter, submitter_repo_name, "", "0"]
     if os.path.exists(scoreboard_file_path):
         with open(scoreboard_file_path, newline="") as file:
             reader = csv.reader(file)
             rows = list(reader)
         columns = rows[0]
         data = rows[1:]
+
+        def migrate_scoreboard() -> None:
+            if "repo_name" in columns:
+                return
+            columns.insert(1, "repo_name")
+            for row in data:
+                row.insert(1, "")
+
+        migrate_scoreboard()
     else:
-        columns = [
-            "",
-            "last_edit",
-            "total",
-        ]
+        columns = fixed_headers
         data = []
 
     submitter_found = False
@@ -69,8 +77,7 @@ def generate_scoreboard(
             submitter_found = True
             break
     if not submitter_found:
-        fixed_columns = [submitter, "", "0"]
-        submitter_row = fixed_columns + [""] * (len(columns) - len(fixed_columns))
+        submitter_row = fixed_defaults + [""] * (len(columns) - len(fixed_headers))
         data.append(submitter_row)
 
     # Update data
@@ -85,9 +92,9 @@ def generate_scoreboard(
             exercise_name = comment.split("-")[0]
     # Find if exercise in table:
     if exercise_name not in columns:
-        column_tail = columns[3:]
+        column_tail = columns[len(fixed_headers) :]
         bisect.insort(column_tail, exercise_name)
-        columns[3:] = column_tail
+        columns[len(fixed_headers) :] = column_tail
         index = columns.index(exercise_name)
         for row in data:
             row.insert(index, "")
@@ -101,16 +108,21 @@ def generate_scoreboard(
 
     total = 0
     for col in columns:
-        if col in ["", "total", "last_edit"]:
+        if col in fixed_headers:
             continue
         idx = columns.index(col)
         if (submitter_row[idx] is not None) and (submitter_row[idx] != ""):
-            total += int(submitter_row[idx])
+            try:
+                total += int(submitter_row[idx])
+            except ValueError:
+                pass
 
     submitter_row[columns.index("total")] = str(total)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     submitter_row[columns.index("last_edit")] = now
+
+    submitter_row[columns.index("repo")] = submitter_repo_name
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))
