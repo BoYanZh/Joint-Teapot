@@ -122,7 +122,7 @@ def generate_scoreboard(
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     submitter_row[columns.index("last_edit")] = now
 
-    submitter_row[columns.index("repo")] = submitter_repo_name
+    submitter_row[columns.index("repo_name")] = submitter_repo_name
 
     # Sort data by total, from low to high
     data.sort(key=lambda x: int(x[columns.index("total")]))
