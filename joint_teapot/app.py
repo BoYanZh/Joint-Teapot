@@ -295,6 +295,10 @@ def joj3_all_env(
         False,
         help="skip creating failed table on gitea",
     ),
+    scoreboard_column_by_ref: bool = Option(
+        False,
+        help="use git ref as scoreboard column name",
+    ),
     submitter_in_issue_title: bool = Option(
         True,
         help="whether to include submitter in issue title",
@@ -403,11 +407,14 @@ def joj3_all_env(
                 raise Exit(code=1)
             repo.git.reset("--hard", "origin/grading")
             if not skip_scoreboard:
+                exercise_name = env.joj3_conf_name
+                if scoreboard_column_by_ref:
+                    exercise_name = env.github_ref
                 joj3.generate_scoreboard(
                     env.joj3_output_path,
                     env.github_actor,
                     os.path.join(repo_path, scoreboard_filename),
-                    env.joj3_conf_name,
+                    exercise_name,
                     submitter_repo_name,
                 )
                 tea.pot.git.add_commit(
