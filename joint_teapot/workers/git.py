@@ -103,6 +103,7 @@ class Git:
                         "logs/HEAD.lock",
                         "packed-refs.lock",
                         "config.lock",
+                        f"refs/heads/{current_branch}.lock",
                         f"refs/remotes/origin/{current_branch}.lock",
                     ]
                     for lock_file in lock_files:
