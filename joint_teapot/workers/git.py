@@ -105,6 +105,8 @@ class Git:
                         "config.lock",
                         f"refs/heads/{current_branch}.lock",
                         f"refs/remotes/origin/{current_branch}.lock",
+                        f"refs/remotes/origin/{checkout_dest}.lock",
+                        f"refs/remotes/origin/{checkout_dest}.lock",
                     ]
                     for lock_file in lock_files:
                         lock_path = os.path.join(repo_dir, ".git", lock_file)
