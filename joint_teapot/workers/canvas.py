@@ -61,6 +61,11 @@ class Canvas:
         self.grade_filename = grade_filename
         logger.debug("Canvas initialized")
 
+    def export_wrong_email_users(self) -> None:
+        for user in self.users:
+            if not user.email.endswith("@sjtu.edu.cn"):
+                print(user.email)
+
     def export_users_to_csv(self, filename: Path) -> None:
         with open(filename, mode="w", newline="") as file:
             writer = csv.writer(file)

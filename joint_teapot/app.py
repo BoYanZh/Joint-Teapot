@@ -40,6 +40,14 @@ def export_users_to_csv(output_file: Path = Argument("students.csv")) -> None:
 
 
 @app.command(
+    "export-wrong-email-users",
+    help="export users with wrong email from canvas in stdout",
+)
+def export_wrong_email_users() -> None:
+    tea.pot.canvas.export_wrong_email_users()
+
+
+@app.command(
     "invite-to-teams", help="invite all canvas students to gitea teams by team name"
 )
 def add_all_canvas_students_to_teams(team_names: List[str]) -> None:
