@@ -72,9 +72,7 @@ Teaching Team"""
             user.email for user in self.users if not user.email.endswith("@sjtu.edu.cn")
         ]
         print(f"To: {','.join(emails)}")
-        print(
-            f"Subject: [{settings.gitea_org_name}] Important: wrong course configuration"
-        )
+        print(f"Subject: [{settings.gitea_org_name}] Important: wrong Canvas email")
         print(f"Body:\n{SAMPLE_EMAIL_BODY}")
 
     def export_users_to_csv(self, filename: Path) -> None:
