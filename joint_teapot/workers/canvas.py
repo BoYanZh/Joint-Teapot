@@ -62,9 +62,20 @@ class Canvas:
         logger.debug("Canvas initialized")
 
     def export_wrong_email_users(self) -> None:
-        for user in self.users:
-            if not user.email.endswith("@sjtu.edu.cn"):
-                print(user.email)
+        SAMPLE_EMAIL_BODY = """Dear Student,
+
+We have noticed that you have changed your email address on Canvas. While this can clearly cause privacy issues, this also prevents you from joining Gitea which will be intensively used in this course. Please revert back to your SJTU email address (`jaccount@sjtu.edu.cn`) as soon as possible. Note that if your email address is still incorrect in 24 hours, we will have to apply penalties as this is slowing down the whole course progress.
+
+Best regards,
+Teaching Team"""
+        emails = [
+            user.email for user in self.users if not user.email.endswith("@sjtu.edu.cn")
+        ]
+        print(f"To: {','.join(emails)}")
+        print(
+            f"Subject: [{settings.gitea_org_name}] Important: wrong course configuration"
+        )
+        print(f"Body:\n{SAMPLE_EMAIL_BODY}")
 
     def export_users_to_csv(self, filename: Path) -> None:
         with open(filename, mode="w", newline="") as file:
