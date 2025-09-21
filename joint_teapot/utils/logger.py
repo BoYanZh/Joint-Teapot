@@ -35,7 +35,6 @@ class InterceptHandler(logging.Handler):
 
 def set_logger(
     stderr_log_level: str = settings.stderr_log_level,
-    enable_file_log: bool = True,
 ) -> None:
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     logger.remove()
@@ -43,8 +42,7 @@ def set_logger(
         stderr,
         level=stderr_log_level,
     )
-    if enable_file_log:
-        logger.add(settings.log_file_path, level="DEBUG")
+    logger.add(settings.log_file_path, level="DEBUG")
 
 
 set_logger()
