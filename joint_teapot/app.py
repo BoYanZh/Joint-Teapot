@@ -541,7 +541,7 @@ def joj3_check_gitea_token(
     set_settings(Settings(_env_file=env_path))
     set_logger(settings.stderr_log_level)
     user = tea.pot.gitea.get_user()
-    echo(json.dumps(user))
+    echo(user)
 
 
 if __name__ == "__main__":
