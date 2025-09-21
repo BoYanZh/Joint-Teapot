@@ -34,11 +34,6 @@ class Tea:
 tea = Tea()  # lazy loader
 
 
-@app.command("get-gitea-user")
-def get_gitea_user() -> None:
-    tea.pot.gitea.get_user()
-
-
 @app.command("export-users", help="export users from canvas to csv file")
 def export_users_to_csv(output_file: Path = Argument("students.csv")) -> None:
     tea.pot.canvas.export_users_to_csv(output_file)
@@ -536,6 +531,17 @@ def joj3_check_env(
         )
     )  # print result to stdout for joj3
     logger.info("joj3-check-env done")
+
+
+@app.command("joj3-check-gitea-token")
+def joj3_check_gitea_token(
+    env_path: str = Argument("", help="path to .env file")
+) -> None:
+    app.pretty_exceptions_enable = False
+    set_settings(Settings(_env_file=env_path))
+    set_logger(settings.stderr_log_level)
+    user = tea.pot.gitea.get_user()
+    echo(json.dumps(user))
 
 
 if __name__ == "__main__":
