@@ -34,6 +34,11 @@ class Tea:
 tea = Tea()  # lazy loader
 
 
+@app.command("get-gitea-user")
+def get_gitea_user() -> None:
+    tea.pot.gitea.get_user()
+
+
 @app.command("export-users", help="export users from canvas to csv file")
 def export_users_to_csv(output_file: Path = Argument("students.csv")) -> None:
     tea.pot.canvas.export_users_to_csv(output_file)

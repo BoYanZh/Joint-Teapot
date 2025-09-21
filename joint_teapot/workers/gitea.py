@@ -110,6 +110,10 @@ class Gitea:
                     + "but not found in Canvas students"
                 )
 
+    def get_user(self) -> None:
+        user = self.user_api.user_get_current()
+        logger.info(f"Current user: {user}")
+
     def create_personal_repos_for_canvas_students(
         self,
         students: PaginatedList,
