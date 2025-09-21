@@ -539,7 +539,7 @@ def joj3_check_gitea_token(
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
-    set_logger(settings.stderr_log_level)
+    set_logger(settings.stderr_log_level, enable_file_log=False)
     user = tea.pot.gitea.get_user()
     echo(user)
 
