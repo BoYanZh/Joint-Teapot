@@ -494,6 +494,7 @@ class Gitea:
             self.repository_api.user_current_delete_subscription(
                 self.org_name, repo.name
             )
+            logger.info(f"Unwatched {repo.name}")
 
     def get_all_teams(self) -> Dict[str, List[str]]:
         res: Dict[str, List[str]] = {}
