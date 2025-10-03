@@ -38,10 +38,7 @@ def set_logger(
 ) -> None:
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     logger.remove()
-    logger.add(
-        stderr,
-        level=stderr_log_level,
-    )
+    logger.add(stderr, level=stderr_log_level, colorize=stderr.isatty())
     logger.add(settings.log_file_path, level="DEBUG")
 
 
