@@ -90,32 +90,23 @@ class Git:
         retry_interval = 2
         while retry_interval and auto_retry:
             try:
-                current_branch = ""
-                if repo.head.is_detached:
-                    current_branch = repo.head.commit.hexsha
-                else:
-                    current_branch = repo.active_branch.name
                 if clean_git_lock:
-                    lock_files = [
-                        "index.lock",
-                        "HEAD.lock",
-                        "fetch-pack.lock",
-                        "packed-refs.lock",
-                        "config.lock",
-                        f"refs/heads/{current_branch}.lock",
-                        f"refs/remotes/origin/{current_branch}.lock",
-                        f"refs/heads/{checkout_dest}.lock",
-                        f"refs/remotes/origin/{checkout_dest}.lock",
-                        "logs/HEAD.lock",
-                        f"logs/refs/heads/{current_branch}.lock",
-                        f"logs/refs/remotes/origin/{current_branch}.lock",
-                        f"logs/refs/heads/{checkout_dest}.lock",
-                        f"logs/refs/remotes/origin/{checkout_dest}.lock",
-                    ]
-                    for lock_file in lock_files:
-                        lock_path = os.path.join(repo_dir, ".git", lock_file)
-                        if os.path.exists(lock_path):
-                            os.remove(lock_path)
+                    locks_removed_count = 0
+                    for root, _, files in os.walk(os.path.join(repo_dir, ".git")):
+                        for filename in files:
+                            if filename.endswith(".lock"):
+                                lock_file_path = os.path.join(root, filename)
+                                if (
+                                    os.path.join(".git", filename)
+                                    == settings.joj3_lock_file_path
+                                ):
+                                    continue
+                                try:
+                                    os.remove(lock_file_path)
+                                    locks_removed_count += 1
+                                except OSError as e:
+                                    logger.warning(f"Error removing lock file: {e}")
+                    logger.info(f"Removed {locks_removed_count} lock files")
                 repo.git.fetch("--tags", "--all", "-f")
                 repo.git.reset("--hard", reset_target)
                 repo.git.clean("-d", "-f", "-x")
