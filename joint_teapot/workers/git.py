@@ -100,13 +100,17 @@ class Git:
                         "index.lock",
                         "HEAD.lock",
                         "fetch-pack.lock",
-                        "logs/HEAD.lock",
                         "packed-refs.lock",
                         "config.lock",
                         f"refs/heads/{current_branch}.lock",
                         f"refs/remotes/origin/{current_branch}.lock",
                         f"refs/heads/{checkout_dest}.lock",
                         f"refs/remotes/origin/{checkout_dest}.lock",
+                        "logs/HEAD.lock",
+                        f"logs/refs/heads/{current_branch}.lock",
+                        f"logs/refs/remotes/origin/{current_branch}.lock",
+                        f"logs/refs/heads/{checkout_dest}.lock",
+                        f"logs/refs/remotes/origin/{checkout_dest}.lock",
                     ]
                     for lock_file in lock_files:
                         lock_path = os.path.join(repo_dir, ".git", lock_file)
