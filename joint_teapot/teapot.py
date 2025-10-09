@@ -386,11 +386,13 @@ class Teapot:
             time_windows.append(since)
             valid_items.append((name, max_count, time_period, since))
         logger.info(f"valid items: {valid_items}, time windows: {time_windows}")
-        all_commits = []
+        matched_commits = []
+        all_commits_length = 0
         if time_windows:
             earliest_since = min(time_windows).strftime("%Y-%m-%dT%H:%M:%S")
             commits = repo.iter_commits(paths=scoreboard_filename, since=earliest_since)
             for commit in commits:
+                all_commits_length += 1
                 lines = commit.message.strip().splitlines()
                 if not lines:
                     continue
@@ -408,17 +410,19 @@ class Teapot:
                 commit_groups = (
                     groups_line[len("groups: ") :].split(",") if groups_line else []
                 )
-                all_commits.append(
+                matched_commits.append(
                     {
                         "time": commit.committed_datetime,
                         "groups": [g.strip() for g in commit_groups],
                     }
                 )
-        logger.info(f"all commits length: {len(all_commits)}")
+        logger.info(
+            f"matched commits length: {len(matched_commits)}, all commits length: {all_commits_length}"
+        )
         for name, max_count, time_period, since in valid_items:
             submit_count = 0
             time_limit = now - timedelta(hours=time_period)
-            for commit in all_commits:
+            for commit in matched_commits:
                 if commit["time"] < time_limit:
                     continue
                 if name:
