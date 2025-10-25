@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     joj_sid: str = ""
 
     # joj3
-    joj3_lock_file_path: str = ".git/teapot.lock"
+    joj3_lock_file_path: str = ".git/teapot-joj3-all-env.lock"
     joj3_lock_file_timeout: int = 30
 
     # moss
