@@ -97,7 +97,7 @@ class Git:
                             if filename.endswith(".lock"):
                                 lock_file_path = os.path.join(root, filename)
                                 if (
-                                    os.path.join(".git", filename)
+                                    os.path.relpath(lock_file_path, repo_dir)
                                     == settings.joj3_lock_file_path
                                 ):
                                     continue
