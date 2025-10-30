@@ -359,7 +359,9 @@ class Teapot:
         grading_repo_name: str,
         group_config: str,
         scoreboard_filename: str,
+        ignore_submitter: bool,
     ) -> Tuple[str, bool]:
+        submitter = env.github_actor
         submitter_repo_name = env.github_repository.split("/")[-1]
         repo: Repo = self.git.get_repo(grading_repo_name)
         now = datetime.now(timezone.utc)
@@ -402,9 +404,10 @@ class Teapot:
                 d = match.groupdict()
                 if (
                     env.joj3_conf_name != d["exercise_name"]
-                    or env.github_actor != d["submitter"]
                     or submitter_repo_name != d["submitter_repo_name"]
                 ):
+                    continue
+                if not ignore_submitter and submitter != d["submitter"]:
                     continue
                 groups_line = next((l for l in lines if l.startswith("groups: ")), None)
                 commit_groups = (
@@ -432,7 +435,7 @@ class Teapot:
                         continue
                 submit_count += 1
             logger.info(
-                f"submitter {env.github_actor} is submitting for the {submit_count + 1} time, "
+                f"submitter {submitter} is submitting for the {submit_count + 1} time, "
                 f"{min(0, max_count - submit_count - 1)} time(s) remaining, "
                 f"group={name}, "
                 f"time period={time_period} hour(s), "

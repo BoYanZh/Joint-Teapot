@@ -501,6 +501,7 @@ def joj3_check_env(
             "Example: --penalty-config 24=0.75,48=0.5"
         ),
     ),
+    ignore_submitter: bool = Option(False, help="ignore submitter when checking"),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
@@ -519,7 +520,7 @@ def joj3_check_env(
         penalty_config,
     )
     count_msg, count_failed = tea.pot.joj3_check_submission_count(
-        env, grading_repo_name, group_config, scoreboard_filename
+        env, grading_repo_name, group_config, scoreboard_filename, ignore_submitter
     )
     echo(
         json.dumps(
