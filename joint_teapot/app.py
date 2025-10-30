@@ -501,7 +501,9 @@ def joj3_check_env(
             "Example: --penalty-config 24=0.75,48=0.5"
         ),
     ),
-    ignore_submitter: bool = Option(False, help="ignore submitter when checking"),
+    ignore_submitter: bool = Option(
+        False, help="ignore submitter when checking submission count"
+    ),
 ) -> None:
     app.pretty_exceptions_enable = False
     set_settings(Settings(_env_file=env_path))
