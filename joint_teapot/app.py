@@ -349,6 +349,7 @@ def joj3_all_env(
     submitter_repo_name = env.github_repository.split("/")[-1]
     penalty_factor = joj3.get_penalty_factor(end_time, penalty_config)
     total_score = joj3.get_total_score(env.joj3_output_path)
+    total_score = round(total_score - abs(total_score) * (1 - penalty_factor))
     res = {
         "totalScore": total_score,
         "cappedTotalScore": (
@@ -423,6 +424,7 @@ def joj3_all_env(
                     os.path.join(repo_path, scoreboard_filename),
                     exercise_name,
                     submitter_repo_name,
+                    total_score,
                 )
                 tea.pot.git.add_commit(
                     grading_repo_name,

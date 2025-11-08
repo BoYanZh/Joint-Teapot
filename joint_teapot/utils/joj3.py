@@ -41,6 +41,7 @@ def generate_scoreboard(
     scoreboard_file_path: str,
     exercise_name: str,
     submitter_repo_name: str,
+    exercise_total_score: int,
 ) -> None:
     if not scoreboard_file_path.endswith(".csv"):
         logger.error(
@@ -99,11 +100,6 @@ def generate_scoreboard(
         for row in data:
             row.insert(index, "")
 
-    exercise_total_score = 0
-    for stage in stages:
-        for result in stage["results"]:
-            exercise_total_score += result["score"]
-    exercise_total_score = exercise_total_score
     submitter_row[columns.index(exercise_name)] = str(exercise_total_score)
 
     total = 0
