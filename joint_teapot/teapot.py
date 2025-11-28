@@ -266,7 +266,6 @@ class Teapot:
         ):
             if issue.title.startswith(title_prefix):
                 joj3_issue = issue
-                logger.info(f"found joj3 issue: #{joj3_issue.number}")
                 break
         else:
             new_issue = True
@@ -293,9 +292,7 @@ class Teapot:
                 submitter_repo_name,
                 body={"title": title, "body": comment, "labels": [label_id]},
             )
-            logger.info(f"created joj3 issue: #{joj3_issue.number}")
         gitea_issue_url = joj3_issue.html_url
-        logger.info(f"gitea issue url: {gitea_issue_url}")
         if not new_issue:
             self.gitea.issue_api.issue_edit_issue(
                 self.gitea.org_name,
