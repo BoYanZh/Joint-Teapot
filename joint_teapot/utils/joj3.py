@@ -142,6 +142,18 @@ def get_failed_table_from_file(table_file_path: str) -> List[List[str]]:
     return data
 
 
+def get_failed_stage_from_file(score_file_path: str) -> str:
+    with open(score_file_path) as json_file:
+        stages: List[Dict[str, Any]] = json.load(json_file)
+
+    failed_stage = ""
+    for stage in stages:
+        if stage["force_quit"] == True:
+            failed_stage = stage["name"]
+            break
+    return failed_stage
+
+
 def update_failed_table_from_score_file(
     data: List[List[str]],
     score_file_path: str,
@@ -149,31 +161,23 @@ def update_failed_table_from_score_file(
     repo_link: str,
     action_link: str,
 ) -> None:
-    # get info from score file
-    with open(score_file_path) as json_file:
-        stages: List[Dict[str, Any]] = json.load(json_file)
-
-    failed_name = ""
-    for stage in stages:
-        if stage["force_quit"] == True:
-            failed_name = stage["name"]
-            break
+    failed_stage = get_failed_stage_from_file(score_file_path)
 
     # append to failed table
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     repo = f"[{repo_name}]({repo_link})"
-    failure = f"[{failed_name}]({action_link})"
+    failure = f"[{failed_stage}]({action_link})"
     row_found = False
     for i, row in enumerate(data[:]):
         if row[1] == repo:
             row_found = True
-            if failed_name == "":
+            if failed_stage == "":
                 data.remove(row)
             else:
                 data[i][0] = now
                 data[i][2] = failure
             break
-    if not row_found and failed_name != "":
+    if not row_found and failed_stage != "":
         data.append([now, repo, failure])
 
 

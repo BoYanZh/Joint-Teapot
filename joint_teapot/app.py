@@ -426,6 +426,7 @@ def joj3_all_env(
                     submitter_repo_name,
                     total_score,
                 )
+                failed_stage = joj3.get_failed_stage_from_file(env.joj3_output_path)
                 tea.pot.git.add_commit(
                     grading_repo_name,
                     [scoreboard_filename],
@@ -435,6 +436,7 @@ def joj3_all_env(
                         f"gitea actions link: {gitea_actions_url}\n"
                         f"gitea issue link: {gitea_issue_url}\n"
                         f"groups: {env.joj3_groups}\n"
+                        f"failed stage: {failed_stage}\n"
                     ),
                 )
             if not skip_failed_table:
