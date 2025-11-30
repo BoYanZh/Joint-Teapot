@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic_settings import BaseSettings
 
+from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
 
 
@@ -243,7 +244,7 @@ def generate_title_and_comment(
         f"Generated at {now} from [Gitea Actions #{run_number}]({action_link}), "
         f"commit {commit_hash}, "
         f"triggered by @{submitter}, "
-        f"run ID `{run_id}`.\n"
+        f"run ID [`{run_id}`](https://focs.ji.sjtu.edu.cn/joj-mon/d/{settings.gitea_org_name}?var-Filters=RunID%7C%3D%7C{run_id}).\n"
         "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )
