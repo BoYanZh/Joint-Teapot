@@ -105,8 +105,8 @@ class Git:
                                     os.remove(lock_file_path)
                                     locks_removed_count += 1
                                 except OSError as e:
-                                    logger.warning(f"Error removing lock file: {e}")
-                    logger.info(f"Removed {locks_removed_count} lock files")
+                                    logger.warning(f"error removing lock file: {e}")
+                    logger.info(f"removed {locks_removed_count} lock files")
                 repo.git.fetch("--tags", "--all", "-f")
                 repo.git.reset("--hard", reset_target)
                 repo.git.clean("-d", "-f", "-x")
@@ -143,9 +143,7 @@ class Git:
             try:
                 repo.index.add(file)
             except OSError:
-                logger.warning(
-                    f'File path "{file}" does not exist. Skipping this file.'
-                )
+                logger.warning(f'file path "{file}" does not exist, skipped')
                 continue
         if repo.is_dirty(untracked_files=True) or repo.index.diff(None):
             repo.index.commit(commit_message)

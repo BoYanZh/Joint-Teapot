@@ -389,12 +389,12 @@ def joj3_all_env(
     lock_file_path = os.path.join(
         settings.repos_dir, grading_repo_name, settings.joj3_lock_file_path
     )
-    logger.info(
+    logger.debug(
         f"try to acquire lock, file path: {lock_file_path}, "
         + f"timeout: {settings.joj3_lock_file_timeout}"
     )
     with FileLock(lock_file_path, timeout=settings.joj3_lock_file_timeout).acquire():
-        logger.info("file lock acquired")
+        logger.debug("file lock acquired")
         retry_interval = 1
         git_push_ok = False
         while not git_push_ok:
