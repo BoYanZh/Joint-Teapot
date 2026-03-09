@@ -242,6 +242,13 @@ def create_personal_channels_on_mm(
 ) -> None:
     tea.pot.create_channels_for_individuals(invite_teaching_team)
 
+@app.command(
+    "invite-students-to-mm-team",
+    help="invite all canvas students to the mattermost team",
+)
+def invite_students_to_mattermost_team() -> None:
+    tea.pot.invite_students_to_mattermost_team()
+
 
 @app.command(
     "create-webhooks-for-mm",

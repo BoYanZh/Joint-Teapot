@@ -231,6 +231,9 @@ class Teapot:
             self.canvas.students, invite_teaching_teams
         )
 
+    def invite_students_to_mattermost_team(self) -> None:
+        return self.mattermost.invite_students_to_team(self.canvas.students)
+
     def joj3_post_issue(
         self,
         env: joj3.Env,
