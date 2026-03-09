@@ -39,8 +39,19 @@ class Canvas:
             student.name = (
                 re.sub(r"[^\x00-\x7F]+", "", student.name).strip().title()
             )  # We only care english name
-            student.sis_id = student.login_id
-            student.login_id = student.email.split("@")[0]
+            # Some users (like system users, announcers) might not have login_id
+            if hasattr(student, 'login_id') and student.login_id:
+                student.sis_id = student.login_id
+                student.login_id = student.email.split("@")[0]
+            else:
+                # For users without login_id, use email prefix as both sis_id and login_id
+                if hasattr(student, 'email') and student.email:
+                    student.login_id = student.email.split("@")[0]
+                    student.sis_id = student.login_id
+                else:
+                    # Fallback for users without email
+                    student.login_id = f"user_{student.id}"
+                    student.sis_id = student.login_id
             return student
 
         self.students = [
