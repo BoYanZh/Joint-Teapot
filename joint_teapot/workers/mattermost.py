@@ -229,9 +229,14 @@ class Mattermost:
                 logger.warning(f"Error when creating outgoing webhook at Gitea: {e}")
 
     # unused since we can give students invitation links instead
-    def invite_students_to_team(self, students) -> None:
+    def invite_students_to_team(self, students: List[User]) -> None:
         for student in students:
             username = student.login_id
+
+            if not username:
+                logger.warning(f"Student {student.id} has no login_id, skipping")
+                continue
+
             try:
                 mmuser = self.endpoint.users.get_user_by_username(username)
             except Exception:
