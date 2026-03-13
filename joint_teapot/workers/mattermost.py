@@ -234,13 +234,14 @@ class Mattermost:
             username = student.login_id
 
             if not username:
-                logger.warning(f"Student {student.id} has no login_id, skipping")
+                student_id = getattr(student, 'id', 'unknown')
+                logger.warning(f"Student {student_id} has no login_id, skipping")
                 continue
 
             try:
                 mmuser = self.endpoint.users.get_user_by_username(username)
             except Exception:
-                logger.warning(f"User {student} is not found on the Mattermost server")
+                logger.warning(f"User {username} is not found on the Mattermost server")
                 continue
             self.endpoint.teams.add_user_to_team(
                 self.team["id"], {"user_id": mmuser["id"], "team_id": self.team["id"]}
