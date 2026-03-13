@@ -7,6 +7,7 @@ from mattermostdriver import Driver
 from joint_teapot.config import settings
 from joint_teapot.utils.logger import logger
 from joint_teapot.workers.gitea import Gitea
+from joint_teapot.workers.canvas import User
 
 
 class Mattermost:
