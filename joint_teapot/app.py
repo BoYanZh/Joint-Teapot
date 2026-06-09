@@ -35,8 +35,17 @@ tea = Tea()  # lazy loader
 
 
 @app.command("export-users", help="export users from canvas to csv file")
-def export_users_to_csv(output_file: Path = Argument("students.csv")) -> None:
-    tea.pot.canvas.export_users_to_csv(output_file)
+def export_users_to_csv(
+    output_file: Path = Argument("students.csv"),
+    group_prefix: str = Option(
+        "", "--group", help="export members in matched canvas group set"
+    ),
+) -> None:
+    try:
+        tea.pot.canvas.export_users_to_csv(output_file, group_prefix=group_prefix)
+    except ValueError as e:
+        logger.error(e)
+        raise Exit(code=1)
 
 
 @app.command(
