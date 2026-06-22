@@ -3,10 +3,11 @@ import os
 import re
 from glob import glob
 from pathlib import Path
-from typing import cast
+from typing import Dict, List, Tuple, cast
 
 from canvasapi import Canvas as PyCanvas
 from canvasapi.assignment import Assignment
+from canvasapi.group import GroupCategory
 from canvasapi.user import User
 from patoolib import extract_archive
 from patoolib.util import PatoolError
@@ -86,7 +87,73 @@ Teaching Team"""
         print(f"Subject: [{settings.gitea_org_name}] Important: wrong Canvas email")
         print(f"Body:\n{SAMPLE_EMAIL_BODY}")
 
-    def export_users_to_csv(self, filename: Path) -> None:
+    def _get_group_set_by_prefix(self, group_prefix: str) -> GroupCategory:
+        group_sets = list(self.course.get_group_categories())
+        exact_match = first(group_sets, lambda group_set: group_set.name == group_prefix)
+        if exact_match is not None:
+            return cast(GroupCategory, exact_match)
+        matched_group_sets = [
+            group_set
+            for group_set in group_sets
+            if group_set.name.startswith(group_prefix)
+        ]
+        if len(matched_group_sets) == 0:
+            raise ValueError(
+                f'Canvas group set with prefix "{group_prefix}" not found'
+            )
+        if len(matched_group_sets) > 1:
+            matched_names = ", ".join(group_set.name for group_set in matched_group_sets)
+            raise ValueError(
+                f'Multiple Canvas group sets match prefix "{group_prefix}": {matched_names}'
+            )
+        return matched_group_sets[0]
+
+    def _parse_group_name(self, group_set_name: str, group_name: str) -> Tuple[int, str]:
+        match = re.fullmatch(rf"{re.escape(group_set_name)}\s*(\d+)", group_name)
+        if match is None:
+            raise ValueError(
+                f'Canvas group "{group_name}" in group set "{group_set_name}" '
+                + f'should be named as "{group_set_name} <number>"'
+            )
+        group_number = int(match.group(1))
+        return group_number, f"{group_set_name}{group_number:02}"
+
+    def _get_group_users_csv_rows(self, group_prefix: str) -> Tuple[str, List[List[str]]]:
+        group_set = self._get_group_set_by_prefix(group_prefix)
+        users_by_id: Dict[int, User] = {user.id: user for user in self.users}
+        rows = []
+        groups = []
+        for group in group_set.get_groups():
+            group_number, normalized_group_name = self._parse_group_name(
+                group_set.name, group.name
+            )
+            groups.append((group_number, normalized_group_name, group))
+        for _, normalized_group_name, group in sorted(groups, key=lambda item: item[0]):
+            group_rows = []
+            for membership in group.get_memberships():
+                user = users_by_id.get(membership.user_id)
+                if user is None:
+                    logger.warning(
+                        f"user with id {membership.user_id} found in {group.name} "
+                        + "but not found in course users"
+                    )
+                    continue
+                group_rows.append(
+                    [user.name, user.sis_id, user.login_id, normalized_group_name]
+                )
+            rows.extend(sorted(group_rows))
+        return group_set.name, rows
+
+    def export_users_to_csv(self, filename: Path, group_prefix: str = "") -> None:
+        if group_prefix:
+            group_set_name, rows = self._get_group_users_csv_rows(group_prefix)
+            with open(filename, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                for row in rows:
+                    writer.writerow(row)
+            logger.info(f'Users in group set "{group_set_name}" exported to {filename}')
+            return
+
         with open(filename, mode="w", newline="") as file:
             writer = csv.writer(file)
             for user in self.users:
