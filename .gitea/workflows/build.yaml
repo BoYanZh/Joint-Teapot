@@ -11,10 +11,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519.pub
-          chmod 600 ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519.pub
-          ssh-keyscan -p 2222 focs.gc.sjtu.edu.cn >> ~/.ssh/known_hosts
-          ssh -T git@focs.gc.sjtu.edu.cn -p 2222
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub
+          ssh -o StrictHostKeyChecking=accept-new -T git@focs.gc.sjtu.edu.cn -p 2222
       - name: Set up Git
         run: |
           git config --global user.name "bot-joj"
