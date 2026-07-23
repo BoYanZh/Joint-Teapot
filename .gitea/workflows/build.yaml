@@ -13,16 +13,16 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519.pub
           chmod 600 ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519.pub
-          ssh-keyscan -p 2222 focs.ji.sjtu.edu.cn >> ~/.ssh/known_hosts
-          ssh -T git@focs.ji.sjtu.edu.cn -p 2222
+          ssh-keyscan -p 2222 focs.gc.sjtu.edu.cn >> ~/.ssh/known_hosts
+          ssh -T git@focs.gc.sjtu.edu.cn -p 2222
       - name: Set up Git
         run: |
           git config --global user.name "bot-joj"
-          git config --global user.email "bot-joj@focs.ji.sjtu.edu.cn"
+          git config --global user.email "bot-joj@focs.gc.sjtu.edu.cn"
       - name: Clone, Commit and Push
         shell: bash
         run: |
-          git clone ssh://git@focs.ji.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
+          git clone ssh://git@focs.gc.sjtu.edu.cn:2222/JOJ/runner-images.git runner-images
           cd runner-images
           git submodule update --init --remote --force
           git add -A
