@@ -8,6 +8,8 @@ This tool is still under heavy development. The docs may not be updated on time,
 
 ## Getting Started
 
+Requires Python >= 3.10.
+
 ### Setup venv (Optional)
 
 ```bash
