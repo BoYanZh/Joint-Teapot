@@ -361,6 +361,13 @@ class Teapot:
         scoreboard_filename: str,
         ignore_submitter: bool,
     ) -> Tuple[str, bool]:
+        if settings.gitea_org_name and env.github_repository == (
+            f"{settings.gitea_org_name}/{settings.gitea_org_name}-test"
+        ):
+            return (
+                "### Submission Count Check Exempt\nTeaching-team test repository.\n",
+                False,
+            )
         submitter = env.github_actor
         submitter_repo_name = env.github_repository.split("/")[-1]
         repo: Repo = self.git.get_repo(grading_repo_name)
