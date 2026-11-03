@@ -245,6 +245,7 @@ class Teapot:
         issue_label_color: str,
         issue_label_exclusive: bool,
         penalty_factor: float,
+        dashboard_url: str = "",
     ) -> int:
         title, comment = joj3.generate_title_and_comment(
             env.joj3_output_path,
@@ -257,6 +258,7 @@ class Teapot:
             env.joj3_run_id,
             max_total_score,
             penalty_factor,
+            dashboard_url,
         )
         title_prefix = joj3.get_title_prefix(
             env.joj3_conf_name, env.github_actor, submitter_in_issue_title

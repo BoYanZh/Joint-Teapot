@@ -229,6 +229,7 @@ def generate_title_and_comment(
     run_id: str = "unknown",
     max_total_score: int = -1,
     penalty_factor: float = 1.0,
+    dashboard_url: str = "",
 ) -> Tuple[str, str]:
     with open(score_file_path) as json_file:
         stages: List[Dict[str, Any]] = json.load(json_file)
@@ -240,11 +241,16 @@ def generate_title_and_comment(
             exercise_name = comment.split("-")[0]
     total_score = 0
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if not dashboard_url:
+        # Legacy Grafana dashboards use the org name as the dashboard slug.
+        dashboard_url = (
+            f"https://focs.gc.sjtu.edu.cn/joj-mon/d/{settings.gitea_org_name}"
+        )
     comment = (
         f"Generated at {now} from [Gitea Actions #{run_number}]({action_link}), "
         f"commit {commit_hash}, "
         f"triggered by @{submitter}, "
-        f"run ID [`{run_id}`](https://focs.gc.sjtu.edu.cn/joj-mon/d/{settings.gitea_org_name}?var-Filters=RunID%7C%3D%7C{run_id}).\n"
+        f"run ID [`{run_id}`]({dashboard_url}?var-Filters=RunID%7C%3D%7C{run_id}).\n"
         "Powered by [JOJ3](https://github.com/joint-online-judge/JOJ3) and "
         "[Joint-Teapot](https://github.com/BoYanZh/Joint-Teapot) with ❤️.\n"
     )

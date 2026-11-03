@@ -307,6 +307,12 @@ def joj3_all_env(
         -1,
         help="max total score",
     ),
+    dashboard_url: str = Option(
+        "",
+        help="base URL of the Grafana dashboard linked in result issues, "
+        "e.g. https://focs.gc.sjtu.edu.cn/joj-mon/d/lahb7nh/ece482; "
+        "empty means deriving the legacy dashboard path from the org name",
+    ),
     skip_result_issue: bool = Option(
         False,
         help="skip creating result issue on gitea",
@@ -395,6 +401,7 @@ def joj3_all_env(
             issue_label_color,
             issue_label_exclusive,
             penalty_factor,
+            dashboard_url,
         )
         res["issue"] = issue_number
         gitea_issue_url = f"{submitter_repo_url}/issues/{issue_number}"
